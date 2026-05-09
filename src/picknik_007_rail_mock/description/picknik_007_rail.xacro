@@ -2,8 +2,12 @@
 <robot xmlns:xacro="http://wiki.ros.org/xacro" name="$(arg name)">
   <!-- robot name parameter -->
   <xacro:arg name="name" default="ur"/>
-  <!-- import main macro -->
+  <!-- import main macros -->
   <xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro"/>
+  <xacro:include filename="$(find vention_description)/urdf/vention_mo_lm_039_2295_macro.xacro"/>
+
+  <!-- IP address of the Vention MachineMotion 2 controller for the linear rail -->
+  <xacro:arg name="rail_ip" default="192.168.7.2"/>
 
   <!-- possible 'ur_type' values: ur3, ur3e, ur5, ur5e, ur10, ur10e, ur16e, ur20, ur30 -->
   <!-- the default value should raise an error in case this was called without defining the type -->
@@ -55,11 +59,77 @@
   <!-- create link fixed to the "world" -->
   <link name="world" />
 
+  <!-- Linear rail: Vention MachineMotion 2 (MO-LM-039-2295). The macro creates
+       linear_actuator_base_link (mounted on world) and linear_actuator_carriage_link
+       (the moving carriage), connected by the prismatic linear_actuator_carriage_joint. -->
+  <xacro:linear_actuator
+    parent="world"
+    prefix="linear_actuator_"
+    ip_address="$(arg rail_ip)"
+    use_fake_hardware="$(arg use_fake_hardware)"
+  >
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:linear_actuator>
+
+  <!-- Pedestal cylinder on the rail carriage. -->
+  <link name="linear_actuator_pedestal_link">
+    <visual>
+      <geometry><cylinder length="0.61" radius="0.105"/></geometry>
+      <origin xyz="0 0 0.305"/>
+    </visual>
+    <collision>
+      <geometry><cylinder length="0.61" radius="0.105"/></geometry>
+      <origin xyz="0 0 0.305"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+  </link>
+  <joint name="linear_actuator_pedestal_joint" type="fixed">
+    <parent link="linear_actuator_carriage_link"/>
+    <child link="linear_actuator_pedestal_link"/>
+    <origin rpy="0 0 ${pi}" xyz="0.09 0 0.045"/>
+  </joint>
+
+  <!-- 45-degree robot adapter plate (McMaster 6333N39). -->
+  <link name="linear_actuator_robot_adapter_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://vention_description/meshes/visual/6333N39_45deg_Robot_Base.dae"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://vention_description/meshes/collision/6333N39_45deg_Robot_Base.stl"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+  </link>
+  <joint name="linear_actuator_robot_adapter_joint" type="fixed">
+    <parent link="linear_actuator_pedestal_link"/>
+    <child link="linear_actuator_robot_adapter_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.6096"/>
+  </joint>
+
+  <!-- Robot mount frame: 45° pitch around Y, where the arm base attaches. -->
+  <link name="linear_actuator_robot_mount_link"/>
+  <joint name="linear_actuator_robot_mount_joint" type="fixed">
+    <parent link="linear_actuator_robot_adapter_link"/>
+    <child link="linear_actuator_robot_mount_link"/>
+    <origin rpy="0 ${pi/4} 0" xyz="0.048 0 0.134"/>
+  </joint>
+
   <!-- arm -->
   <xacro:ur_robot
           name="$(arg name)"
           tf_prefix="$(arg tf_prefix)"
-          parent="world"
+          parent="linear_actuator_robot_mount_link"
           joint_limits_parameters_file="$(arg joint_limit_parameters_file)"
           kinematics_parameters_file="$(arg kinematics_params)"
           physical_parameters_file="$(arg physical_params)"

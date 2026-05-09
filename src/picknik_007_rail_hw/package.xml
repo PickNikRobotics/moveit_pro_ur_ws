@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <package format="3">
-  <name>ur_hw</name>
+  <name>picknik_007_rail_hw</name>
   <version>8.6.0</version>
 
   <description>
@@ -17,7 +17,7 @@
 
   <depend>moveit_pro_behavior_interface</depend>
   <depend>moveit_studio_ur_pstop_manager</depend>
-  <depend>ur_mock</depend>
+  <depend>picknik_007_rail_mock</depend>
   <depend>realsense2_camera</depend>
 
   <export>

@@ -1,4 +1,4 @@
-based_on_package: "ur_mock"
+based_on_package: "picknik_007_rail_mock"
 
 # [Required]
 hardware:
@@ -10,7 +10,7 @@ hardware:
   # Specify additional launch files for running the robot with real hardware.
   # [Optional, defaults to a blank launch file if not specified]
   robot_driver_persist_launch_file:
-    package: "ur_hw"
+    package: "picknik_007_rail_hw"
     path: "launch/robot_drivers_to_persist.launch.py"
 
   # Parameters used to configure the robot description through XACRO.
@@ -28,7 +28,7 @@ hardware:
       - use_tool_communication: "true"
       - tool_voltage: "24"
       - joint_limit_parameters_file:
-          package: "ur_hw"
+          package: "picknik_007_rail_hw"
           path: "config/moveit/joint_limits.yaml"
 
 # Configuration files for MoveIt.
@@ -36,5 +36,5 @@ hardware:
 # [Required]
 moveit_params:
   joint_limits:
-    package: "ur_hw"
+    package: "picknik_007_rail_hw"
     path: "config/moveit/joint_limits.yaml"

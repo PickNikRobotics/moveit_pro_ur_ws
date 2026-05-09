@@ -1,4 +1,4 @@
-# ur_hw
+# picknik_007_rail_hw
 
 A MoveIt Pro hardware configuration for a UR10e arm.
 

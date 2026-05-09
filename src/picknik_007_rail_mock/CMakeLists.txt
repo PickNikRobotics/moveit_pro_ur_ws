@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(ur_mock)
+project(picknik_007_rail_mock)
 
 find_package(ament_cmake REQUIRED)
 find_package(moveit_studio_common REQUIRED)
