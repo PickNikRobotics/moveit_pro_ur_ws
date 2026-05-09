@@ -50,6 +50,12 @@
   <xacro:arg name="mock_sensor_commands" default="false" />
   <xacro:arg name="simulation_controllers" default="" />
 
+  <!-- Toggle the rail's hardware interface independently of the arm. Defaults
+       to the arm's use_fake_hardware, but can be overridden in
+       picknik_007_rail_hw/config.yaml when you want the arm to talk to the real
+       UR but skip the Vention driver (e.g., while it's being debugged). -->
+  <xacro:arg name="rail_use_fake_hardware" default="$(arg use_fake_hardware)"/>
+
   <!-- initial position for simulations (Fake Hardware, Gazebo, Ignition) -->
   <xacro:arg name="initial_positions_file" default="$(find ur_description)/config/initial_positions.yaml"/>
 
@@ -66,7 +72,7 @@
     parent="world"
     prefix="linear_actuator_"
     ip_address="$(arg rail_ip)"
-    use_fake_hardware="$(arg use_fake_hardware)"
+    use_fake_hardware="$(arg rail_use_fake_hardware)"
   >
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:linear_actuator>
