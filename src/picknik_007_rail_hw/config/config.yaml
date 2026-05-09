@@ -29,7 +29,7 @@ hardware:
       # The Vention MachineMotion 2 controller's IP for the linear rail.
       - rail_ip: "192.168.7.2"
       # TEMPORARY: machine_motion2_driver is crashing ros2_control on hardware.
-      # Force the rail to fake_components/GenericSystem so the rest of the
+      # Force the rail to mock_components/GenericSystem so the rest of the
       # robot can be brought up. Set this back to "false" (or remove the line)
       # once the Vention driver is fixed.
       - rail_use_fake_hardware: "true"
