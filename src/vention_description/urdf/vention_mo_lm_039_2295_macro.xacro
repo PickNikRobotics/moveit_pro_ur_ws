@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:macro name="linear_actuator" params="
+    parent
+    prefix
+    *origin
+    ip_address:=0.0.0.0
+    use_fake_hardware:=false
+    initial_positions:=${dict(carriage_joint=0.0)}">
+
+    <!-- ROS2 Control -->
+    <xacro:include filename="$(find vention_description)/urdf/vention_mo_lm_039_2295.ros2_control.xacro"/>
+    <xacro:linear_actuator_ros2_control
+      name="vention"
+      prefix="${prefix}"
+      use_fake_hardware="${use_fake_hardware}"
+      ip_address="${ip_address}"
+      initial_positions="${initial_positions}"/>
+
+    <link name="${prefix}base_link">
+      <visual>
+        <geometry>
+          <mesh filename="package://vention_description/meshes/visual/MO-LM-039-2295_frame.dae"/>
+        </geometry>
+        <origin xyz="0 0 0"/>
+      </visual>
+
+      <collision>
+        <geometry>
+          <box size="0.14 2.450 0.09"/>
+        </geometry>
+        <origin xyz="0 0.04 0.045"/>
+      </collision>
+
+      <inertial>
+        <mass value="10"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      </inertial>
+    </link>
+
+    <link name="${prefix}carriage_link">
+      <visual>
+        <geometry>
+          <mesh filename="package://vention_description/meshes/visual/MO-LM-039-2295_carriage.dae"/>
+        </geometry>
+        <origin xyz="0 0 0"/>
+      </visual>
+
+      <collision>
+        <geometry>
+          <box size="0.22 0.22 0.02"/>
+        </geometry>
+        <origin xyz="0 0 -0.01"/>
+      </collision>
+
+      <inertial>
+        <mass value="1"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      </inertial>
+    </link>
+
+    <link name="${prefix}motor_link">
+      <visual>
+        <geometry>
+          <mesh filename="package://vention_description/meshes/visual/MO-LM-039-2295_right_angle_motor.dae"/>
+        </geometry>
+        <origin xyz="0 0 0"/>
+      </visual>
+
+      <collision>
+        <geometry>
+          <box size="0.09 0.125 0.36"/>
+        </geometry>
+        <origin xyz="0 0.075 0.14"/>
+      </collision>
+
+      <inertial>
+        <mass value="1"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${prefix}base_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${prefix}base_link"/>
+      <xacro:insert_block name="origin"/>
+    </joint>
+
+    <joint name="${prefix}motor_joint" type="fixed">
+      <parent link="${prefix}base_link"/>
+      <child link="${prefix}motor_link"/>
+      <origin xyz="0 1.250 0.045" rpy="0 ${pi/2} 0"/>
+    </joint>
+
+    <joint name="${prefix}carriage_joint" type="prismatic">
+      <axis xyz="0 1 0"/>
+      <origin xyz="0.0 0.0 0.1125"/>
+      <parent link="${prefix}base_link"/>
+      <child link="${prefix}carriage_link"/>
+      <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="0.175"/>
+      <dynamics damping="20.0" friction="500.0" />
+    </joint>
+
+  </xacro:macro>
+</robot>

@@ -1,0 +1,26 @@
+controller_manager:
+  ros__parameters:
+
+    update_rate: 200 # Hz
+
+    linear_actuator_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+linear_actuator_controller:
+  ros__parameters:
+    joints:
+      - linear_actuator_carraige_joint
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    command_joints:
+      - linear_actuator_carraige_joint
+    state_publish_rate: 100.0
+    action_monitor_rate: 20.0
+    allow_partial_joints_goal: false
+    constraints:
+      stopped_velocity_tolerance: 0.02
+      goal_time: 0.0
+      linear_actuator_joint: {trajectory: 0.005, goal: 0.005}
