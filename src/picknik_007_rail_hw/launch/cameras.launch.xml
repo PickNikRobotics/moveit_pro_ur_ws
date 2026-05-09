@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  Wrist-mounted Realsense D415 camera (serial 204222061127) for picknik_007.
+  Single quotes inside the serial value force the launch system to pass it as
+  a string (the realsense2_camera launcher otherwise tries to coerce numeric
+  serials to int and chops the leading 2).
+-->
+<launch>
+  <include
+    file="$(find-pkg-share realsense2_camera)/launch/rs_launch.py"
+  >
+    <arg name="camera_name" value="wrist_mounted_camera"/>
+    <arg name="camera_namespace" value=""/>
+    <arg name="serial_no" value="'204222061127'"/>
+    <arg name="device_type" value="D415"/>
+    <arg name="depth_module.profile" value="640x480x6"/>
+    <arg name="pointcloud.enable" value="True"/>
+    <arg name="pointcloud.ordered_pc" value="True"/>
+    <arg name="align_depth.enable" value="True"/>
+    <arg name="decimation_filter.enable" value="False"/>
+  </include>
+</launch>
