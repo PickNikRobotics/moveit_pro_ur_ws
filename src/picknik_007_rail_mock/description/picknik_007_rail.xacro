@@ -56,6 +56,13 @@
        UR but skip the Vention driver (e.g., while it's being debugged). -->
   <xacro:arg name="rail_use_fake_hardware" default="$(arg use_fake_hardware)"/>
 
+  <!-- Same idea for the Robotiq gripper. The real driver activates as part of
+       the same ros2_control_node as the UR, but its on_activate() runs before
+       the UR has pushed the rs485 URScript, so it times out. Force the gripper
+       to mock_components/GenericSystem here while we sort that out; flip back
+       to "false" once rs485 over /tmp/ttyUR is verified. -->
+  <xacro:arg name="gripper_use_fake_hardware" default="$(arg use_fake_hardware)"/>
+
   <!-- initial position for simulations (Fake Hardware, Gazebo, Ignition) -->
   <xacro:arg name="initial_positions_file" default="$(find ur_description)/config/initial_positions.yaml"/>
 
@@ -65,19 +72,81 @@
   <!-- create link fixed to the "world" -->
   <link name="world" />
 
-  <!-- Linear rail: Vention MachineMotion 2 (MO-LM-039-2295). The macro creates
-       linear_actuator_base_link (mounted on world) and linear_actuator_carriage_link
-       (the moving carriage), connected by the prismatic linear_actuator_carriage_joint. -->
+  <!-- Frame that the rail sits on. The visual mesh (nasa_frame.dae) was the
+       support structure built for the original NASA cell; the picknik_007 cell
+       reuses the same frame. Collision is approximated with two boxes (the
+       base profile and the electronics-side wall). -->
+  <link name="linear_actuator_frame_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://vention_description/meshes/visual/nasa_frame.dae"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+    </visual>
+    <collision>
+      <geometry><box size="0.82 2.7 0.365"/></geometry>
+      <origin xyz="0.365 0 0.183"/>
+    </collision>
+    <collision>
+      <geometry><box size="0.2 2.7 0.865"/></geometry>
+      <origin xyz="0.660 0 0.433"/>
+    </collision>
+    <inertial>
+      <mass value="100"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+  </link>
+  <joint name="linear_actuator_frame_joint" type="fixed">
+    <parent link="world"/>
+    <child link="linear_actuator_frame_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <!-- Linear rail: Vention MachineMotion 2 (MO-LM-039-2295). Mounts on the
+       frame at the offset measured for the picknik_007/NASA cell. The macro
+       creates linear_actuator_{base,carriage,motor}_link plus the prismatic
+       linear_actuator_carriage_joint. -->
   <xacro:linear_actuator
-    parent="world"
+    parent="linear_actuator_frame_link"
     prefix="linear_actuator_"
     ip_address="$(arg rail_ip)"
     use_fake_hardware="$(arg rail_use_fake_hardware)"
   >
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="0.2475 -0.0675 0.275" rpy="0 0 0"/>
   </xacro:linear_actuator>
 
-  <!-- Pedestal cylinder on the rail carriage. -->
+  <!-- Carriage adapter plate that the pedestal bolts to. -->
+  <link name="linear_actuator_carriage_adapter_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://vention_description/meshes/visual/nasa_carriage_adapter.dae"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+    </visual>
+    <collision>
+      <geometry><box size="0.410 0.4 0.045"/></geometry>
+      <origin xyz="0.093 0 0.0225"/>
+    </collision>
+    <collision>
+      <geometry><box size="0.275 0.088 0.230"/></geometry>
+      <origin xyz="-0.135 -0.158 0.115"/>
+    </collision>
+    <collision>
+      <geometry><box size="0.1 0.4 0.150"/></geometry>
+      <origin xyz="-0.150 -0.4 0.075"/>
+    </collision>
+    <inertial>
+      <mass value="100"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+  </link>
+  <joint name="linear_actuator_carriage_adapter_joint" type="fixed">
+    <parent link="linear_actuator_carriage_link"/>
+    <child link="linear_actuator_carriage_adapter_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <!-- Pedestal cylinder on the carriage adapter. -->
   <link name="linear_actuator_pedestal_link">
     <visual>
       <geometry><cylinder length="0.61" radius="0.105"/></geometry>
@@ -93,7 +162,7 @@
     </inertial>
   </link>
   <joint name="linear_actuator_pedestal_joint" type="fixed">
-    <parent link="linear_actuator_carriage_link"/>
+    <parent link="linear_actuator_carriage_adapter_link"/>
     <child link="linear_actuator_pedestal_link"/>
     <origin rpy="0 0 ${pi}" xyz="0.09 0 0.045"/>
   </joint>
@@ -169,7 +238,9 @@
           script_sender_port="$(arg script_sender_port)"
           trajectory_port="$(arg trajectory_port)"
   >
-    <origin xyz="0 0 0" rpy="0 0 0" />          <!-- position robot in the world -->
+    <!-- 180° yaw so the UR base faces the opposite side of the 45° mount.
+         (Without this, the arm faces the back of the rail's electronics wall.) -->
+    <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
   </xacro:ur_robot>
 
   <!-- Gripper, UR adapter, and realsense camera -->
@@ -211,7 +282,7 @@
     name="RobotiqGripperHardwareInterface"
     prefix="$(arg tf_prefix)"
     parent="gripper_mount_link"
-    use_fake_hardware="$(arg use_fake_hardware)"
+    use_fake_hardware="$(arg gripper_use_fake_hardware)"
     sim_ignition="false"
     com_port="$(arg tool_device_name)"
   >
