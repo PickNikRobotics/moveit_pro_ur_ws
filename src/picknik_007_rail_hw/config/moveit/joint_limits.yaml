@@ -8,8 +8,22 @@
 #    https://www.universal-robots.com/articles/ur-articles/max-joint-torques
 #    retrieved: 2020-06-16, last modified: 2020-06-09
 #
+# Vention rail (linear_actuator_carriage_joint): max velocity 0.175 m/s comes
+# from the MM2HardwareInterface configuration in the URDF; effort/acceleration
+# are picked conservatively.
+#
 # NOTE: Acceleration limits are not publicly available so we have picked a reasonable upper limit
 joint_limits:
+  linear_actuator_carriage_joint:
+    has_acceleration_limits: true
+    has_effort_limits: true
+    has_position_limits: true
+    has_velocity_limits: true
+    max_acceleration: 1.0
+    max_effort: 1000.0
+    max_position: 1.0
+    min_position: -1.0
+    max_velocity: 0.175
   shoulder_pan_joint:
     has_acceleration_limits: true
     has_effort_limits: true

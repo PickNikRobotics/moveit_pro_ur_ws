@@ -18,12 +18,16 @@ hardware:
   # [Required]
   robot_description:
     urdf_params:
-      - name: "ur10e"
+      - name: "ur5e"
       # NOTE: If using a different UR model, update type here and joint limits in the config/moveit/joint_limits.yaml file.
       # possible 'ur_type' values: ur3, ur3e, ur5, ur5e, ur10, ur10e, ur16e, ur20, ur30
-      - ur_type: "ur10e"
+      - ur_type: "ur5e"
       - use_fake_hardware: "false"
-      - robot_ip: "0.0.0.0"
+      # The UR robot's IP. Source config used 192.10.0.11 — confirm against the
+      # actual cell wiring before first hardware run.
+      - robot_ip: "192.10.0.11"
+      # The Vention MachineMotion 2 controller's IP for the linear rail.
+      - rail_ip: "192.168.7.2"
       - headless_mode: "true"
       - use_tool_communication: "true"
       - tool_voltage: "24"

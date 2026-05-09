@@ -39,6 +39,7 @@ force_torque_sensor_broadcaster:
 joint_trajectory_controller:
   ros__parameters:
     joints:
+      - linear_actuator_carriage_joint
       - shoulder_pan_joint
       - shoulder_lift_joint
       - elbow_joint
@@ -51,6 +52,7 @@ joint_trajectory_controller:
       - position
       - velocity
     command_joints:
+      - linear_actuator_carriage_joint
       - shoulder_pan_joint
       - shoulder_lift_joint
       - elbow_joint
@@ -63,6 +65,8 @@ joint_trajectory_controller:
     constraints:
       stopped_velocity_tolerance: 0.0
       goal_time: 0.0
+      linear_actuator_carriage_joint:
+        goal: 0.01
       shoulder_pan_joint:
         goal: 0.05
       shoulder_lift_joint:
@@ -128,13 +132,15 @@ joint_trajectory_admittance_controller:
 
 velocity_force_controller:
   ros__parameters:
-    planning_group_name: manipulator
+    planning_group_name: linear_actuator_and_manipulator
     sensor_frame: tool0
     ee_frame: grasp_link
     ft_sensor_name: tcp_fts_sensor
     ft_force_deadband: 2.0
     ft_torque_deadband: 1.0
+    # First entry is the rail (linear_actuator_carriage_joint), then the 6 arm joints
     max_joint_velocity:
+      - 0.175
       - 0.524
       - 0.524
       - 0.524
@@ -142,6 +148,7 @@ velocity_force_controller:
       - 1.047
       - 1.047
     max_joint_acceleration:
+      - 1.0
       - 52.4
       - 52.4
       - 52.4
