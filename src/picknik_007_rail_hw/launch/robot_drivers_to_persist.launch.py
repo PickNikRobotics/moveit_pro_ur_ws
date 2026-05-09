@@ -43,14 +43,34 @@ from moveit_studio_utils_py.system_config import (
 )
 
 
+def _get_urdf_param(urdf_params, key, fallback):
+    """Look up a value by key in the urdf_params list-of-singletons block."""
+    for entry in urdf_params:
+        if key in entry:
+            return entry[key]
+    return fallback
+
+
 def generate_launch_description():
     system_config_parser = SystemConfigParser()
     controller_config = system_config_parser.get_ros2_control_config()
 
+    # Read robot_ip from the same urdf_params block that feeds the URDF, so
+    # config.yaml is the single source of truth. Fall back to env var
+    # ROBOT_IP, then 0.0.0.0, only if config.yaml does not specify it.
+    urdf_params = system_config_parser.get_hardware_config().robot_description.urdf_params
+    robot_ip_default = _get_urdf_param(urdf_params, "robot_ip", None)
+
     declare_robot_ip = DeclareLaunchArgument(
         "robot_ip",
-        default_value=EnvironmentVariable("ROBOT_IP", default_value="0.0.0.0"),
-        description="IP address of the robot",
+        default_value=(
+            robot_ip_default
+            if robot_ip_default is not None
+            else EnvironmentVariable("ROBOT_IP", default_value="0.0.0.0")
+        ),
+        description="IP address of the robot. Defaults to the value in "
+        "config.yaml's urdf_params.robot_ip; override with the ROBOT_IP env "
+        "var or a launch argument.",
     )
     robot_ip = LaunchConfiguration("robot_ip")
 
