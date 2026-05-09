@@ -4,7 +4,10 @@
   <version>8.6.0</version>
 
   <description>
-    MoveIt Pro configuration package for a mock hardware UR arm.
+    MoveIt Pro mock-hardware configuration for picknik_007: UR5e arm on a
+    Vention MachineMotion 2 linear rail, with a Robotiq 2f-85 gripper and a
+    wrist-mounted Realsense D415. Parent config — the hw variant inherits
+    from this and overrides for real hardware.
   </description>
 
   <maintainer email="support@picknik.ai">MoveIt Pro Maintainer</maintainer>
@@ -20,6 +23,7 @@
   <depend>robotiq_description</depend>
   <depend>ur_description</depend>
   <depend>ur_robot_driver</depend>
+  <depend>vention_description</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

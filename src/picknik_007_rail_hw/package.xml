@@ -22,6 +22,9 @@
   <depend>moveit_studio_ur_pstop_manager</depend>
   <depend>picknik_007_rail_mock</depend>
   <depend>realsense2_camera</depend>
+  <!-- machine_motion2_driver provides the vention/MM2HardwareInterface plugin
+       that the URDF's ros2_control block loads for the linear rail. -->
+  <depend>machine_motion2_driver</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

@@ -13,3 +13,14 @@
 [submodule "src/external_dependencies/moveit_studio_ur_pstop_manager"]
 	path = src/external_dependencies/moveit_studio_ur_pstop_manager
 	url = https://github.com/PickNikRobotics/moveit_studio_ur_pstop_manager.git
+# TODO(picknik_007): Once the upstream repos are created on GitHub, run
+# `git submodule update --init src/external_dependencies/picknik_tcp_client
+#                              src/external_dependencies/machine_motion2_driver`
+# to populate the working trees. Local seeds for both libraries currently live
+# in /home/nbb/picknik_repos_staging/ (one commit each, ready to push).
+[submodule "src/external_dependencies/picknik_tcp_client"]
+	path = src/external_dependencies/picknik_tcp_client
+	url = git@github.com:PickNikRobotics/picknik_tcp_client.git
+[submodule "src/external_dependencies/machine_motion2_driver"]
+	path = src/external_dependencies/machine_motion2_driver
+	url = git@github.com:PickNikRobotics/machine_motion2_driver.git
