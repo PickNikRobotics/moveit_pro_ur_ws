@@ -1,4 +1,6 @@
 # Planning groups to use in JointJog, and their corresponding JVC controllers.
 # The number of elements in `planning_groups` and `controllers` must match.
-planning_groups: ['manipulator']
-controllers: ['joint_velocity_controller']
+# These also drive the planning-group dropdown in joint-jog teleop mode in the
+# web UI: each entry here becomes a selectable group in the UI.
+planning_groups: ['manipulator', 'linear_actuator_and_manipulator']
+controllers: ['joint_velocity_controller_arm', 'joint_velocity_controller']

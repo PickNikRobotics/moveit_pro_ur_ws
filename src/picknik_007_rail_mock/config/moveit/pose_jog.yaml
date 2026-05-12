@@ -1,4 +1,6 @@
 # Planning groups to use in PoseJog, and their corresponding VFC controllers.
 # The number of elements in `planning_groups` and `controllers` must match.
-planning_groups: ['manipulator']
-controllers: ['velocity_force_controller']
+# These also drive the planning-group dropdown in iMarker (Cartesian) teleop mode
+# in the web UI: each entry here becomes a selectable group in the UI.
+planning_groups: ['manipulator', 'linear_actuator_and_manipulator']
+controllers: ['velocity_force_controller_arm', 'velocity_force_controller']

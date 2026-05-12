@@ -15,9 +15,13 @@ controller_manager:
       type: robotiq_controllers/RobotiqActivationController
     joint_velocity_controller:
       type: joint_velocity_controller/JointVelocityController
+    joint_velocity_controller_arm:
+      type: joint_velocity_controller/JointVelocityController
     joint_trajectory_admittance_controller:
       type: joint_trajectory_admittance_controller/JointTrajectoryAdmittanceController
     velocity_force_controller:
+      type: velocity_force_controller/VelocityForceController
+    velocity_force_controller_arm:
       type: velocity_force_controller/VelocityForceController
 
 io_and_status_controller:
@@ -82,6 +86,31 @@ joint_trajectory_controller:
 
 joint_velocity_controller:
   ros__parameters:
+    planning_group_name: linear_actuator_and_manipulator
+    # First entry is the rail (linear_actuator_carriage_joint), then the 6 arm joints.
+    max_joint_velocity:
+      - 0.175
+      - 1.0
+      - 1.0
+      - 1.0
+      - 1.0
+      - 1.0
+      - 1.0
+    max_joint_acceleration:
+      - 1.0
+      - 2.0
+      - 2.0
+      - 2.0
+      - 2.0
+      - 2.0
+      - 2.0
+    command_interfaces: ["position"]
+    joint_limit_position_tolerance: 0.02
+    command_timeout: 0.2
+    state_publish_rate: 20
+
+joint_velocity_controller_arm:
+  ros__parameters:
     planning_group_name: manipulator
     max_joint_velocity:
       - 1.0
@@ -117,12 +146,14 @@ robotiq_activation_controller:
 
 joint_trajectory_admittance_controller:
   ros__parameters:
-    planning_group_name: manipulator
+    planning_group_name: linear_actuator_and_manipulator
     sensor_frame: tool0
     ee_frame: grasp_link
     ft_sensor_name: tcp_fts_sensor
     # Joint accelerations chosen to match MoveIt configs.
+    # First entry is the rail (linear_actuator_carriage_joint), then the 6 arm joints.
     stop_accelerations:
+      - 1.0
       - 30.0
       - 30.0
       - 30.0
@@ -149,6 +180,43 @@ velocity_force_controller:
       - 1.047
     max_joint_acceleration:
       - 1.0
+      - 52.4
+      - 52.4
+      - 52.4
+      - 52.4
+      - 52.4
+      - 52.4
+    max_cartesian_velocity:
+      - 0.25
+      - 0.25
+      - 0.25
+      - 1.5707
+      - 1.5707
+      - 1.5707
+    max_cartesian_acceleration:
+      - 20.0
+      - 20.0
+      - 20.0
+      - 40.0
+      - 40.0
+      - 40.0
+
+velocity_force_controller_arm:
+  ros__parameters:
+    planning_group_name: manipulator
+    sensor_frame: tool0
+    ee_frame: grasp_link
+    ft_sensor_name: tcp_fts_sensor
+    ft_force_deadband: 2.0
+    ft_torque_deadband: 1.0
+    max_joint_velocity:
+      - 0.524
+      - 0.524
+      - 0.524
+      - 1.047
+      - 1.047
+      - 1.047
+    max_joint_acceleration:
       - 52.4
       - 52.4
       - 52.4

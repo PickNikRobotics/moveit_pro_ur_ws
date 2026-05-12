@@ -1,4 +1,16 @@
+linear_actuator_and_manipulator:
+  kinematics_solver: pose_ik_plugin/PoseIKPlugin
+  target_tolerance: 0.001
+  solve_mode: "optimize_distance"
+  optimization_timeout: 0.005
+
 manipulator:
+  kinematics_solver: pose_ik_plugin/PoseIKPlugin
+  target_tolerance: 0.001
+  solve_mode: "optimize_distance"
+  optimization_timeout: 0.005
+
+linear_actuator:
   kinematics_solver: pose_ik_plugin/PoseIKPlugin
   target_tolerance: 0.001
   solve_mode: "optimize_distance"

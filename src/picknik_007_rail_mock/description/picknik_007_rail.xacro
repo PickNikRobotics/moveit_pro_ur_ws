@@ -278,6 +278,15 @@
     child="gripper_mount_link"
     rotation="0"
   />
+  <!-- If the gripper hardware interface fails to activate at startup with
+       "Resending the command ... got 0 bytes" warnings followed by an abort
+       after 5 retries, the most common cause is the wrist Tool I/O setting on
+       the UR teach pendant. Verify Installation -> General -> Tool I/O ->
+       "Analogue inputs - communication interface" is set to "Communication
+       interface" (not "Analog inputs") AND that the Installation has been
+       *saved* to disk. PolyScope keeps the active Installation in memory
+       separately from the saved one, so an unsaved change reverts on every
+       controller reboot and produces the same "got 0 bytes" symptom. -->
   <xacro:robotiq_gripper
     name="RobotiqGripperHardwareInterface"
     prefix="$(arg tf_prefix)"
