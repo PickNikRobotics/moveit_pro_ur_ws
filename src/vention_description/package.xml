@@ -1,9 +1,13 @@
-<?xml version="1.0"?>
+<?xml version="1.0" ?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>vention_description</name>
   <version>0.0.0</version>
-  <description>URDF descriptions and meshes for Vention MachineMotion linear actuators (e.g., MO-LM-039-2295) and the pedestal mounts that connect a UR arm to a carriage. Hardware-only — no customer-specific fixtures.</description>
+  <description>
+    URDF descriptions and meshes for Vention MachineMotion linear
+    actuators (e.g., MO-LM-039-2295) and the pedestal mounts that connect a UR
+    arm to a carriage. Hardware-only — no customer-specific fixtures.
+  </description>
   <maintainer email="marq.razz@gmail.com">Marq Rasmussen</maintainer>
   <license>BSD-3-Clause</license>
 

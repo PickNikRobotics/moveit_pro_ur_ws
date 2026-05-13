@@ -16,7 +16,7 @@ public:
       [[maybe_unused]] const std::shared_ptr<moveit_pro::behaviors::BehaviorContext>& shared_resources) override
   {
     moveit_pro::behaviors::registerBehavior<TriggerPStopResetService>(factory, "TriggerPStopResetService",
-                                                                         shared_resources);
+                                                                      shared_resources);
   }
 };
 }  // namespace trigger_pstop_reset_service

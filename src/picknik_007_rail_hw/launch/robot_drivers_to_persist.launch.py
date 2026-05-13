@@ -58,7 +58,9 @@ def generate_launch_description():
     # Read robot_ip from the same urdf_params block that feeds the URDF, so
     # config.yaml is the single source of truth. Fall back to env var
     # ROBOT_IP, then 0.0.0.0, only if config.yaml does not specify it.
-    urdf_params = system_config_parser.get_hardware_config().robot_description.urdf_params
+    urdf_params = (
+        system_config_parser.get_hardware_config().robot_description.urdf_params
+    )
     robot_ip_default = _get_urdf_param(urdf_params, "robot_ip", None)
 
     declare_robot_ip = DeclareLaunchArgument(
