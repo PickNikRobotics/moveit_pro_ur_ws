@@ -98,36 +98,14 @@
 
   <!-- Gripper, UR adapter, and realsense camera -->
   <xacro:include
-    filename="$(find picknik_accessories)/descriptions/brackets/ur_realsense_camera_adapter/picknik_ur_camera_adapter.urdf.xacro"
-  />
-  <xacro:include
-    filename="$(find picknik_accessories)/descriptions/sensors/realsense_d415.urdf.xacro"
-  />
-  <xacro:include
     filename="$(find robotiq_description)/urdf/ur_to_robotiq_adapter.urdf.xacro"
   />
   <xacro:include
     filename="$(find robotiq_description)/urdf/robotiq_2f_85_macro.urdf.xacro"
   />
-  <!-- wrist camera adapter and camera-->
-  <xacro:ur_realsense_camera_adapter
-    prefix="$(arg tf_prefix)"
-    parent="tool0"
-    child_tool="realsense_camera_adapter_tool0"
-    child_camera="d415_mount_link"
-    rotation="0"
-  />
-  <xacro:realsense_d415
-    parent="d415_mount_link"
-    name="wrist_mounted_camera"
-    use_mesh="true"
-  >
-    <origin xyz="0 0 0" rpy="0 0 0" />
-  </xacro:realsense_d415>
-  <!-- gripper and UR adapter-->
   <xacro:ur_to_robotiq
     prefix="$(arg tf_prefix)"
-    parent="realsense_camera_adapter_tool0"
+    parent="tool0"
     child="gripper_mount_link"
     rotation="0"
   />
