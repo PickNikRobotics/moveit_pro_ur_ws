@@ -1,0 +1,342 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="$(arg name)">
+  <!-- robot name parameter -->
+  <xacro:arg name="name" default="ur"/>
+  <!-- import main macro -->
+  <xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro"/>
+
+  <!-- possible 'ur_type' values: ur3, ur3e, ur5, ur5e, ur10, ur10e, ur16e, ur20, ur30 -->
+  <xacro:arg name="ur_type" default="ur5e"/>
+
+  <!-- parameters -->
+  <xacro:arg name="tf_prefix" default="" />
+  <xacro:arg name="joint_limit_parameters_file" default="$(find ur_description)/config/$(arg ur_type)/joint_limits.yaml"/>
+  <xacro:arg name="kinematics_params" default="$(find ur_description)/config/$(arg ur_type)/default_kinematics.yaml"/>
+  <!-- true loads this arm's factory kinematics (config/ur5e_009_kinematics.yaml, extracted from the
+       controller with ur_calibration) instead of kinematics_params. Only the hardware config sets it:
+       sim and mock keep the nominal UR5e values. Re-extract the file if the arm is re-calibrated or
+       swapped; the UR driver logs a mismatch error at startup when it no longer matches. -->
+  <xacro:arg name="use_calibrated_kinematics" default="false"/>
+  <xacro:arg name="physical_params" default="$(find ur_description)/config/$(arg ur_type)/physical_parameters.yaml"/>
+  <xacro:arg name="visual_params" default="$(find ur_description)/config/$(arg ur_type)/visual_parameters.yaml"/>
+  <xacro:arg name="transmission_hw_interface" default=""/>
+  <xacro:arg name="safety_limits" default="false"/>
+  <xacro:arg name="safety_pos_margin" default="0.15"/>
+  <xacro:arg name="safety_k_position" default="20"/>
+  <!-- ros2_control related parameters -->
+  <xacro:arg name="headless_mode" default="true" />
+  <xacro:arg name="robot_ip" default="0.0.0.0" />
+  <!-- The external-control script moved from ur_robot_driver/resources/ros_control.urscript
+       to ur_client_library/resources/external_control.urscript in the Jazzy UR driver.
+       The old path no longer exists and makes the ur5e hardware fail on_configure. -->
+  <xacro:arg name="script_filename" default="$(find ur_client_library)/resources/external_control.urscript"/>
+  <xacro:arg name="output_recipe_filename" default="$(find ur_robot_driver)/resources/rtde_output_recipe.txt"/>
+  <xacro:arg name="input_recipe_filename" default="$(find ur_robot_driver)/resources/rtde_input_recipe.txt"/>
+  <xacro:arg name="reverse_ip" default="0.0.0.0"/>
+  <xacro:arg name="script_command_port" default="50004"/>
+  <xacro:arg name="reverse_port" default="50001"/>
+  <xacro:arg name="script_sender_port" default="50002"/>
+  <xacro:arg name="trajectory_port" default="50003"/>
+  <!--   tool communication related parameters-->
+  <xacro:arg name="use_tool_communication" default="true" />
+  <xacro:arg name="tool_voltage" default="24" />
+  <xacro:arg name="tool_parity" default="0" />
+  <xacro:arg name="tool_baud_rate" default="115200" />
+  <xacro:arg name="tool_stop_bits" default="1" />
+  <xacro:arg name="tool_rx_idle_chars" default="1.5" />
+  <xacro:arg name="tool_tx_idle_chars" default="3.5" />
+  <xacro:arg name="tool_device_name" default="/tmp/ttyUR" />
+  <xacro:arg name="tool_tcp_port" default="54321" />
+
+  <!-- Simulation parameters -->
+  <xacro:arg name="use_fake_hardware" default="true" />
+  <xacro:arg name="fake_hw_mode" default="mock"/> <!-- options: 'mujoco', 'mock'-->
+  <xacro:arg name="mock_sensor_commands" default="false" />
+  <xacro:arg name="simulation_controllers" default="" />
+
+  <!-- initial position for simulations (Fake Hardware, Gazebo, Ignition) -->
+  <xacro:arg name="initial_positions_file" default="$(find ur_description)/config/initial_positions.yaml"/>
+
+  <!-- EPick parameters -->
+  <!-- End effector below gripper_mount_link: "epick" (suction, the default) or
+       "robotiq_2f85" (2-finger). Both end in a grasp_link with +Z along the
+       approach, which is what the shared shelf-stocking Objectives plan to.
+       The SRDF, the controllers and the gripper switching subtrees must match
+       the choice; picknik_009_ur5e_2f85_hw_config carries the 2F-85 set. See
+       design_docs/end_effector_variants.md. -->
+  <xacro:arg name="end_effector" default="epick" />
+  <xacro:property name="end_effector" value="$(arg end_effector)" />
+  <!-- robotiq_2f85 only: "true" runs the fingers on mock_components while the
+       arm stays real; "false" uses robotiq_driver. See
+       design_docs/end_effector_variants.md. -->
+  <xacro:arg name="gripper_use_fake_hardware" default="true" />
+  <!-- robotiq_2f85 only: serial device robotiq_driver opens. Defaults to the
+       FTDI USB-RS485 bridge the EPick used (see epick_usb_port below), not the
+       arm's tool port (tool_device_name). -->
+  <xacro:arg name="robotiq_2f85_com_port" default="/dev/ttyUSB0" />
+  <xacro:arg name="epick_extension_radius" default="0.005" />
+  <xacro:arg name="epick_extension_length" default="0.1" />
+  <xacro:arg name="epick_suction_cup_radius" default="0.012" />
+  <xacro:arg name="epick_suction_cup_height" default="0.015" />
+  <xacro:arg name="epick_tcp_stroke_compensation" default="0.005" />
+  <!-- AdvancedMode grip target (kPa, negative = below atmospheric). Range
+       -100..0; the EPick pump physically caps around -80..-84 kPa, so values
+       past about -85 just saturate. Only honored in AdvancedMode (the
+       driver's default mode); ignored in AutomaticMode. -->
+  <xacro:arg name="epick_grip_max_vacuum_pressure" default="-80" />
+  <!-- Serial device the EPick's Modbus RTU driver opens. On UR5e 009 the
+       gripper hangs off an FTDI "USB TO RS-485" bridge plugged into the
+       Agent PC, which enumerates as /dev/ttyUSB0. It is NOT reached through
+       the arm's tool port; see the warning in the design doc before binding
+       this to tool_device_name. Declared here rather than left to the
+       submodule default so a
+       ros2_epick_gripper bump cannot move the device out from under us.
+       See design_docs/epick_suction_pressure.md. -->
+  <xacro:arg name="epick_usb_port" default="/dev/ttyUSB0" />
+
+  <!-- convert to property to use substitution in function -->
+  <xacro:property name="initial_positions_file" default="$(arg initial_positions_file)"/>
+  <xacro:property name="use_fake_hardware_prop" value="$(arg use_fake_hardware)"/>
+  <xacro:property name="fake_hw_mode_prop" value="$(arg fake_hw_mode)"/>
+  <xacro:property name="generate_ros2_control" value="${'false' if use_fake_hardware_prop else 'true'}" />
+
+  <!-- create link fixed to the "world" -->
+  <link name="world" />
+
+  <!-- arm -->
+  <xacro:ur_robot
+          name="$(arg name)"
+          tf_prefix="$(arg tf_prefix)"
+          parent="world"
+          joint_limits_parameters_file="$(arg joint_limit_parameters_file)"
+          kinematics_parameters_file="${'$(find picknik_009_ur5e_config)/config/ur5e_009_kinematics.yaml' if '$(arg use_calibrated_kinematics)' == 'true' else '$(arg kinematics_params)'}"
+          physical_parameters_file="$(arg physical_params)"
+          visual_parameters_file="$(arg visual_params)"
+          transmission_hw_interface="$(arg transmission_hw_interface)"
+          safety_limits="$(arg safety_limits)"
+          safety_pos_margin="$(arg safety_pos_margin)"
+          safety_k_position="$(arg safety_k_position)"
+          use_fake_hardware="$(arg use_fake_hardware)"
+          mock_sensor_commands="$(arg mock_sensor_commands)"
+          sim_gazebo="false"
+          sim_ignition="false"
+          headless_mode="$(arg headless_mode)"
+          initial_positions="${xacro.load_yaml(initial_positions_file)}"
+          use_tool_communication="$(arg use_tool_communication)"
+          tool_voltage="$(arg tool_voltage)"
+          tool_parity="$(arg tool_parity)"
+          tool_baud_rate="$(arg tool_baud_rate)"
+          tool_stop_bits="$(arg tool_stop_bits)"
+          tool_rx_idle_chars="$(arg tool_rx_idle_chars)"
+          tool_tx_idle_chars="$(arg tool_tx_idle_chars)"
+          tool_device_name="$(arg tool_device_name)"
+          tool_tcp_port="$(arg tool_tcp_port)"
+          robot_ip="$(arg robot_ip)"
+          script_filename="$(arg script_filename)"
+          output_recipe_filename="$(arg output_recipe_filename)"
+          input_recipe_filename="$(arg input_recipe_filename)"
+          reverse_ip="$(arg reverse_ip)"
+          script_command_port="$(arg script_command_port)"
+          reverse_port="$(arg reverse_port)"
+          script_sender_port="$(arg script_sender_port)"
+          trajectory_port="$(arg trajectory_port)"
+          generate_ros2_control_tag="${generate_ros2_control}"
+  >
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:ur_robot>
+
+  <!-- Wrist camera adapter and camera -->
+  <xacro:include
+    filename="$(find picknik_009_ur5e_config)/description/wrist_camera_adapter/picknik_ur_camera_adapter.urdf.xacro"
+  />
+  <xacro:include
+    filename="$(find picknik_009_ur5e_config)/description/wrist_camera_adapter/realsense_d415.urdf.xacro"
+  />
+  <xacro:ur_realsense_camera_adapter
+    prefix="$(arg tf_prefix)"
+    parent="tool0"
+    child_tool="realsense_camera_adapter_tool0"
+    child_camera="d415_mount_link"
+    rotation="0"
+  />
+  <!-- Camera mount origin from cell_calibration.yaml; Apply Wrist Camera Calibration writes it. -->
+  <xacro:property
+    name="wrist_mount"
+    value="${xacro.load_yaml('$(find picknik_009_ur5e_config)/objectives/calibration/cell_calibration.yaml')['wrist_camera_mount']['pose']}"
+  />
+  <xacro:property name="wm_p" value="${wrist_mount['position']}" />
+  <xacro:property name="wm_q" value="${wrist_mount['orientation']}" />
+  <xacro:property name="wm_x" value="${wm_q['x']}" />
+  <xacro:property name="wm_y" value="${wm_q['y']}" />
+  <xacro:property name="wm_z" value="${wm_q['z']}" />
+  <xacro:property name="wm_w" value="${wm_q['w']}" />
+  <xacro:realsense_d415
+    parent="d415_mount_link"
+    name="wrist_mounted_camera"
+    use_mesh="true"
+  >
+    <!-- Quaternion to fixed-axis roll, pitch, yaw; the pitch argument is clamped for asin. -->
+    <origin
+      xyz="${wm_p['x']} ${wm_p['y']} ${wm_p['z']}"
+      rpy="${atan2(2*(wm_w*wm_x + wm_y*wm_z), 1 - 2*(wm_x*wm_x + wm_y*wm_y))} ${asin(max(-1.0, min(1.0, 2*(wm_w*wm_y - wm_z*wm_x))))} ${atan2(2*(wm_w*wm_z + wm_x*wm_y), 1 - 2*(wm_y*wm_y + wm_z*wm_z))}"
+    />
+  </xacro:realsense_d415>
+
+  <!-- Gripper adapter (UR to Robotiq) -->
+  <xacro:include
+    filename="$(find robotiq_description)/urdf/ur_to_robotiq_adapter.urdf.xacro"
+  />
+  <xacro:ur_to_robotiq
+    prefix="$(arg tf_prefix)"
+    parent="realsense_camera_adapter_tool0"
+    child="gripper_mount_link"
+    rotation="0"
+  />
+
+  <xacro:if value="${end_effector == 'epick'}">
+    <!-- Robotiq EPick suction gripper.
+
+         The body of epick_single_suction_cup is inlined here (rather than
+         called as a macro) because that wrapper does not forward
+         grip_max_vacuum_pressure to the inner epick_driver_ros2_control
+         instantiation, and we need to override the driver default to raise
+         suction force. See design_docs/epick_suction_pressure.md for context. -->
+    <xacro:include filename="$(find epick_description)/urdf/epick_driver_ros2_control.xacro"/>
+    <xacro:include filename="$(find epick_description)/urdf/epick_body.xacro"/>
+
+    <xacro:epick_driver_ros2_control
+      name="epick_driver_ros2_control"
+      use_fake_hardware="$(arg use_fake_hardware)"
+      usb_port="$(arg epick_usb_port)"
+      grip_max_vacuum_pressure="$(arg epick_grip_max_vacuum_pressure)"
+      publish_gripper_joint_state="true"
+    />
+
+    <xacro:property name="extension_radius"        value="$(arg epick_extension_radius)"/>
+    <xacro:property name="extension_length"        value="$(arg epick_extension_length)"/>
+    <xacro:property name="suction_cup_radius"      value="$(arg epick_suction_cup_radius)"/>
+    <xacro:property name="suction_cup_height"      value="$(arg epick_suction_cup_height)"/>
+    <xacro:property name="tcp_stroke_compensation" value="$(arg epick_tcp_stroke_compensation)"/>
+
+    <!-- Body (defines body_link / body_length / body_color in parent scope) -->
+    <xacro:epick_body parent="gripper_mount_link"/>
+    <xacro:property name="suction_cup_parent"        value="${body_link}"/>
+    <xacro:property name="suction_cup_parent_length" value="${body_length}"/>
+
+    <!-- Extension (optional) -->
+    <xacro:if value="${extension_length * extension_radius > 0.0}">
+      <xacro:property name="suction_cup_parent"        value="epick_extension"/>
+      <xacro:property name="suction_cup_parent_length" value="${extension_length}"/>
+      <xacro:cylinder_link name="epick_extension"
+                           radius="${extension_radius}"
+                           length="${extension_length}"
+                           color="${body_color}"
+                           parent="${body_link}"
+                           origin_xyz="0 0 ${(body_length + extension_length) / 2}"/>
+    </xacro:if>
+
+    <!-- Suction Cup -->
+    <xacro:cylinder_link name="epick_suction_cup"
+                         radius="${suction_cup_radius}"
+                         length="${suction_cup_height}"
+                         color="${body_color}"
+                         parent="${suction_cup_parent}"
+                         origin_xyz="0 0 ${(suction_cup_parent_length + suction_cup_height) / 2}"/>
+
+    <!-- TIP Frame -->
+    <link name="epick_tip"/>
+    <xacro:joint parent="epick_suction_cup"
+                 child="epick_tip"
+                 xyz="0 0 ${suction_cup_height / 2}"/>
+
+    <!-- TCP Frame -->
+    <link name="epick_tcp"/>
+    <xacro:joint parent="epick_tip"
+                 child="epick_tcp"
+                 xyz="0 0 ${-tcp_stroke_compensation}"/>
+
+    <!-- Vacuum state link for weld targets. The `gripper` joint carries the EPick grip state (0 released, 1 gripping) into /joint_states, so recordings and ExecutePolicy see suction as a joint. See src/shelf_stocking/design_docs/policy_suction_channel.md. -->
+    <link name="epick_vacuum_state"/>
+    <joint name="gripper" type="revolute">
+      <parent link="epick_tcp"/>
+      <child link="epick_vacuum_state"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="30" velocity="1.0" lower="0.0" upper="1.0"/>
+    </joint>
+
+    <!-- Grasp link at EPick TCP -->
+    <link name="grasp_link"/>
+    <joint name="grasp_link_joint" type="fixed">
+      <parent link="epick_tcp"/>
+      <child link="grasp_link"/>
+      <origin xyz="0.0 0.0 0" rpy="0.0 0.0 ${pi}"/>
+    </joint>
+  </xacro:if>
+
+  <!-- Robotiq 2F-85 2-finger gripper, as mounted in moveit_pro_ur_ws's ur_mock. -->
+  <xacro:if value="${end_effector == 'robotiq_2f85'}">
+    <xacro:include filename="$(find robotiq_description)/urdf/robotiq_2f_85_macro.urdf.xacro"/>
+    <xacro:robotiq_gripper
+      name="RobotiqGripperHardwareInterface"
+      prefix="$(arg tf_prefix)"
+      parent="gripper_mount_link"
+      use_fake_hardware="$(arg gripper_use_fake_hardware)"
+      sim_gazebo="false"
+      com_port="$(arg robotiq_2f85_com_port)"
+    >
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:robotiq_gripper>
+    <!-- Between the finger pads, +Z along the approach. -->
+    <link name="grasp_link"/>
+    <joint name="grasp_link_joint" type="fixed">
+      <parent link="robotiq_85_base_link"/>
+      <child link="grasp_link"/>
+      <origin xyz="0.0 0.0 0.134" rpy="0.0 0.0 ${pi}"/>
+    </joint>
+  </xacro:if>
+
+  <!-- Environment objects (table, bin, pole, camera) are placed dynamically
+       by the "Calibrate Bin" and "Load Calibrated Scene" objectives. -->
+  <xacro:include filename="$(find picknik_009_ur5e_config)/description/environment.xacro"/>
+  <xacro:environment parent="world"/>
+
+  <!-- Scene camera is placed dynamically by calibration objectives. -->
+
+  <link name="ur_stand">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://picknik_009_ur5e_config/description/ur_stand.stl" />
+      </geometry>
+      <material name="workcell_material">
+        <color rgba="0.792 0.820 0.933 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://picknik_009_ur5e_config/description/ur_stand.stl" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="world_to_ur_stand" type="fixed">
+    <parent link="world"/>
+    <child link="ur_stand"/>
+    <origin xyz="0.0 0.0 0" rpy="0.0 0.0 0.0"/>
+  </joint>
+
+  <!-- The shelving is added by Load Calibrated Scene from the board calibration.
+       Do not add a static shelf here. -->
+
+  <!-- Include the selected ros2_control backend when using fake hardware. -->
+  <xacro:if value="$(arg use_fake_hardware)">
+    <xacro:if value="${fake_hw_mode_prop == 'mujoco'}">
+      <xacro:include filename="$(find picknik_009_ur5e_config_sim)/urdf/ur_mujoco_ros2_control.xacro"/>
+    </xacro:if>
+    <xacro:if value="${fake_hw_mode_prop == 'mock'}">
+      <xacro:include filename="$(find picknik_009_ur5e_config)/description/ur_mock_ros2_control.urdf.xacro"/>
+    </xacro:if>
+  </xacro:if>
+</robot>

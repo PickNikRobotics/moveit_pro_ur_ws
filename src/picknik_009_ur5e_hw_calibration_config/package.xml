@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<package format="3">
+  <name>picknik_009_ur5e_hw_calibration_config</name>
+  <version>0.0.0</version>
+
+  <description>
+    Calibration-session config for UR5e 009. Inherits everything from
+    picknik_009_ur5e_hw_config and only starts the cameras at the
+    calibration-only resolutions. See design_docs/board_based_calibration.md.
+  </description>
+
+  <maintainer email="support@picknik.ai">
+    Sanchit Badamikar
+  </maintainer>
+
+  <license>Proprietary</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>picknik_009_ur5e_hw_config</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

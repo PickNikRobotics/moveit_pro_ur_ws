@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<package format="3">
+  <name>picknik_009_ur5e_hw_config</name>
+  <version>0.0.0</version>
+
+  <description>
+    Hardware config inheriting Core resources from picknik_009_ur5e_config, and
+    adding hardware-specific resources such as drivers.
+  </description>
+
+  <maintainer email="support@picknik.ai">Henning Kayser</maintainer>
+
+  <license>Proprietary</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- Required because agent_bridge.launch.xml `<include>`s
+       $(find-pkg-share picknik_009_ur5e_config)/launch/serve_custom_view_panes.launch.xml.
+       Without this, an installed-only build of hw_config can ship without the
+       sibling package's share dir and `ros2 launch` will fail at include time. -->
+  <exec_depend>picknik_009_ur5e_config</exec_depend>
+  <exec_depend>realsense2_camera</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>epick_msgs</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <!-- No exec_depend on zed_wrapper: colcon would then need the ZED packages built,
+       and hosts without the ZED SDK (CI) skip them. See design_docs/zed_shelf_cam.md. -->
+  <exec_depend>ur_robot_driver</exec_depend>
+  <!-- Required because agent_bridge.launch.xml `<include>`s
+       $(find-pkg-share quest_oculus)/launch/quest_oculus_teleop.launch.py for
+       the Meta Quest teleop input device. -->
+  <exec_depend>quest_oculus</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_clang_format</test_depend>
+  <test_depend>ament_clang_tidy</test_depend>
+  <test_depend>ament_cmake_lint_cmake</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

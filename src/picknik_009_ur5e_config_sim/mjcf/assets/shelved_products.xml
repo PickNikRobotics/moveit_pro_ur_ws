@@ -1,0 +1,829 @@
+<shelved_products>
+  <!-- Static, visual-only products on the flanking shelf units. Included by the generated
+       calibrated_scene.xml inside a body that follows the calibrated back wall. -->
+  <body
+    name="shelved_tomato_soup_can_left_2_top_0"
+    pos="-3.2400 0.6343 0.6641"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_tomato_soup_can_left_2_top_0_visual"
+      type="mesh"
+      mesh="tomato_soup_can_visual_mesh"
+      material="tomato_soup_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_tomato_soup_can_left_2_top_1"
+    pos="-3.0600 0.6343 0.6641"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_tomato_soup_can_left_2_top_1_visual"
+      type="mesh"
+      mesh="tomato_soup_can_visual_mesh"
+      material="tomato_soup_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_tomato_soup_can_left_2_top_2"
+    pos="-2.8800 0.6343 0.6641"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_tomato_soup_can_left_2_top_2_visual"
+      type="mesh"
+      mesh="tomato_soup_can_visual_mesh"
+      material="tomato_soup_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_tomato_soup_can_left_2_top_3"
+    pos="-2.7000 0.6343 0.6641"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_tomato_soup_can_left_2_top_3_visual"
+      type="mesh"
+      mesh="tomato_soup_can_visual_mesh"
+      material="tomato_soup_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_tomato_soup_can_left_2_top_4"
+    pos="-2.5200 0.6343 0.6641"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_tomato_soup_can_left_2_top_4_visual"
+      type="mesh"
+      mesh="tomato_soup_can_visual_mesh"
+      material="tomato_soup_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_tomato_soup_can_left_2_top_5"
+    pos="-2.3400 0.6343 0.6641"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_tomato_soup_can_left_2_top_5_visual"
+      type="mesh"
+      mesh="tomato_soup_can_visual_mesh"
+      material="tomato_soup_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_tomato_soup_can_left_2_top_6"
+    pos="-2.1600 0.6343 0.6641"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_tomato_soup_can_left_2_top_6_visual"
+      type="mesh"
+      mesh="tomato_soup_can_visual_mesh"
+      material="tomato_soup_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_cracker_box_left_2_bot_0"
+    pos="-3.2000 0.6613 -0.0917"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_cracker_box_left_2_bot_0_visual"
+      type="mesh"
+      mesh="cracker_box_visual_mesh"
+      material="cracker_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_cracker_box_left_2_bot_1"
+    pos="-3.0000 0.6613 -0.0917"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_cracker_box_left_2_bot_1_visual"
+      type="mesh"
+      mesh="cracker_box_visual_mesh"
+      material="cracker_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_cracker_box_left_2_bot_2"
+    pos="-2.8000 0.6613 -0.0917"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_cracker_box_left_2_bot_2_visual"
+      type="mesh"
+      mesh="cracker_box_visual_mesh"
+      material="cracker_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_cracker_box_left_2_bot_3"
+    pos="-2.6000 0.6613 -0.0917"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_cracker_box_left_2_bot_3_visual"
+      type="mesh"
+      mesh="cracker_box_visual_mesh"
+      material="cracker_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_cracker_box_left_2_bot_4"
+    pos="-2.4000 0.6613 -0.0917"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_cracker_box_left_2_bot_4_visual"
+      type="mesh"
+      mesh="cracker_box_visual_mesh"
+      material="cracker_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_cracker_box_left_2_bot_5"
+    pos="-2.2000 0.6613 -0.0917"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_cracker_box_left_2_bot_5_visual"
+      type="mesh"
+      mesh="cracker_box_visual_mesh"
+      material="cracker_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_bleach_cleanser_left_1_top_0"
+    pos="-1.9200 0.6343 0.7171"
+    euler="0 0 1.5708"
+  >
+    <geom
+      name="shelved_bleach_cleanser_left_1_top_0_visual"
+      type="mesh"
+      mesh="bleach_cleanser_visual_mesh"
+      material="bleach_cleanser_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_windex_bottle_left_1_top_1"
+    pos="-1.7400 0.6343 0.7171"
+    euler="0 0 1.5708"
+  >
+    <geom
+      name="shelved_windex_bottle_left_1_top_1_visual"
+      type="mesh"
+      mesh="windex_bottle_visual_mesh"
+      material="windex_bottle_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_bleach_cleanser_left_1_top_2"
+    pos="-1.5600 0.6343 0.7171"
+    euler="0 0 1.5708"
+  >
+    <geom
+      name="shelved_bleach_cleanser_left_1_top_2_visual"
+      type="mesh"
+      mesh="bleach_cleanser_visual_mesh"
+      material="bleach_cleanser_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_windex_bottle_left_1_top_3"
+    pos="-1.3800 0.6343 0.7171"
+    euler="0 0 1.5708"
+  >
+    <geom
+      name="shelved_windex_bottle_left_1_top_3_visual"
+      type="mesh"
+      mesh="windex_bottle_visual_mesh"
+      material="windex_bottle_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_bleach_cleanser_left_1_top_4"
+    pos="-1.2000 0.6343 0.7171"
+    euler="0 0 1.5708"
+  >
+    <geom
+      name="shelved_bleach_cleanser_left_1_top_4_visual"
+      type="mesh"
+      mesh="bleach_cleanser_visual_mesh"
+      material="bleach_cleanser_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_windex_bottle_left_1_top_5"
+    pos="-1.0200 0.6343 0.7171"
+    euler="0 0 1.5708"
+  >
+    <geom
+      name="shelved_windex_bottle_left_1_top_5_visual"
+      type="mesh"
+      mesh="windex_bottle_visual_mesh"
+      material="windex_bottle_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_bleach_cleanser_left_1_top_6"
+    pos="-0.8400 0.6343 0.7171"
+    euler="0 0 1.5708"
+  >
+    <geom
+      name="shelved_bleach_cleanser_left_1_top_6_visual"
+      type="mesh"
+      mesh="bleach_cleanser_visual_mesh"
+      material="bleach_cleanser_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_tuna_fish_can_left_1_bot_0"
+    pos="-1.9200 0.6613 -0.1817"
+    euler="0 0 3.1416"
+  >
+    <geom
+      name="shelved_tuna_fish_can_left_1_bot_0_visual"
+      type="mesh"
+      mesh="tuna_fish_can_visual_mesh"
+      material="tuna_fish_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_tuna_fish_can_left_1_bot_1"
+    pos="-1.7400 0.6613 -0.1817"
+    euler="0 0 3.1416"
+  >
+    <geom
+      name="shelved_tuna_fish_can_left_1_bot_1_visual"
+      type="mesh"
+      mesh="tuna_fish_can_visual_mesh"
+      material="tuna_fish_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_tuna_fish_can_left_1_bot_2"
+    pos="-1.5600 0.6613 -0.1817"
+    euler="0 0 3.1416"
+  >
+    <geom
+      name="shelved_tuna_fish_can_left_1_bot_2_visual"
+      type="mesh"
+      mesh="tuna_fish_can_visual_mesh"
+      material="tuna_fish_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_tuna_fish_can_left_1_bot_3"
+    pos="-1.3800 0.6613 -0.1817"
+    euler="0 0 3.1416"
+  >
+    <geom
+      name="shelved_tuna_fish_can_left_1_bot_3_visual"
+      type="mesh"
+      mesh="tuna_fish_can_visual_mesh"
+      material="tuna_fish_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_tuna_fish_can_left_1_bot_4"
+    pos="-1.2000 0.6613 -0.1817"
+    euler="0 0 3.1416"
+  >
+    <geom
+      name="shelved_tuna_fish_can_left_1_bot_4_visual"
+      type="mesh"
+      mesh="tuna_fish_can_visual_mesh"
+      material="tuna_fish_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_tuna_fish_can_left_1_bot_5"
+    pos="-1.0200 0.6613 -0.1817"
+    euler="0 0 3.1416"
+  >
+    <geom
+      name="shelved_tuna_fish_can_left_1_bot_5_visual"
+      type="mesh"
+      mesh="tuna_fish_can_visual_mesh"
+      material="tuna_fish_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_tuna_fish_can_left_1_bot_6"
+    pos="-0.8400 0.6613 -0.1817"
+    euler="0 0 3.1416"
+  >
+    <geom
+      name="shelved_tuna_fish_can_left_1_bot_6_visual"
+      type="mesh"
+      mesh="tuna_fish_can_visual_mesh"
+      material="tuna_fish_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_sugar_box_right_1_top_0"
+    pos="0.7600 0.6343 0.7001"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_sugar_box_right_1_top_0_visual"
+      type="mesh"
+      mesh="sugar_box_visual_mesh"
+      material="sugar_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_sugar_box_right_1_top_1"
+    pos="0.9600 0.6343 0.7001"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_sugar_box_right_1_top_1_visual"
+      type="mesh"
+      mesh="sugar_box_visual_mesh"
+      material="sugar_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_sugar_box_right_1_top_2"
+    pos="1.1600 0.6343 0.7001"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_sugar_box_right_1_top_2_visual"
+      type="mesh"
+      mesh="sugar_box_visual_mesh"
+      material="sugar_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_sugar_box_right_1_top_3"
+    pos="1.3600 0.6343 0.7001"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_sugar_box_right_1_top_3_visual"
+      type="mesh"
+      mesh="sugar_box_visual_mesh"
+      material="sugar_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_sugar_box_right_1_top_4"
+    pos="1.5600 0.6343 0.7001"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_sugar_box_right_1_top_4_visual"
+      type="mesh"
+      mesh="sugar_box_visual_mesh"
+      material="sugar_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_sugar_box_right_1_top_5"
+    pos="1.7600 0.6343 0.7001"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_sugar_box_right_1_top_5_visual"
+      type="mesh"
+      mesh="sugar_box_visual_mesh"
+      material="sugar_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_pudding_box_right_1_bot_0"
+    pos="0.7100 0.6613 -0.1537"
+    euler="1.5708 0 -1.5708"
+  >
+    <geom
+      name="shelved_pudding_box_right_1_bot_0_visual"
+      type="mesh"
+      mesh="pudding_box_visual_mesh"
+      material="pudding_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_gelatin_box_right_1_bot_1"
+    pos="0.8700 0.6613 -0.1537"
+    euler="1.5708 0 3.1416"
+  >
+    <geom
+      name="shelved_gelatin_box_right_1_bot_1_visual"
+      type="mesh"
+      mesh="gelatin_box_visual_mesh"
+      material="gelatin_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_pudding_box_right_1_bot_2"
+    pos="1.0300 0.6613 -0.1537"
+    euler="1.5708 0 -1.5708"
+  >
+    <geom
+      name="shelved_pudding_box_right_1_bot_2_visual"
+      type="mesh"
+      mesh="pudding_box_visual_mesh"
+      material="pudding_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_gelatin_box_right_1_bot_3"
+    pos="1.1900 0.6613 -0.1537"
+    euler="1.5708 0 3.1416"
+  >
+    <geom
+      name="shelved_gelatin_box_right_1_bot_3_visual"
+      type="mesh"
+      mesh="gelatin_box_visual_mesh"
+      material="gelatin_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_pudding_box_right_1_bot_4"
+    pos="1.3300 0.6613 -0.1537"
+    euler="1.5708 0 -1.5708"
+  >
+    <geom
+      name="shelved_pudding_box_right_1_bot_4_visual"
+      type="mesh"
+      mesh="pudding_box_visual_mesh"
+      material="pudding_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_gelatin_box_right_1_bot_5"
+    pos="1.4900 0.6613 -0.1537"
+    euler="1.5708 0 3.1416"
+  >
+    <geom
+      name="shelved_gelatin_box_right_1_bot_5_visual"
+      type="mesh"
+      mesh="gelatin_box_visual_mesh"
+      material="gelatin_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_pudding_box_right_1_bot_6"
+    pos="1.6500 0.6613 -0.1537"
+    euler="1.5708 0 -1.5708"
+  >
+    <geom
+      name="shelved_pudding_box_right_1_bot_6_visual"
+      type="mesh"
+      mesh="pudding_box_visual_mesh"
+      material="pudding_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_gelatin_box_right_1_bot_7"
+    pos="1.8100 0.6613 -0.1537"
+    euler="1.5708 0 3.1416"
+  >
+    <geom
+      name="shelved_gelatin_box_right_1_bot_7_visual"
+      type="mesh"
+      mesh="gelatin_box_visual_mesh"
+      material="gelatin_box_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_mustard_bottle_right_2_top_0"
+    pos="2.0400 0.6343 0.6921"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_mustard_bottle_right_2_top_0_visual"
+      type="mesh"
+      mesh="mustard_bottle_visual_mesh"
+      material="mustard_bottle_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_mustard_bottle_right_2_top_1"
+    pos="2.2200 0.6343 0.6921"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_mustard_bottle_right_2_top_1_visual"
+      type="mesh"
+      mesh="mustard_bottle_visual_mesh"
+      material="mustard_bottle_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_mustard_bottle_right_2_top_2"
+    pos="2.4000 0.6343 0.6921"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_mustard_bottle_right_2_top_2_visual"
+      type="mesh"
+      mesh="mustard_bottle_visual_mesh"
+      material="mustard_bottle_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_mustard_bottle_right_2_top_3"
+    pos="2.5800 0.6343 0.6921"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_mustard_bottle_right_2_top_3_visual"
+      type="mesh"
+      mesh="mustard_bottle_visual_mesh"
+      material="mustard_bottle_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_mustard_bottle_right_2_top_4"
+    pos="2.7600 0.6343 0.6921"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_mustard_bottle_right_2_top_4_visual"
+      type="mesh"
+      mesh="mustard_bottle_visual_mesh"
+      material="mustard_bottle_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_mustard_bottle_right_2_top_5"
+    pos="2.9400 0.6343 0.6921"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_mustard_bottle_right_2_top_5_visual"
+      type="mesh"
+      mesh="mustard_bottle_visual_mesh"
+      material="mustard_bottle_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_mustard_bottle_right_2_top_6"
+    pos="3.1200 0.6343 0.6921"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_mustard_bottle_right_2_top_6_visual"
+      type="mesh"
+      mesh="mustard_bottle_visual_mesh"
+      material="mustard_bottle_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_master_chef_can_right_2_bot_0"
+    pos="2.0400 0.6613 -0.1267"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_master_chef_can_right_2_bot_0_visual"
+      type="mesh"
+      mesh="master_chef_can_visual_mesh"
+      material="master_chef_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_master_chef_can_right_2_bot_1"
+    pos="2.2200 0.6613 -0.1267"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_master_chef_can_right_2_bot_1_visual"
+      type="mesh"
+      mesh="master_chef_can_visual_mesh"
+      material="master_chef_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_master_chef_can_right_2_bot_2"
+    pos="2.4000 0.6613 -0.1267"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_master_chef_can_right_2_bot_2_visual"
+      type="mesh"
+      mesh="master_chef_can_visual_mesh"
+      material="master_chef_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_master_chef_can_right_2_bot_3"
+    pos="2.5800 0.6613 -0.1267"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_master_chef_can_right_2_bot_3_visual"
+      type="mesh"
+      mesh="master_chef_can_visual_mesh"
+      material="master_chef_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_master_chef_can_right_2_bot_4"
+    pos="2.7600 0.6613 -0.1267"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_master_chef_can_right_2_bot_4_visual"
+      type="mesh"
+      mesh="master_chef_can_visual_mesh"
+      material="master_chef_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_master_chef_can_right_2_bot_5"
+    pos="2.9400 0.6613 -0.1267"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_master_chef_can_right_2_bot_5_visual"
+      type="mesh"
+      mesh="master_chef_can_visual_mesh"
+      material="master_chef_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+  <body
+    name="shelved_master_chef_can_right_2_bot_6"
+    pos="3.1200 0.6613 -0.1267"
+    euler="0 0 -1.5708"
+  >
+    <geom
+      name="shelved_master_chef_can_right_2_bot_6_visual"
+      type="mesh"
+      mesh="master_chef_can_visual_mesh"
+      material="master_chef_can_material"
+      contype="0"
+      conaffinity="0"
+      group="2"
+    />
+  </body>
+</shelved_products>

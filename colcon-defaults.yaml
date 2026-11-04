@@ -2,6 +2,11 @@
 build:
   # Enable this for bidirectional syncing from the UI
   symlink-install: true
+  # zed_debug (zed-ros2-wrapper 5.x) links an executable against the ZED SDK, which needs
+  # libcuda.so.1 at link time. The build container gets no GPU, so it cannot link, and
+  # nothing here uses it. See design_docs/zed_shelf_cam.md.
+  packages-ignore:
+    - zed_debug
   allow-overriding:
     - robotiq_description
     - ur_description
@@ -17,6 +22,8 @@ build:
     - coverage-gcc
     - coverage-pytest
 test:
+  packages-ignore:
+    - zed_debug
   event-handlers:
     - console_direct+
     - desktop_notification+

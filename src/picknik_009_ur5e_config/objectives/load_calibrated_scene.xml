@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Load Calibrated Scene">
+  <BehaviorTree
+    ID="Load Calibrated Scene"
+    _description="Builds the calibrated scene from objectives/calibration/cell_calibration.yaml and board_offsets.yaml: works out the shelving and the tote from the two board poses and the offsets, places them and the fixed workcell parts in the planning scene, and publishes the scene camera and shelf_cam transforms. An offset edit counts at the next run. See design_docs/board_based_calibration.md."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence" _collapsed="false">
+      <!--=== CLEANUP any previous calibration objects ===-->
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveURDFFromScene" urdf_name="calibrated_top_shelf" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveURDFFromScene" urdf_name="calibrated_bottom_shelf" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveURDFFromScene" urdf_name="calibrated_bin" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveURDFFromScene" urdf_name="calibrated_camera" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveURDFFromScene" urdf_name="calibrated_workcell" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveURDFFromScene" urdf_name="calibrated_shelf_cam" />
+      </Decorator>
+      <!--=== WORK OUT THE SHELVING FROM THE WALL BOARD AND THE OFFSETS ===-->
+      <Action
+        ID="LoadPoseStampedFromYamlNamespace"
+        file_path="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="wall_board"
+        output="{wall_board_pose}"
+      />
+      <SubTree
+        ID="Place Shelving From Wall Board"
+        _collapsed="true"
+        wall_board_pose="{wall_board_pose}"
+        shelf_back_pose="{shelf_back_pose}"
+        top_shelf_pose="{top_shelf_pose}"
+        bottom_shelf_pose="{bottom_shelf_pose}"
+        shelf_base_pose="{shelf_base_pose}"
+      />
+      <!--=== PLACE TOP SHELF ===-->
+      <Action
+        ID="AddURDF"
+        urdf_name="calibrated_top_shelf"
+        urdf_pose="{top_shelf_pose}"
+        package_name="picknik_009_ur5e_config"
+        urdf_file_path="description/chunky_shelf_only.urdf"
+      />
+      <Action
+        ID="VisualizePose"
+        marker_lifetime="0.000000"
+        marker_name="top_shelf_center"
+        marker_size="0.100000"
+        pose="{top_shelf_pose}"
+        marker_text="Top Shelf"
+      />
+      <!--=== PLACE BOTTOM SHELF ===-->
+      <Action
+        ID="AddURDF"
+        urdf_name="calibrated_bottom_shelf"
+        urdf_pose="{bottom_shelf_pose}"
+        package_name="picknik_009_ur5e_config"
+        urdf_file_path="description/chunky_shelf_only.urdf"
+      />
+      <Action
+        ID="VisualizePose"
+        marker_lifetime="0.000000"
+        marker_name="bottom_shelf_center"
+        marker_size="0.100000"
+        pose="{bottom_shelf_pose}"
+        marker_text="Bottom Shelf"
+      />
+      <!--=== PLACE SHELF BACK BOX ===-->
+      <!--1.27m wide, 0.08m deep, 72" (1.8288m) tall-->
+      <!--AddCollisionBox (MoveIt Pro 10.0) builds the box and applies it to the
+          live scene in one step, replacing the CreateSolidPrimitiveBox +
+          CreateCollisionObjectFromSolidPrimitive + Convert To GraspableObject +
+          AddVirtualObjectToPlanningScene chain (all removed in 10.0).-->
+      <Action
+        ID="AddCollisionBox"
+        object_id="shelf_back"
+        dimensions="1.27;0.08;1.8288"
+        pose="{shelf_back_pose}"
+        overwrite="true"
+      />
+      <!--=== PLACE SHELF BASE BOX ===-->
+      <!--1.27m wide, 0.48m deep, 0.20m tall-->
+      <Action
+        ID="AddCollisionBox"
+        object_id="shelf_base"
+        dimensions="1.27;0.48;0.20"
+        pose="{shelf_base_pose}"
+        overwrite="true"
+      />
+      <!--=== PLACE TABLE (offset back from the robot in -Y, centered in X) ===-->
+      <!--Table is 1.24m wide (X), 0.63m deep (Y), 0.76m tall (Z). The table sits
+          in front of the robot (-Y), centered in X, top flush with the robot
+          base in Z. Y position offsets the front edge 0.34 m back from the
+          robot origin (front edge y = -0.34, center y = -0.655), to give
+          clearance from the shelves on the +Y side. Not calibrated; this is a
+          fixed assumption of the workcell.-->
+      <Action
+        ID="CreatePoseStamped"
+        reference_frame="world"
+        position_xyz="0;-0.655;-0.38"
+        orientation_xyzw="0;0;0;1"
+        pose_stamped="{table_calibrated_pose}"
+      />
+      <Action
+        ID="AddCollisionBox"
+        object_id="calibrated_table"
+        dimensions="1.24;0.63;0.76"
+        pose="{table_calibrated_pose}"
+        overwrite="true"
+      />
+      <!--=== PLACE WORKCELL TOP (mounted on table, origin at front-right-bottom corner) ===-->
+      <!--Workcell occupies the middle of the 1.24m table:
+          ~16 cm gap on the operator's left (world +X), ~17 cm on the right (world -X).
+          Front face flush with the table's robot-side (+Y) edge.
+          Origin sits on the table top.
+          The mesh's local axes are rotated 90 deg from the table axes
+          (mesh +X-face = workcell right, mesh -Y-face = workcell front), so we
+          apply a +90 deg yaw (CCW about world Z) on top of the corner-offset
+          translation. Quaternion below = (0, 0, sin(45), cos(45)).-->
+      <Action
+        ID="TransformPose"
+        input_pose="{table_calibrated_pose}"
+        output_pose="{workcell_top_pose}"
+        translation_xyz="0.46;0.315;0.38"
+        quaternion_xyzw="0;0;0.7071068;0.7071068"
+      />
+      <Action
+        ID="AddURDF"
+        urdf_name="calibrated_workcell"
+        urdf_pose="{workcell_top_pose}"
+        package_name="picknik_009_ur5e_config"
+        urdf_file_path="description/workcell.urdf"
+      />
+      <!--=== PLACE CAMERA MOUNT PLATE (sits on top of workcell crossbar at z=0.66 from workcell base) ===-->
+      <!--7" x 1.5" x 0.25" plate (0.1778 x 0.0381 x 0.00635 m) for the scene
+          camera mounting bracket. Crossbar top sits at z = 0.66 m above the
+          workcell base (= world z = 0.66, since the workcell base = table top
+          = world z = 0). Plate center.z = 0.66 + half_thickness = 0.663175.
+          Default placement is the workcell footprint center in X and Y; nudge
+          the position_xyz below if the crossbar isn't where this assumes.
+          The +90 deg yaw on the pose below rotates the box's local X (the 7"
+          dimension) onto world Y, so the long edge runs front-to-back in world.-->
+      <Action
+        ID="CreatePoseStamped"
+        reference_frame="world"
+        position_xyz="0;-0.9;0.663175"
+        orientation_xyzw="0;0;0.7071068;0.7071068"
+        pose_stamped="{camera_mount_plate_pose}"
+      />
+      <Action
+        ID="AddCollisionBox"
+        object_id="camera_mount_plate"
+        dimensions="0.1778;0.0381;0.00635"
+        pose="{camera_mount_plate_pose}"
+        overwrite="true"
+      />
+      <!--=== PLACE VLA CAMERA RIG (80/20 cross on the table, world -X of the bin) ===-->
+      <!--Two 4x4 cm 80/20 bars forming a cross, plus a camera clamp, placed
+          by touch-off rather than AprilTag calibration. Every number below
+          is derived from one reading: with the suction cup touching the
+          post's bin-side (+X) face at the cross, approaching along world -X,
+          grasp_link read world (-0.365, -0.383, 0.552).
+          Vertical post: on the bin side. Centerline x = -0.365 - 0.02 (half a
+          bar width behind the touched face), y = -0.383. 25.7" (0.6528 m)
+          tall from the table top (world z=0).
+          Crossbar: 24" (0.6096 m) long along world Y at the cross height,
+          bolted to the post's OUTSIDE (-X) face, so its centerline is one
+          bar width further out: x = -0.385 - 0.04. It protrudes 9.75"
+          (0.2477 m) toward the shelf (+Y) from the post centerline, so its
+          +Y end is y = -0.383 + 0.2477 = -0.1353 and its center is 0.3048 m
+          back from that.
+          Re-touch-off and update these numbers if the rig is moved.-->
+      <Action
+        ID="CreatePoseStamped"
+        reference_frame="world"
+        position_xyz="-0.385;-0.383;0.3264"
+        orientation_xyzw="0;0;0;1"
+        pose_stamped="{vla_cam_rig_post_pose}"
+      />
+      <Action
+        ID="AddCollisionBox"
+        object_id="vla_cam_rig_post"
+        dimensions="0.04;0.04;0.6528"
+        pose="{vla_cam_rig_post_pose}"
+        overwrite="true"
+      />
+      <Action
+        ID="CreatePoseStamped"
+        reference_frame="world"
+        position_xyz="-0.425;-0.4401;0.552"
+        orientation_xyzw="0;0;0;1"
+        pose_stamped="{vla_cam_rig_crossbar_pose}"
+      />
+      <Action
+        ID="AddCollisionBox"
+        object_id="vla_cam_rig_crossbar"
+        dimensions="0.04;0.6096;0.04"
+        pose="{vla_cam_rig_crossbar_pose}"
+        overwrite="true"
+      />
+      <!--Camera clamp: a rough bounding box, not a model of the real part.
+          6" (0.1524 m) wide along world X (parallel to the shelves), 2"
+          (0.0508 m) deep along Y, 9" (0.2286 m) tall. Its shelf-side (+Y)
+          face is flush with the crossbar's +Y end (y = -0.1353), so its
+          center is half a depth back from that. In X/Z it is aligned to the
+          crossbar's top-left corner (operator's left = world +X): clamp top
+          = bar top (0.552 + 0.02), clamp +X face = bar +X face
+          (-0.425 + 0.02), so the box hangs down and extends toward -X.-->
+      <Action
+        ID="CreatePoseStamped"
+        reference_frame="world"
+        position_xyz="-0.4812;-0.1607;0.4577"
+        orientation_xyzw="0;0;0;1"
+        pose_stamped="{vla_cam_rig_clamp_pose}"
+      />
+      <Action
+        ID="AddCollisionBox"
+        object_id="vla_cam_rig_clamp"
+        dimensions="0.1524;0.0508;0.2286"
+        pose="{vla_cam_rig_clamp_pose}"
+        overwrite="true"
+      />
+      <!--=== LOAD CALIBRATED BIN (walls-only URDF so robot can reach inside) ===-->
+      <!--The tote pose is the bin_tote.urdf origin, worked out from the tote board and the offsets.-->
+      <Action
+        ID="LoadPoseStampedFromYamlNamespace"
+        file_path="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="tote_board"
+        output="{tote_board_pose}"
+      />
+      <SubTree
+        ID="Place Tote From Tote Board"
+        _collapsed="true"
+        tote_board_pose="{tote_board_pose}"
+        bin_calibrated_pose="{bin_calibrated_pose}"
+      />
+      <Action
+        ID="AddURDF"
+        urdf_name="calibrated_bin"
+        urdf_pose="{bin_calibrated_pose}"
+        package_name="picknik_009_ur5e_config"
+        urdf_file_path="description/bin_tote.urdf"
+      />
+      <!--=== LOAD CALIBRATED SCENE CAMERA (from Calibrate Scene Camera From Tote Board) ===-->
+      <Action
+        ID="LoadPoseStampedFromYamlNamespace"
+        file_path="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="scene_camera_link"
+        output="{scene_camera_link_pose}"
+      />
+      <Action
+        ID="AddURDF"
+        urdf_name="calibrated_camera"
+        urdf_pose="{scene_camera_link_pose}"
+        package_name="picknik_009_ur5e_config"
+        urdf_file_path="description/scene_camera.urdf"
+      />
+      <Action
+        ID="PublishStaticTransform"
+        pose="{scene_camera_link_pose}"
+        child_frame_id="scene_camera_link"
+      />
+      <!--=== LOAD CALIBRATED SHELF CAM (ZED 2i, from Calibrate Shelf Cam From Wall Board) ===-->
+      <!--Optional: skipped while the shelf_cam pose file is missing, before stage c has run.-->
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Control ID="Sequence">
+          <Action
+            ID="LoadPoseStampedFromYamlNamespace"
+            file_path="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+            namespace="shelf_cam_camera_link"
+            output="{shelf_cam_link_pose}"
+          />
+          <Action
+            ID="PublishStaticTransform"
+            pose="{shelf_cam_link_pose}"
+            child_frame_id="shelf_cam_camera_link"
+          />
+          <!--Collision body at the same pose, like the scene camera; skipped with the transform.-->
+          <Action
+            ID="AddURDF"
+            urdf_name="calibrated_shelf_cam"
+            urdf_pose="{shelf_cam_link_pose}"
+            package_name="picknik_009_ur5e_config"
+            urdf_file_path="description/shelf_cam.urdf"
+          />
+        </Control>
+      </Decorator>
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Load Calibrated Scene">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+      <output_port name="top_shelf_pose">
+        Top-shelf reference pose, worked out from the wall board and the
+        offsets. Map this at the call site.
+      </output_port>
+      <output_port name="bottom_shelf_pose">
+        Bottom-shelf reference pose, worked out from the wall board and the
+        offsets. Map this at the call site.
+      </output_port>
+      <output_port name="bin_calibrated_pose">
+        Calibrated bin reference pose (world frame), the bin_tote.urdf origin,
+        worked out from the tote board and the offsets. Exposed so the parent
+        can
+        derive the bin top z (bin_top_z_world =
+        bin_calibrated_pose.position.z + 0.0925, the bin wall
+        half-height per bin_tote.urdf).
+      </output_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<robot name="sim_rack">
+	<link name="rack_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<mesh filename="package://picknik_009_ur5e_config_sim/mjcf/assets/racks/example_rack_1.stl" scale="1 1 1"/>
+			</geometry>
+		</visual>
+
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<mesh filename="package://picknik_009_ur5e_config_sim/mjcf/assets/racks/example_rack_1.stl" scale="1 1 1"/>
+			</geometry>
+		</collision>
+	</link>
+</robot>

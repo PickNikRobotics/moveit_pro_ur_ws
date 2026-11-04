@@ -136,7 +136,7 @@
     prefix="$(arg tf_prefix)"
     parent="gripper_mount_link"
     use_fake_hardware="$(arg use_fake_hardware)"
-    sim_ignition="false"
+    sim_gazebo="false"
     com_port="$(arg tool_device_name)"
   >
     <origin xyz="0 0 0" rpy="0 0 0" />

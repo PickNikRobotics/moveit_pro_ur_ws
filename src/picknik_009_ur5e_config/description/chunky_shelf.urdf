@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<robot name="chunky_shelf" xmlns:xacro="http://wiki.ros.org/xacro">
+  <link name="chunky_shelf">
+    <visual>
+      <geometry>
+        <mesh filename="package://picknik_009_ur5e_config/description/chunky_shelf.stl"/>
+      </geometry>
+      <material name="chunky_shelf_material">
+        <color rgba="0.8 0.2 0.2 0.4"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://picknik_009_ur5e_config/description/chunky_shelf.stl"/>
+      </geometry>
+    </collision>
+  </link>
+</robot>

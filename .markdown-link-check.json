@@ -1,0 +1,14 @@
+{
+  "ignorePatterns": [
+    {
+      "pattern": "^https?://"
+    },
+    {
+      "pattern": "src/external_dependencies/"
+    },
+    {
+      "pattern": "src/shelf_stocking/"
+    }
+  ],
+  "_comment": "External URLs are deliberately NOT checked. Checking them is what made this hook fail: with several external links in one file, markdown-link-check aborts that file mid-check and prints nothing -- no link results, no error, no 'N links checked' -- and exits 1. An aborted file contributes no results, so the run summary shows every remaining link healthy next to a failed hook, which reads as a tool bug rather than a link problem. It is load- and network-dependent, not caused by any one URL: removing all external links from README.md makes it pass, removing any single one does not, and removing only the relative links does not. CI's shared egress makes it worse than a workstation's. Dropping external checks keeps the check that actually earns its keep -- relative links between design docs, which really do rot when a doc is renamed, split, or deleted -- and gives up the one that rots slowly and that a reader notices anyway. src/external_dependencies/ stays because those relative paths point into submodules CI does not check out. See design_docs/ci.md. src/shelf_stocking/ is skipped for the same reason: it is a private submodule, which CI on this public repo cannot check out."
+}

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Loop Move Between 2 Waypoints">
+  <BehaviorTree
+    ID="Loop Move Between 2 Waypoints"
+    _description="Loops the arm between the 'Look at Table' and 'Look at Tote' waypoints until canceled. The inner ForceSuccess wrapper converts move failures to SUCCESS so RepeatUnlessFailureEachTick keeps looping — failed moves are silently skipped rather than ending the loop. Useful as a quick motion-stack smoke test."
+    _favorite="false"
+  >
+    <Decorator
+      ID="RepeatUnlessFailureEachTick"
+      num_cycles="-1"
+      _collapsed="false"
+    >
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Control ID="Sequence" name="TableToTote" _collapsed="false">
+          <SubTree
+            ID="Move to Waypoint"
+            _collapsed="true"
+            waypoint_name="Look at Table"
+            joint_group_name="manipulator"
+            use_all_planners="false"
+          />
+          <SubTree
+            ID="Move to Waypoint"
+            _collapsed="true"
+            waypoint_name="Look at Tote"
+            joint_group_name="manipulator"
+            use_all_planners="false"
+          />
+        </Control>
+      </Decorator>
+    </Decorator>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Loop Move Between 2 Waypoints">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="2. Hardware Control" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

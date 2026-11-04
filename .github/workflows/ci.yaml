@@ -1,0 +1,93 @@
+# Tier 1 CI — build + colcon test + objective lint.
+# See design_docs/ci.md for design rationale, bump procedure, and failure triage.
+
+name: ci
+
+on:
+  pull_request:
+  workflow_dispatch:
+ src/picknik_009_ur5e_*/objectives/, so this job has no use forinputs:
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  image_ref:
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for    description: "Full MoveIt Pro image ref; '{0}' is replaced by the ROS distro (defaults to 'picknikciuser/moveit-pro:10.0.0-{0}')"
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for    type: string
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for    required: false
+
+permissions:
+  contents: read
+
+jobs:
+  ensure-no-ssh-in-gitmodules:
+ src/picknik_009_ur5e_*/objectives/, so this job has no use forruns-on: ubuntu-22.04
+ src/picknik_009_ur5e_*/objectives/, so this job has no use forsteps:
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  - uses: actions/checkout@v4
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  - name: Reject SSH submodule URLs
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for    run: |
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for      # Match only `url = git@...` or `url = ssh://...` lines (the actual
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for      # submodule URL fields), not arbitrary `git@` substrings elsewhere
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for      # in the file (comments, other key names, etc).
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for      if [ -f .gitmodules ] && grep -qE '^[[:space:]]*url[[:space:]]*=[[:space:]]*(git@|ssh://)' .gitmodules; then
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for        echo "::error::Found SSH submodule URL in .gitmodules — use https:// for CI compatibility"
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for        grep -nE '^[[:space:]]*url[[:space:]]*=[[:space:]]*(git@|ssh://)' .gitmodules
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for        exit 1
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for      fi
+
+  validate_objectives:
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# Submodules are intentionally NOT fetched here. The v0.0.1 lint globs
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# **/*.xml and attempts xml.etree.parse on every match. Well-formed
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# non-BT XML (launch XML, plugin_description.xml, robot description)
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# parses fine and is silently skipped because there's no <BehaviorTree>
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# element — those files don't cause failures. The failure mode is
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# files that aren't standalone-parseable XML at all, e.g. MuJoCo
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# <include> fragments some third-party submodules ship, which
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# lack a root element. Our objectives all live in
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# src/picknik_009_ur5e_*/objectives/, so this job has no use for
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# submodule contents. `submodules: false` is the actions/checkout
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# default; setting it explicitly so shared defaults can't silently
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# re-enable submodule fetch.
+ src/picknik_009_ur5e_*/objectives/, so this job has no use forruns-on: ubuntu-22.04
+ src/picknik_009_ur5e_*/objectives/, so this job has no use forsteps:
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  - uses: actions/checkout@v4
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for    with:
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for      submodules: false
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  - uses: PickNikRobotics/moveit_pro_lint@v0.0.1
+
+  integration_test:
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# Omitting `config_package:` switches the reusable workflow from
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# `colcon build --packages-up-to <pkg>` + `colcon test --packages-select <pkg>`
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# to a full-workspace build + `colcon test --packages-skip <external_dependencies>`.
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# This is what we want: the custom C++ behavior packages
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# (shelf_stocking_behaviors, pcl_nn_filter,
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# get_graspable_grocery_objects_from_masks3d) are loaded at runtime via
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# pluginlib, so they don't appear in any config package's package.xml and
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# would be skipped under --packages-up-to. Their gtest suites are where
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for# the workspace's real test coverage lives. See design_docs/ci.md.
+ src/picknik_009_ur5e_*/objectives/, so this job has no use foruses: PickNikRobotics/moveit_pro_ci/.github/workflows/workspace_integration_test.yaml@v0.9.1
+ src/picknik_009_ur5e_*/objectives/, so this job has no use forwith:
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # `image_ref`, not `image_tag`: Pro 10 publishes to a RENAMED Docker Hub
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # repo (picknikciuser/moveit-pro), while `image_tag` still formats the
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # Pro 9 name (picknikciuser/moveit-studio:<tag>-<distro>), which has no
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # 10.x tag at all. `image_ref` overrides the whole reference; the `{0}`
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # is substituted with the matrix's ros_distro by the reusable workflow.
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  image_ref: ${{ github.event.inputs.image_ref || 'picknikciuser/moveit-pro:10.0.0-{0}' }}
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # Jazzy only. This workspace is Pro 10 / Jazzy and does not build on
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # Humble -- <tl/expected.hpp> exists only on Pro 10, so the humble leg of
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # the default '["humble", "jazzy"]' matrix fails at compile time.
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  ros_distros: '["jazzy"]'
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # Override the mixin list from the workspace's colcon-defaults.yaml. That file is
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # tuned for dev workflows and turns on `rel-with-deb-info` plus `coverage-gcc` /
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # `coverage-pytest`; on a GitHub-hosted runner the resulting debug symbols and gcov
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # instrumentation exhaust the disk and the job dies mid-`colcon test` with
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # "No space left on device" *after* a successful build. Nothing in CI consumes the
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # coverage data, so it is pure cost here. `build-testing-on` is retained and is
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # load-bearing: without it no test targets are built and `colcon test` would find
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # nothing to run, which looks green while testing nothing.
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  #
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # The ZED packages from the zed-ros2-wrapper / zed-ros2-interfaces submodules need
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # the Stereolabs ZED SDK and CUDA, which the CI image does not have. No package
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # depends on them in package.xml (colcon would refuse the skip), so skip them. `--packages-skip` must come before
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  # `--cmake-args`, which swallows every later argument. See design_docs/zed_shelf_cam.md.
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  colcon_build_args: "--packages-skip zed_msgs zed_components zed_wrapper zed_ros2 zed_debug --mixin lld compile-commands build-testing-on --cmake-args -DCMAKE_BUILD_TYPE=Release"
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  colcon_test_args: "--executor sequential"
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  runner: "ubuntu-22.04"
+ src/picknik_009_ur5e_*/objectives/, so this job has no use forsecrets:
+ src/picknik_009_ur5e_*/objectives/, so this job has no use for  moveit_license_key: ${{ secrets.MOVEIT_LICENSE_KEY }}

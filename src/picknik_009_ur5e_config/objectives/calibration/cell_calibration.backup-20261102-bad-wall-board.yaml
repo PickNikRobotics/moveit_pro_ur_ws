@@ -1,0 +1,128 @@
+wall_board:
+  header:
+    stamp:
+      sec: 0
+      nanosec: 0
+    frame_id: world
+  pose:
+    position:
+      x: 0.066980100332608206
+      y: 0.91993626543683404
+      z: 0.19057919958139688
+    orientation:
+      x: -0.017099054888565363
+      y: 0.70694596154021017
+      z: 0.70706044378451793
+      w: -0.0007474082860359539
+tote_board:
+  header:
+    stamp:
+      sec: 0
+      nanosec: 0
+    frame_id: world
+  pose:
+    position:
+      x: 0.28078085566113664
+      y: -0.4389116326898845
+      z: -0.026505747590914747
+    orientation:
+      x: 0.7157635991462062
+      y: -0.6983061934171356
+      z: 0.005741206085532383
+      w: -0.004238976907523861
+scene_camera_link:
+  header:
+    stamp:
+      sec: 1792095451
+      nanosec: 856972401
+    frame_id: world
+  pose:
+    position:
+      x: -0.020996337246526716
+      y: -0.7868566513230408
+      z: 0.6463476554132722
+    orientation:
+      x: -0.4061524575221902
+      y: 0.384162663261593
+      z: 0.573670899294031
+      w: 0.5986325489877945
+shelf_cam_camera_link:
+  header:
+    stamp:
+      sec: 1792095410
+      nanosec: 562526335
+    frame_id: world
+  pose:
+    position:
+      x: -0.5420114102838873
+      y: -0.13747300908724722
+      z: 0.6181015982565019
+    orientation:
+      x: -0.10297576876864079
+      y: 0.15613467684969964
+      z: 0.5800973368898187
+      w: 0.7927830935791248
+wrist_camera_solve_wall_board:
+  header:
+    stamp:
+      sec: 0
+      nanosec: 0
+    frame_id: grasp_link
+  pose:
+    position:
+      x: 0.036113243033903501
+      y: 0.074025781891399259
+      z: -0.21441771494683801
+    orientation:
+      x: -0.0067990194047873216
+      y: -0.064314138082774724
+      z: 0.9978264363459578
+      w: 0.012643888125463895
+wrist_camera_solve_difference:
+  header:
+    stamp:
+      sec: 0
+      nanosec: 0
+    frame_id: grasp_link
+  pose:
+    position:
+      x: -0.027711731876820234
+      y: -0.004974667594734125
+      z: 0.005490197721802065
+    orientation:
+      x: -0.002310938225746049
+      y: 0.004091373785841715
+      z: -0.014639029677144992
+      w: 0.999881802532266
+wrist_camera_mount:
+  header:
+    stamp:
+      sec: 1793666814
+      nanosec: 654321215
+    frame_id: d415_mount_link
+  pose:
+    position:
+      x: -0.0027347785427536131
+      y: 0.0008475496005192686
+      z: -0.003768153066557936
+    orientation:
+      x: -0.012270726934157311
+      y: 0.012003797081088166
+      z: -0.0074514315606654703
+      w: 0.99982489181048106
+wrist_camera_mount_candidate_wall_board:
+  header:
+    stamp:
+      sec: 1793666814
+      nanosec: 654321215
+    frame_id: d415_mount_link
+  pose:
+    position:
+      x: -0.0027347785427536131
+      y: 0.0008475496005192686
+      z: -0.003768153066557936
+    orientation:
+      x: -0.012270726934157311
+      y: 0.012003797081088166
+      z: -0.0074514315606654703
+      w: 0.99982489181048106

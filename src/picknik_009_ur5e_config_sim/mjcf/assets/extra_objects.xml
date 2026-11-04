@@ -1,0 +1,922 @@
+<extra_objects>
+  <asset>
+    <mesh
+      name="tuna_fish_can_visual_mesh"
+      file="ycb_dataset/ycb/tuna_fish_can/textured.obj"
+    />
+    <mesh
+      name="tuna_fish_can_collision_mesh_0"
+      file="ycb_dataset/ycb/tuna_fish_can/textured_coacd_0.stl"
+    />
+    <mesh
+      name="tuna_fish_can_collision_mesh_1"
+      file="ycb_dataset/ycb/tuna_fish_can/textured_coacd_1.stl"
+    />
+    <mesh
+      name="tuna_fish_can_collision_mesh_2"
+      file="ycb_dataset/ycb/tuna_fish_can/textured_coacd_2.stl"
+    />
+    <mesh
+      name="tuna_fish_can_collision_mesh_3"
+      file="ycb_dataset/ycb/tuna_fish_can/textured_coacd_3.stl"
+    />
+    <mesh
+      name="tuna_fish_can_collision_mesh_4"
+      file="ycb_dataset/ycb/tuna_fish_can/textured_coacd_4.stl"
+    />
+    <texture
+      name="tuna_fish_can_texture"
+      type="2d"
+      file="ycb_dataset/ycb/tuna_fish_can/texture_map.png"
+    />
+    <material
+      name="tuna_fish_can_material"
+      texture="tuna_fish_can_texture"
+      specular="0.20"
+      shininess="0.40"
+    />
+
+    <mesh
+      name="tomato_soup_can_visual_mesh"
+      file="ycb_dataset/ycb/tomato_soup_can/textured.obj"
+    />
+    <mesh
+      name="tomato_soup_can_collision_mesh_0"
+      file="ycb_dataset/ycb/tomato_soup_can/textured_coacd_0.stl"
+    />
+    <mesh
+      name="tomato_soup_can_collision_mesh_1"
+      file="ycb_dataset/ycb/tomato_soup_can/textured_coacd_1.stl"
+    />
+    <mesh
+      name="tomato_soup_can_collision_mesh_2"
+      file="ycb_dataset/ycb/tomato_soup_can/textured_coacd_2.stl"
+    />
+    <mesh
+      name="tomato_soup_can_collision_mesh_3"
+      file="ycb_dataset/ycb/tomato_soup_can/textured_coacd_3.stl"
+    />
+    <mesh
+      name="tomato_soup_can_collision_mesh_4"
+      file="ycb_dataset/ycb/tomato_soup_can/textured_coacd_4.stl"
+    />
+    <texture
+      name="tomato_soup_can_texture"
+      type="2d"
+      file="ycb_dataset/ycb/tomato_soup_can/texture_map.png"
+    />
+    <material
+      name="tomato_soup_can_material"
+      texture="tomato_soup_can_texture"
+      specular="0.20"
+      shininess="0.40"
+    />
+
+    <mesh
+      name="sugar_box_visual_mesh"
+      file="ycb_dataset/ycb/sugar_box/textured.obj"
+    />
+    <texture
+      name="sugar_box_texture"
+      type="2d"
+      file="ycb_dataset/ycb/sugar_box/texture_map.png"
+    />
+    <material
+      name="sugar_box_material"
+      texture="sugar_box_texture"
+      specular="0.0"
+      shininess="0.15"
+    />
+
+    <mesh
+      name="cracker_box_visual_mesh"
+      file="ycb_dataset/ycb/cracker_box/textured.obj"
+    />
+    <texture
+      name="cracker_box_texture"
+      type="2d"
+      file="ycb_dataset/ycb/cracker_box/texture_map.png"
+    />
+    <material
+      name="cracker_box_material"
+      texture="cracker_box_texture"
+      specular="0.0"
+      shininess="0.15"
+    />
+
+    <mesh
+      name="gelatin_box_visual_mesh"
+      file="ycb_dataset/ycb/gelatin_box/textured.obj"
+    />
+    <texture
+      name="gelatin_box_texture"
+      type="2d"
+      file="ycb_dataset/ycb/gelatin_box/texture_map.png"
+    />
+    <material
+      name="gelatin_box_material"
+      texture="gelatin_box_texture"
+      rgba="0.75 0.75 0.75 1"
+      specular="0.0"
+      shininess="0.15"
+    />
+
+    <mesh
+      name="master_chef_can_visual_mesh"
+      file="ycb_dataset/ycb/master_chef_can/textured.obj"
+    />
+    <mesh
+      name="master_chef_can_collision_mesh_0"
+      file="ycb_dataset/ycb/master_chef_can/textured_coacd_0.stl"
+    />
+    <mesh
+      name="master_chef_can_collision_mesh_1"
+      file="ycb_dataset/ycb/master_chef_can/textured_coacd_1.stl"
+    />
+    <mesh
+      name="master_chef_can_collision_mesh_2"
+      file="ycb_dataset/ycb/master_chef_can/textured_coacd_2.stl"
+    />
+    <mesh
+      name="master_chef_can_collision_mesh_3"
+      file="ycb_dataset/ycb/master_chef_can/textured_coacd_3.stl"
+    />
+    <mesh
+      name="master_chef_can_collision_mesh_4"
+      file="ycb_dataset/ycb/master_chef_can/textured_coacd_4.stl"
+    />
+    <texture
+      name="master_chef_can_texture"
+      type="2d"
+      file="ycb_dataset/ycb/master_chef_can/texture_map.png"
+    />
+    <material
+      name="master_chef_can_material"
+      texture="master_chef_can_texture"
+      specular="0.20"
+      shininess="0.40"
+    />
+
+    <mesh
+      name="potted_meat_can_visual_mesh"
+      file="ycb_dataset/ycb/potted_meat_can/textured.obj"
+    />
+    <mesh
+      name="potted_meat_can_collision_mesh_0"
+      file="ycb_dataset/ycb/potted_meat_can/textured_coacd_0.stl"
+    />
+    <mesh
+      name="potted_meat_can_collision_mesh_1"
+      file="ycb_dataset/ycb/potted_meat_can/textured_coacd_1.stl"
+    />
+    <mesh
+      name="potted_meat_can_collision_mesh_2"
+      file="ycb_dataset/ycb/potted_meat_can/textured_coacd_2.stl"
+    />
+    <mesh
+      name="potted_meat_can_collision_mesh_3"
+      file="ycb_dataset/ycb/potted_meat_can/textured_coacd_3.stl"
+    />
+    <mesh
+      name="potted_meat_can_collision_mesh_4"
+      file="ycb_dataset/ycb/potted_meat_can/textured_coacd_4.stl"
+    />
+    <texture
+      name="potted_meat_can_texture"
+      type="2d"
+      file="ycb_dataset/ycb/potted_meat_can/texture_map.png"
+    />
+    <material
+      name="potted_meat_can_material"
+      texture="potted_meat_can_texture"
+      specular="0.20"
+      shininess="0.40"
+    />
+
+    <mesh
+      name="pudding_box_visual_mesh"
+      file="ycb_dataset/ycb/pudding_box/textured.obj"
+    />
+    <texture
+      name="pudding_box_texture"
+      type="2d"
+      file="ycb_dataset/ycb/pudding_box/texture_map.png"
+    />
+    <material
+      name="pudding_box_material"
+      texture="pudding_box_texture"
+      rgba="0.75 0.75 0.75 1"
+      specular="0.0"
+      shininess="0.15"
+    />
+
+    <!--
+      Decoration-only YCB items: visual mesh + texture + material only, no
+      collision meshes. Used by the shelved_* bodies on the four flanking
+      decorative shelf units; those bodies are visual-only (group=2,
+      contype=0 conaffinity=0) and never participate in physics or planning.
+    -->
+    <mesh
+      name="mustard_bottle_visual_mesh"
+      file="ycb_dataset/ycb/mustard_bottle/textured.obj"
+    />
+    <texture
+      name="mustard_bottle_texture"
+      type="2d"
+      file="ycb_dataset/ycb/mustard_bottle/texture_map.png"
+    />
+    <material
+      name="mustard_bottle_material"
+      texture="mustard_bottle_texture"
+      specular="0.15"
+      shininess="0.30"
+    />
+
+    <mesh
+      name="bleach_cleanser_visual_mesh"
+      file="ycb_dataset/ycb/bleach_cleanser/textured.obj"
+    />
+    <texture
+      name="bleach_cleanser_texture"
+      type="2d"
+      file="ycb_dataset/ycb/bleach_cleanser/texture_map.png"
+    />
+    <material
+      name="bleach_cleanser_material"
+      texture="bleach_cleanser_texture"
+      specular="0.15"
+      shininess="0.30"
+    />
+
+    <mesh
+      name="windex_bottle_visual_mesh"
+      file="ycb_dataset/ycb/windex_bottle/textured.obj"
+    />
+    <texture
+      name="windex_bottle_texture"
+      type="2d"
+      file="ycb_dataset/ycb/windex_bottle/texture_map.png"
+    />
+    <material
+      name="windex_bottle_material"
+      texture="windex_bottle_texture"
+      specular="0.15"
+      shininess="0.30"
+    />
+  </asset>
+
+  <worldbody>
+    <!-- Freejoint bodies must be direct worldbody children -->
+    <body
+      name="tomato_soup_can_1"
+      pos="-0.0824 -0.5841 0.0277"
+      euler="0 -0.785398 0"
+    >
+      <site
+        name="tomato_soup_can_1_tf"
+        pos="0 0 0"
+        size="0.008"
+        rgba="1 0 0 0.35"
+      />
+      <freejoint name="tomato_soup_can_1_joint" />
+      <geom
+        name="tomato_soup_can_visual_geom"
+        type="mesh"
+        mesh="tomato_soup_can_visual_mesh"
+        material="tomato_soup_can_material"
+        pos="-0.0 0.0 0.0"
+        euler="0 0 0"
+        contype="0"
+        conaffinity="0"
+        group="2"
+      />
+      <geom
+        name="tomato_soup_can_collision_geom_0"
+        type="mesh"
+        mesh="tomato_soup_can_collision_mesh_0"
+        pos="-0.0 0.0 0.0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <geom
+        name="tomato_soup_can_collision_geom_1"
+        type="mesh"
+        mesh="tomato_soup_can_collision_mesh_1"
+        pos="-0.0 0.0 0.0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <geom
+        name="tomato_soup_can_collision_geom_2"
+        type="mesh"
+        mesh="tomato_soup_can_collision_mesh_2"
+        pos="-0.0 0.0 0.0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <geom
+        name="tomato_soup_can_collision_geom_3"
+        type="mesh"
+        mesh="tomato_soup_can_collision_mesh_3"
+        pos="-0.0 0.0 0.0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <geom
+        name="tomato_soup_can_collision_geom_4"
+        type="mesh"
+        mesh="tomato_soup_can_collision_mesh_4"
+        pos="-0.0 0.0 0.0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <inertial
+        pos="0 0 0"
+        euler="0 0 0"
+        mass="0.3"
+        diaginertia="0.001 0.001 0.001"
+      />
+    </body>
+
+    <body
+      name="tuna_fish_can_static"
+      pos="0.2066 -0.6898 -0.0087"
+      euler="0 0 0.2"
+    >
+      <site
+        name="tuna_fish_can_static_tf"
+        pos="0 0 0"
+        size="0.008"
+        rgba="1 0.5 0 0.35"
+      />
+      <freejoint name="tuna_fish_can_static_joint" />
+      <geom
+        name="tuna_fish_can_static_visual"
+        type="mesh"
+        mesh="tuna_fish_can_visual_mesh"
+        material="tuna_fish_can_material"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="0"
+        conaffinity="0"
+        group="2"
+      />
+      <geom
+        name="tuna_fish_can_static_collision_0"
+        type="mesh"
+        mesh="tuna_fish_can_collision_mesh_0"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <geom
+        name="tuna_fish_can_static_collision_1"
+        type="mesh"
+        mesh="tuna_fish_can_collision_mesh_1"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <geom
+        name="tuna_fish_can_static_collision_2"
+        type="mesh"
+        mesh="tuna_fish_can_collision_mesh_2"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <geom
+        name="tuna_fish_can_static_collision_3"
+        type="mesh"
+        mesh="tuna_fish_can_collision_mesh_3"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <geom
+        name="tuna_fish_can_static_collision_4"
+        type="mesh"
+        mesh="tuna_fish_can_collision_mesh_4"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <inertial
+        pos="0 0 0"
+        euler="0 0 0"
+        mass="0.171"
+        diaginertia="0.001 0.001 0.001"
+      />
+    </body>
+
+    <body
+      name="sugar_box_static"
+      pos="-0.2034 -0.4798 0.0813"
+      euler="0 0 1.5708"
+    >
+      <site
+        name="sugar_box_static_tf"
+        pos="0 0 0"
+        size="0.008"
+        rgba="1 1 0 0.35"
+      />
+      <freejoint name="sugar_box_static_joint" />
+      <geom
+        name="sugar_box_static_visual"
+        type="mesh"
+        mesh="sugar_box_visual_mesh"
+        material="sugar_box_material"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="0"
+        conaffinity="0"
+        group="2"
+      />
+      <geom
+        name="sugar_box_static_collision"
+        type="box"
+        size="0.0225 0.0465 0.088"
+        pos="0.0005 0.0005 0.002"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <!-- diaginertia from m/12 * (a²+b²) using the primitive-box full extents and the body mass. -->
+      <inertial
+        pos="0 0 0"
+        euler="0 0 0"
+        mass="0.514"
+        diaginertia="0.00169722 0.00141361 0.000457204"
+      />
+    </body>
+
+    <body
+      name="sugar_box_static_2"
+      pos="-0.1934 -0.4798 0.30"
+      euler="0 0 1.5708"
+    >
+      <site
+        name="sugar_box_static_2_tf"
+        pos="0 0 0"
+        size="0.008"
+        rgba="1 1 0 0.35"
+      />
+      <freejoint name="sugar_box_static_2_joint" />
+      <geom
+        name="sugar_box_static_2_visual"
+        type="mesh"
+        mesh="sugar_box_visual_mesh"
+        material="sugar_box_material"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="0"
+        conaffinity="0"
+        group="2"
+      />
+      <geom
+        name="sugar_box_static_2_collision"
+        type="box"
+        size="0.0225 0.0465 0.088"
+        pos="0.0005 0.0005 0.002"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <!-- diaginertia from m/12 * (a²+b²) using the primitive-box full extents and the body mass. -->
+      <inertial
+        pos="0 0 0"
+        euler="0 0 0"
+        mass="0.514"
+        diaginertia="0.00169722 0.00141361 0.000457204"
+      />
+    </body>
+
+    <body name="cracker_box_static" pos="0.2166 -0.5298 0.0913" euler="0 0 0">
+      <site
+        name="cracker_box_static_tf"
+        pos="0 0 0"
+        size="0.008"
+        rgba="1 0 0 0.35"
+      />
+      <freejoint name="cracker_box_static_joint" />
+      <geom
+        name="cracker_box_static_visual"
+        type="mesh"
+        mesh="cracker_box_visual_mesh"
+        material="cracker_box_material"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="0"
+        conaffinity="0"
+        group="2"
+      />
+      <geom
+        name="cracker_box_static_collision"
+        type="box"
+        size="0.036 0.082 0.107"
+        pos="0.001 0 0.001"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <!-- diaginertia from m/12 * (a²+b²) using the primitive-box full extents and the body mass. -->
+      <inertial
+        pos="0 0 0"
+        euler="0 0 0"
+        mass="0.411"
+        diaginertia="0.00248970 0.00174607 0.00109874"
+      />
+    </body>
+
+    <body name="cracker_box_static_2" pos="0.2266 -0.5298 0.3" euler="0 0 0">
+      <site
+        name="cracker_box_static_2_tf"
+        pos="0 0 0"
+        size="0.008"
+        rgba="1 0 0 0.35"
+      />
+      <freejoint name="cracker_box_static_2_joint" />
+      <geom
+        name="cracker_box_static_2_visual"
+        type="mesh"
+        mesh="cracker_box_visual_mesh"
+        material="cracker_box_material"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="0"
+        conaffinity="0"
+        group="2"
+      />
+      <geom
+        name="cracker_box_static_2_collision"
+        type="box"
+        size="0.036 0.082 0.107"
+        pos="0.001 0 0.001"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <!-- diaginertia from m/12 * (a²+b²) using the primitive-box full extents and the body mass. -->
+      <inertial
+        pos="0 0 0"
+        euler="0 0 0"
+        mass="0.411"
+        diaginertia="0.00248970 0.00174607 0.00109874"
+      />
+    </body>
+
+    <body
+      name="gelatin_box_static"
+      pos="-0.0834 -0.5198 0.0013"
+      euler="0 0 -0.95"
+    >
+      <site
+        name="gelatin_box_static_tf"
+        pos="0 0 0"
+        size="0.008"
+        rgba="1 0.3 0.3 0.35"
+      />
+      <freejoint name="gelatin_box_static_joint" />
+      <geom
+        name="gelatin_box_static_visual"
+        type="mesh"
+        mesh="gelatin_box_visual_mesh"
+        material="gelatin_box_material"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="0"
+        conaffinity="0"
+        group="2"
+      />
+      <geom
+        name="gelatin_box_static_collision"
+        type="box"
+        size="0.036 0.0445 0.015"
+        pos="0 -0.0005 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <!-- diaginertia from m/12 * (a²+b²) using the primitive-box full extents and the body mass. -->
+      <inertial
+        pos="0 0 0"
+        euler="0 0 0"
+        mass="0.097"
+        diaginertia="0.0000713030 0.0000491790 0.000105932"
+      />
+    </body>
+
+    <body
+      name="gelatin_box_static_2"
+      pos="-0.0734 -0.5198 0.10"
+      euler="0 0 -0.95"
+    >
+      <site
+        name="gelatin_box_static_2_tf"
+        pos="0 0 0"
+        size="0.008"
+        rgba="1 0.3 0.3 0.35"
+      />
+      <freejoint name="gelatin_box_static_2_joint" />
+      <geom
+        name="gelatin_box_static_2_visual"
+        type="mesh"
+        mesh="gelatin_box_visual_mesh"
+        material="gelatin_box_material"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="0"
+        conaffinity="0"
+        group="2"
+      />
+      <geom
+        name="gelatin_box_static_2_collision"
+        type="box"
+        size="0.036 0.0445 0.015"
+        pos="0 -0.0005 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <!-- diaginertia from m/12 * (a²+b²) using the primitive-box full extents and the body mass. -->
+      <inertial
+        pos="0 0 0"
+        euler="0 0 0"
+        mass="0.097"
+        diaginertia="0.0000713030 0.0000491790 0.000105932"
+      />
+    </body>
+
+    <body
+      name="master_chef_can_static"
+      pos="0.1166 -0.7098 0.0413"
+      euler="0 0 0"
+    >
+      <site
+        name="master_chef_can_static_tf"
+        pos="0 0 0"
+        size="0.008"
+        rgba="0.8 0.8 0.2 0.35"
+      />
+      <freejoint name="master_chef_can_static_joint" />
+      <geom
+        name="master_chef_can_static_visual"
+        type="mesh"
+        mesh="master_chef_can_visual_mesh"
+        material="master_chef_can_material"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="0"
+        conaffinity="0"
+        group="2"
+      />
+      <geom
+        name="master_chef_can_static_collision_0"
+        type="mesh"
+        mesh="master_chef_can_collision_mesh_0"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <geom
+        name="master_chef_can_static_collision_1"
+        type="mesh"
+        mesh="master_chef_can_collision_mesh_1"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <geom
+        name="master_chef_can_static_collision_2"
+        type="mesh"
+        mesh="master_chef_can_collision_mesh_2"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <geom
+        name="master_chef_can_static_collision_3"
+        type="mesh"
+        mesh="master_chef_can_collision_mesh_3"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <geom
+        name="master_chef_can_static_collision_4"
+        type="mesh"
+        mesh="master_chef_can_collision_mesh_4"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <inertial
+        pos="0 0 0"
+        euler="0 0 0"
+        mass="0.414"
+        diaginertia="0.001 0.001 0.001"
+      />
+    </body>
+
+    <body
+      name="potted_meat_can_static"
+      pos="-0.1934 -0.5998 0.0413"
+      euler="0 0 0.1"
+    >
+      <site
+        name="potted_meat_can_static_tf"
+        pos="0 0 0"
+        size="0.008"
+        rgba="0.6 0.4 0.2 0.35"
+      />
+      <freejoint name="potted_meat_can_static_joint" />
+      <geom
+        name="potted_meat_can_static_visual"
+        type="mesh"
+        mesh="potted_meat_can_visual_mesh"
+        material="potted_meat_can_material"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="0"
+        conaffinity="0"
+        group="2"
+      />
+      <geom
+        name="potted_meat_can_static_collision_0"
+        type="mesh"
+        mesh="potted_meat_can_collision_mesh_0"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <geom
+        name="potted_meat_can_static_collision_1"
+        type="mesh"
+        mesh="potted_meat_can_collision_mesh_1"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <geom
+        name="potted_meat_can_static_collision_2"
+        type="mesh"
+        mesh="potted_meat_can_collision_mesh_2"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <geom
+        name="potted_meat_can_static_collision_3"
+        type="mesh"
+        mesh="potted_meat_can_collision_mesh_3"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <geom
+        name="potted_meat_can_static_collision_4"
+        type="mesh"
+        mesh="potted_meat_can_collision_mesh_4"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <inertial
+        pos="0 0 0"
+        euler="0 0 0"
+        mass="0.37"
+        diaginertia="0.001 0.001 0.001"
+      />
+    </body>
+
+    <body
+      name="pudding_box_static"
+      pos="-0.0634 -0.6698 0.0013"
+      euler="0 0 1.5708"
+    >
+      <site
+        name="pudding_box_static_tf"
+        pos="0 0 0"
+        size="0.008"
+        rgba="0.7 0.3 0.2 0.35"
+      />
+      <freejoint name="pudding_box_static_joint" />
+      <geom
+        name="pudding_box_static_visual"
+        type="mesh"
+        mesh="pudding_box_visual_mesh"
+        material="pudding_box_material"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="0"
+        conaffinity="0"
+        group="2"
+      />
+      <geom
+        name="pudding_box_static_collision"
+        type="box"
+        size="0.0445 0.0565 0.0195"
+        pos="-0.0005 -0.0005 -0.0005"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <!-- diaginertia from m/12 * (a²+b²) using the primitive-box full extents and the body mass. -->
+      <inertial
+        pos="0 0 0"
+        euler="0 0 0"
+        mass="0.187"
+        diaginertia="0.000222686 0.000147138 0.000322419"
+      />
+    </body>
+
+    <body
+      name="pudding_box_static_2"
+      pos="-0.0534 -0.6698 0.15"
+      euler="0 0 1.5708"
+    >
+      <site
+        name="pudding_box_static_2_tf"
+        pos="0 0 0"
+        size="0.008"
+        rgba="0.7 0.3 0.2 0.35"
+      />
+      <freejoint name="pudding_box_static_2_joint" />
+      <geom
+        name="pudding_box_static_2_visual"
+        type="mesh"
+        mesh="pudding_box_visual_mesh"
+        material="pudding_box_material"
+        pos="0 0 0"
+        euler="0 0 0"
+        contype="0"
+        conaffinity="0"
+        group="2"
+      />
+      <geom
+        name="pudding_box_static_2_collision"
+        type="box"
+        size="0.0445 0.0565 0.0195"
+        pos="-0.0005 -0.0005 -0.0005"
+        euler="0 0 0"
+        contype="1"
+        conaffinity="1"
+        group="3"
+      />
+      <!-- diaginertia from m/12 * (a²+b²) using the primitive-box full extents and the body mass. -->
+      <inertial
+        pos="0 0 0"
+        euler="0 0 0"
+        mass="0.187"
+        diaginertia="0.000222686 0.000147138 0.000322419"
+      />
+    </body>
+  </worldbody>
+</extra_objects>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<launch>
+  <arg
+    name="serve_custom_view_panes"
+    default="true"
+    description="Start the host-side custom view pane HTTP server. Set false on a host that already has one from a sibling launch (port-8731 collision)."
+  />
+  <include
+    file="$(find-pkg-share moveit_studio_agent)/launch/studio_agent_bridge.launch.xml"
+  />
+  <!-- Host-side HTTP server for the custom view panes. Hooked here, in the base
+       package, because config.yaml's `runtime_launch_file` names this file by
+       explicit package + path — so this is the one agent_bridge that every
+       config (base, sim, hw) actually loads. See design_docs/custom_view_pane_transport.md
+       for why the panes are served here rather than by the REST package-file route. -->
+  <include
+    file="$(find-pkg-share shelf_stocking_objectives)/launch/serve_custom_view_panes.launch.py"
+  >
+    <arg
+      name="serve_custom_view_panes"
+      value="$(var serve_custom_view_panes)"
+    />
+  </include>
+  <!-- <include
+    file="$(find-pkg-share picknik_009_ur5e_config)/launch/cameras.launch.xml"
+  /> -->
+</launch>

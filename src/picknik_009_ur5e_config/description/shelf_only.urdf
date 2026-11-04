@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<robot name="shelf_only" xmlns:xacro="http://wiki.ros.org/xacro">
+  <link name="shelf_only">
+    <visual>
+      <geometry>
+        <mesh filename="package://picknik_009_ur5e_config/description/shelf_only.stl"/>
+      </geometry>
+      <material name="calibrated_shelf_material">
+        <color rgba="0.55 0.35 0.2 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://picknik_009_ur5e_config/description/shelf_only.stl"/>
+      </geometry>
+    </collision>
+  </link>
+</robot>

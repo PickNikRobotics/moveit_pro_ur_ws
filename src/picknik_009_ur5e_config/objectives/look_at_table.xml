@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Look at Table">
+  <BehaviorTree
+    ID="Look at Table"
+    _description="Move the arm to a position that faces the table surface"
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <SubTree
+        ID="Move to Waypoint"
+        _collapsed="true"
+        waypoint_name="Look at Table"
+        joint_group_name="manipulator"
+        link_padding="{link_padding}"
+        velocity_scale_factor="{velocity_scale_factor}"
+        acceleration_scale_factor="{acceleration_scale_factor}"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Look at Table">
+      <input_port name="link_padding" default="0.01">
+        Per-link collision padding (meters) used when planning the Move to
+        Waypoint motion.
+        Default 0.01.
+      </input_port>
+      <input_port name="velocity_scale_factor" default="1.0">
+        Velocity scale of the move, as in Move to Waypoint.
+      </input_port>
+      <input_port name="acceleration_scale_factor" default="1.0">
+        Acceleration scale of the move, as in Move to Waypoint.
+      </input_port>
+      <MetadataFields>
+        <Metadata subcategory="2. Hardware Control" />
+        <Metadata runnable="true" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

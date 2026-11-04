@@ -1,0 +1,33 @@
+# Parameter overrides for the shelf_cam ZED 2i, layered over zed_wrapper's
+# common_stereo.yaml and zed2i.yaml by launch/pro_zed_launch.py.
+# Only values that differ from the zed_wrapper defaults belong here.
+# zed_shelf_cam_calibration.yaml repeats this file: keep the two in step.
+# See design_docs/zed_shelf_cam.md.
+---
+/**:
+  ros__parameters:
+    general:
+      # The SDK grabs every frame at this rate, so it sets the USB load.
+      grab_frame_rate: 30
+      # The Trainer's fps (10). An exact divisor of the grab rate, so every third
+      # frame is published; the Trainer resamples by nearest frame and needs an
+      # even spacing. See design_docs/cracker_box_pick_drop_collection.md.
+      pub_frame_rate: 10.0
+
+    video:
+      # 3-channel bgr8 instead of bgra8; rgb_image_relay.py turns it into rgb8.
+      enable_24bit_output: true
+      # The upstream default clips the image to white under the lab lighting.
+      brightness: 3
+
+    depth:
+      # Classic stereo matching: no AI model download or TensorRT build.
+      depth_mode: 'ULTRA'
+      # 16UC1 millimetres, like the RealSense depth on the same topic names.
+      # Do not change it without changing the topic names too.
+      openni_depth_mode: true
+      point_cloud_freq: 6.0
+
+    pos_tracking:
+      # The camera is fixed in the cell; tracking only costs GPU.
+      pos_tracking_enabled: false

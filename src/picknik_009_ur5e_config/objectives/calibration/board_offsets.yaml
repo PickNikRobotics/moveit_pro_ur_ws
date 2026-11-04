@@ -1,0 +1,76 @@
+# Offsets for the board-based scene placement, one named section each. Each section holds
+# one scalar, xyz, written "x;y;z" in metres. Keep it one quoted scalar: ReadYamlValue
+# fails on a list or a map. See design_docs/board_based_calibration.md.
+
+wall_corner_in_wall_board:
+  # MEASURE ON THE CELL, board on the back wall. The wall's front-face top-left corner
+  # (seen from the robot) in the board frame: x = -a, y = -b, z = +t.
+  # a, b: wall left / top edge to the pattern's black edge. t: wall face to pattern face,
+  # the print thickness (board mounted directly on the wall).
+  # 2026-10-16: NOT the measured value. The operator's measurement ("-0.544;-0.600;0.0006")
+  # put the wall, both racks and the shelf base 45 mm low and 16 mm nearer the robot than
+  # the AprilTag poses placing had used for months, and places hit the rack. This value is
+  # fitted so all four land back on those AprilTag poses (top_shelf_pose.yaml etc., removed
+  # in ff08116) to within 0.1 mm. Re-measure a, b and t before trusting a fresh value; the
+  # 16 mm in z (off the wall face) is not physical and says the measurement, the board
+  # solve or the old poses are off, not which. See design_docs/board_based_calibration.md.
+  # 2026-10-16, later: then touched off on the cell, from the cup lip (epick_tip, 5 mm past
+  # grasp_link). With the lip pressed against the top rack's front face, centred on it top to
+  # bottom and at its right end (seen from the robot), the model's front face, face centre
+  # and right end were moved onto it, all four poses together. A fit, not a tape measurement.
+  xyz: "-0.5605;-0.6693;0.0429"
+
+tote_outer_corner_in_tote_board:
+  # MEASURE ON THE CELL, tote board in the tote. The tote's outer corner (world +x and robot
+  # side, at floor height) in the board frame: x = -d_y, y = -d_x, z = +t_b. d_x, d_y: board
+  # origin to the +x and robot-side outer surfaces along world x and y. t_b: floor to pattern
+  # face (the print thickness). Board lies turned: +x along world -y, +y along world -x.
+  # 2026-10-16: NOT the measured value ("-0.025;-0.030;0.0006"). Fitted to the tote rim
+  # touched with epick_tip, the cup centred on the rim: both robot-side corners, robot-side
+  # wall mid-span, far wall mid-span. The tote moved 18 mm toward the robot, 9 mm to +x and
+  # 9 mm down, so its rim matches the touched rim at the tote centre. The real rim slopes
+  # about 1.2 deg (far side lower), which the square-to-world tote cannot follow. See
+  # design_docs/board_based_calibration.md.
+  xyz: "-0.0430;-0.0395;0.0101"
+
+wall_center_from_wall_corner:
+  # Geometry. Back-wall box centre from the wall's front-face top-left corner, in
+  # the world-aligned wall frame (+x right, +y into the wall, +z up).
+  # Half the shelf_back box size in Load Calibrated Scene.
+  xyz: "0.635;0.04;-0.9144"
+
+top_rack_from_wall_corner:
+  # Geometry, measurable. Top rack reference point (chunky_shelf_only.urdf origin:
+  # centre in x, top surface, behind the front lip) from the wall's front-face
+  # top-left corner, world-aligned wall frame. Default: current calibration.
+  # 2026-10-20: z lowered 22.0 mm (was -0.436). Touch-off: 4 cm cup laid flat on the top
+  # surface near the right end, surface = epick_tip z minus the cup radius. The front-face
+  # fit had left the top surface high, because the mesh's front lip is taller than the
+  # real one. See design_docs/board_based_calibration.md.
+  # 2026-10-20: x moved +25.4 mm (was 0.6313) with the mesh cut from 50" to the real 48",
+  # keeping the right end where the front-face touch-off put it. Left end not touched off.
+  xyz: "0.6567;-0.4135;-0.458"
+
+bottom_rack_from_wall_corner:
+  # Geometry, measurable. Bottom rack reference point (chunky_shelf_only.urdf
+  # origin) from the wall's front-face top-left corner, world-aligned wall frame.
+  # Default: current calibration.
+  # 2026-10-20: z lowered 11.0 mm in all (was -1.2678). Set to a cup-lip (epick_tip)
+  # touch on the top surface at the RIGHT front corner (seen from the robot), bellows
+  # compressed. The real rack slopes along x: the left front corner touched 19 mm lower.
+  # The level model sits on the high end on purpose, so the place descent stops on force
+  # at the low end. Set to the low end (-1.2980), places on the right half pressed into
+  # the shelf and the push into the shelf aborted on goal tolerance.
+  # 2026-10-20: x moved +39.9 mm (was 0.6387) with the mesh cut to the real 48" rack: centred
+  # between the cup-centre touches at the left (-0.6456) and right (0.5440) front corners.
+  xyz: "0.6786;-0.3865;-1.2788"
+
+shelf_base_from_wall_corner:
+  # Geometry, measurable. Shelf base box centre from the wall's front-face top-left
+  # corner, world-aligned wall frame. Default: current calibration.
+  xyz: "0.635;-0.16;-1.7284"
+
+tote_origin_from_outer_corner:
+  # Geometry. bin_tote.urdf origin from the tote's outer corner (+x side, robot side, at
+  # floor height), world-aligned. From the outer wall faces and the slab top in bin_tote.urdf.
+  xyz: "-0.3048;-0.1905;0.09025"

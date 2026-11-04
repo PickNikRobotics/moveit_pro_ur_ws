@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Place Tote From Tote Board">
+  <BehaviorTree
+    ID="Place Tote From Tote Board"
+    _description="Works out the tote pose (the bin_tote.urdf origin) from the tote ChArUco board lying face up on the tote floor. The board pose plus the measured tote_outer_corner_in_tote_board section of objectives/calibration/board_offsets.yaml gives the tote's outer corner (world +x and robot side) at floor height; the file's geometry section, taken from bin_tote.urdf, gives the tote origin. Outputs the tote pose; Load Calibrated Scene calls it at every load. See design_docs/board_based_calibration.md."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <!--Read each offset before any typed use of its key: the text entry must come first.-->
+      <Action
+        ID="ReadYamlValue"
+        package_name="picknik_009_ur5e_config"
+        relative_file_path="objectives/calibration/board_offsets.yaml"
+        key1="tote_outer_corner_in_tote_board"
+        key2="xyz"
+        key3=""
+        key4=""
+        key5=""
+        value="{tote_outer_corner_in_board}"
+      />
+      <Action
+        ID="ReadYamlValue"
+        package_name="picknik_009_ur5e_config"
+        relative_file_path="objectives/calibration/board_offsets.yaml"
+        key1="tote_origin_from_outer_corner"
+        key2="xyz"
+        key3=""
+        key4=""
+        key5=""
+        value="{tote_origin_offset}"
+      />
+      <!--Board frame to the tote's outer corner at floor height, measured in the board frame.-->
+      <Action
+        ID="TransformPose"
+        input_pose="{tote_board_pose}"
+        translation_xyz="{tote_outer_corner_in_board}"
+        quaternion_xyzw="0;0;0;1"
+        output_pose="{tote_outer_corner_pose}"
+      />
+      <!--Only the board position is used; the tote stays square to world.-->
+      <Action
+        ID="OverridePoseOrientation"
+        input_pose="{tote_outer_corner_pose}"
+        orientation_xyzw="0;0;0;1"
+        output_pose="{tote_outer_corner_pose}"
+      />
+      <Action
+        ID="TransformPose"
+        input_pose="{tote_outer_corner_pose}"
+        translation_xyz="{tote_origin_offset}"
+        quaternion_xyzw="0;0;0;1"
+        output_pose="{bin_calibrated_pose}"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Place Tote From Tote Board">
+      <MetadataFields>
+        <Metadata runnable="false" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+      <input_port
+        name="tote_board_pose"
+        default="{tote_board_pose}"
+        type="geometry_msgs::msg::PoseStamped"
+      >
+        Tote board pose in world: the pattern's top-left outer corner, x right,
+        y down the page, z into the tote floor.
+      </input_port>
+      <output_port
+        name="bin_calibrated_pose"
+        type="geometry_msgs::msg::PoseStamped"
+      >
+        The bin_tote.urdf origin in world.
+      </output_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Deactivate Vacuum">
+  <BehaviorTree
+    ID="Deactivate Vacuum"
+    _description="Deactivate the EPick vacuum gripper."
+    _favorite="true"
+  >
+    <Control ID="Sequence" name="root">
+      <Action
+        ID="MoveGripperAction"
+        position="0"
+        gripper_command_action_name="/epick_controller/gripper_cmd"
+        timeout="10.000000"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Deactivate Vacuum">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="2. Hardware Control" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

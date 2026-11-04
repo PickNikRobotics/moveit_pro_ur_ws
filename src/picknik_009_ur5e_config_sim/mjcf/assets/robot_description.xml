@@ -1,0 +1,947 @@
+<?xml version="1.0" ?>
+<mujoco model="ur5e">
+  <compiler angle="radian" />
+
+  <!-- Per-camera user param 0 = depth_type (0 = RGB_DEPTH default, 1 = RGB_ONLY).
+       Used by picknik_mujoco_ros to skip depth/points rendering for RGB_ONLY cameras. -->
+  <size nuser_cam="1" />
+
+  <option integrator="implicitfast" timestep="0.003" viscosity="0.001">
+    <flag multiccd="enable" island="enable" sleep="enable" />
+  </option>
+
+  <asset>
+    <!-- Convex-hull collision STLs (also used as visuals on non-UR5e parts). -->
+    <mesh name="base" file="base.stl" />
+    <mesh name="shoulder" file="shoulder.stl" />
+    <mesh name="upperarm" file="upperarm.stl" />
+    <mesh name="forearm" file="forearm.stl" />
+    <mesh name="wrist1" file="wrist1.stl" />
+    <mesh name="wrist2" file="wrist2.stl" />
+    <mesh name="wrist3" file="wrist3.stl" />
+    <mesh
+      name="picknik_ur5_realsense_camera_adapter_rev2_collision"
+      file="picknik_ur5_realsense_camera_adapter_rev2_collision.stl"
+    />
+    <mesh name="ur_to_robotiq_adapter" file="ur_to_robotiq_adapter.stl" />
+    <mesh name="epick_body" file="epick_body.stl" scale="0.001 0.001 0.001" />
+
+    <!--
+      mujoco_menagerie split-by-color visual meshes for the UR5e (vendored
+      locally into this package from the mujoco_menagerie UR5e model). Each link is split into two or
+      three OBJ files corresponding to the painted-black, joint-gray, and
+      Universal Robots blue regions of the real arm. Materials are assigned per
+      geom in the worldbody so the renderer treats them as separate colored
+      surfaces. See design_docs/sim_visuals.md for the body-frame caveat.
+    -->
+    <mesh name="ur5e_base_0" file="ur5e_visual/base_0.obj" />
+    <mesh name="ur5e_base_1" file="ur5e_visual/base_1.obj" />
+    <mesh name="ur5e_shoulder_0" file="ur5e_visual/shoulder_0.obj" />
+    <mesh name="ur5e_shoulder_1" file="ur5e_visual/shoulder_1.obj" />
+    <mesh name="ur5e_shoulder_2" file="ur5e_visual/shoulder_2.obj" />
+    <mesh name="ur5e_upperarm_0" file="ur5e_visual/upperarm_0.obj" />
+    <mesh name="ur5e_upperarm_1" file="ur5e_visual/upperarm_1.obj" />
+    <mesh name="ur5e_upperarm_2" file="ur5e_visual/upperarm_2.obj" />
+    <mesh name="ur5e_upperarm_3" file="ur5e_visual/upperarm_3.obj" />
+    <mesh name="ur5e_forearm_0" file="ur5e_visual/forearm_0.obj" />
+    <mesh name="ur5e_forearm_1" file="ur5e_visual/forearm_1.obj" />
+    <mesh name="ur5e_forearm_2" file="ur5e_visual/forearm_2.obj" />
+    <mesh name="ur5e_forearm_3" file="ur5e_visual/forearm_3.obj" />
+    <mesh name="ur5e_wrist1_0" file="ur5e_visual/wrist1_0.obj" />
+    <mesh name="ur5e_wrist1_1" file="ur5e_visual/wrist1_1.obj" />
+    <mesh name="ur5e_wrist1_2" file="ur5e_visual/wrist1_2.obj" />
+    <mesh name="ur5e_wrist2_0" file="ur5e_visual/wrist2_0.obj" />
+    <mesh name="ur5e_wrist2_1" file="ur5e_visual/wrist2_1.obj" />
+    <mesh name="ur5e_wrist2_2" file="ur5e_visual/wrist2_2.obj" />
+    <mesh name="ur5e_wrist3" file="ur5e_visual/wrist3.obj" />
+
+    <!-- UR5e color materials (rgba values from mujoco_menagerie ur5e_globals). -->
+    <material
+      name="ur5e_black"
+      rgba="0.033 0.033 0.033 1"
+      specular="0.5"
+      shininess="0.25"
+    />
+    <material
+      name="ur5e_jointgray"
+      rgba="0.278 0.278 0.278 1"
+      specular="0.5"
+      shininess="0.25"
+    />
+    <material
+      name="ur5e_linkgray"
+      rgba="0.82 0.82 0.82 1"
+      specular="0.5"
+      shininess="0.25"
+    />
+    <material
+      name="ur5e_blue"
+      rgba="0.49 0.678 0.8 1"
+      specular="0.5"
+      shininess="0.25"
+    />
+  </asset>
+
+  <contact>
+    <exclude body1="base_link_inertia" body2="shoulder_link" />
+    <exclude body1="floor_body" body2="calibrated_table" />
+    <exclude body1="floor_body" body2="calibrated_bin" />
+    <exclude body1="floor_body" body2="calibrated_top_shelf" />
+    <exclude body1="floor_body" body2="calibrated_bottom_shelf" />
+    <exclude body1="floor_body" body2="shelf_back" />
+    <exclude body1="floor_body" body2="shelf_base" />
+  </contact>
+
+  <asset>
+    <!--
+      Grocery-store floor: cream/gray procedural tile with subtle grout edges.
+      Tile-pitch math: builtin="checker" produces a 2x2 alternating pattern
+      per rep, so the visible tile is HALF the rep pitch. texrepeat="1 1" with
+      texuniform="true" means 1 rep per world meter -> 0.5 m visible tiles
+      (~20 inch grocery-floor pitch). Larger tiles also survive minification
+      at high (top-down) camera angles, where the previous 0.25 m tiles got
+      averaged away by mipmapping into a uniform gray. rgb1/rgb2 contrast is
+      bumped so even when adjacent tiles blend in the mipmap chain the
+      residual difference still reads. The previous mark="edge" attribute
+      produced visible Moiré "wavy dark band" artifacts under mipmap
+      minification at grazing camera angles, so it has been removed.
+    -->
+    <texture
+      type="2d"
+      name="groundplane"
+      builtin="checker"
+      mark="none"
+      rgb1="0.82 0.80 0.75"
+      rgb2="0.55 0.53 0.49"
+      width="512"
+      height="512"
+    />
+    <material
+      name="groundplane"
+      texture="groundplane"
+      texuniform="true"
+      texrepeat="1 1"
+      specular="0.1"
+      shininess="0.3"
+      reflectance="0"
+    />
+
+    <!--
+      Grocery-store skybox: 4-column x 3-row cube unfold (".U..LFRB.D..").
+      The top cell is a cream suspended-tile ceiling with two warm
+      fluorescents; the four side cells share a stylized horizon view —
+      ceiling band on top, distant gondola shelving in the middle, cool
+      floor band on the bottom; the bottom cell is a neutral floor color
+      (covered by the actual floor plane in practice). Generated by
+      generate_grocery_skybox.py — re-run to reroll the gondola layout.
+    -->
+    <texture
+      type="skybox"
+      file="textures/grocery_skybox.png"
+      gridsize="3 4"
+      gridlayout=".U..LFRB.D.."
+    />
+  </asset>
+
+  <visual>
+    <!--
+      Headlight specular restored from 0 (which made all surfaces look
+      dead-matte) to a moderate value so plastic/metal/wood reads correctly.
+    -->
+    <headlight
+      diffuse="0.35 0.35 0.35"
+      ambient="0.25 0.25 0.27"
+      specular="0.10 0.10 0.10"
+    />
+    <rgba haze="0.85 0.88 0.92 1" />
+    <global azimuth="120" elevation="-20" offwidth="1280" offheight="960" />
+    <map zfar="50" />
+    <quality shadowsize="4096" offsamples="8" />
+  </visual>
+
+  <worldbody>
+    <!-- Key light: warm overhead, casts shadows. -->
+    <!-- <light pos="0 0 2.5" dir="0 0 -1" directional="true" /> -->
+    <light
+      name="key_light"
+      pos="1.0 -0.5 2.5"
+      dir="-0.3 0.2 -1"
+      directional="true"
+      castshadow="true"
+      diffuse="0.55 0.53 0.48"
+      specular="0.10 0.10 0.10"
+    />
+    <!-- Cool fill light: opposite side, no shadows, softens dark side. -->
+    <light
+      name="fill_light"
+      pos="-1.0 1.0 2.0"
+      dir="0.3 -0.2 -1"
+      directional="true"
+      castshadow="false"
+      diffuse="0.50 0.52 0.58"
+      specular="0.02 0.02 0.02"
+    />
+    <!-- Front light: directional, no shadow, points horizontally toward the
+         shelves (+Y) with a slight downward tilt. Hits operator-facing item
+         fronts at full diffuse but contributes little to top surfaces, so it
+         brightens the shelved decorative items without re-washing the bin
+         top-down view. -->
+    <light
+      name="front_light"
+      pos="0 -2 1.5"
+      dir="0 1 -0.2"
+      directional="true"
+      castshadow="false"
+      diffuse="0.30 0.30 0.32"
+      specular="0.05 0.05 0.05"
+    />
+    <body name="floor_body" pos="0 0 -0.8120632171630859">
+      <geom
+        name="floor"
+        pos="0 0 0"
+        size="0 0 0.05"
+        type="plane"
+        material="groundplane"
+        group="2"
+      />
+    </body>
+  </worldbody>
+
+  <actuator>
+    <position
+      joint="shoulder_pan_joint"
+      name="shoulder_pan_joint"
+      ctrlrange="-6.28319 6.28319"
+      kp="5000"
+      forcelimited="false"
+      dampratio="1"
+    />
+    <position
+      joint="shoulder_lift_joint"
+      name="shoulder_lift_joint"
+      ctrlrange="-6.28319 6.28319"
+      kp="5000"
+      forcelimited="false"
+      dampratio="1"
+    />
+    <position
+      joint="elbow_joint"
+      name="elbow_joint"
+      ctrlrange="-3.14159 3.14159"
+      kp="5000"
+      forcelimited="false"
+      dampratio="1"
+    />
+    <position
+      joint="wrist_1_joint"
+      name="wrist_1_joint"
+      ctrlrange="-6.28319 6.28319"
+      kp="5000"
+      forcelimited="false"
+      dampratio="1"
+    />
+    <position
+      joint="wrist_2_joint"
+      name="wrist_2_joint"
+      ctrlrange="-6.28319 6.28319"
+      kp="5000"
+      forcelimited="false"
+      dampratio="1"
+    />
+    <position
+      joint="wrist_3_joint"
+      name="wrist_3_joint"
+      ctrlrange="-6.28319 6.28319"
+      kp="5000"
+      forcelimited="false"
+      dampratio="1"
+    />
+  </actuator>
+  <worldbody>
+    <body name="base_link" gravcomp="1">
+      <body name="base_link_inertia" quat="0 0 0 1" gravcomp="1">
+        <inertial
+          pos="0 0 0"
+          quat="0.5 0.5 -0.5 0.5"
+          mass="4"
+          diaginertia="0.0072 0.00443333 0.00443333"
+        />
+        <geom
+          pos="0 0 0"
+          quat="0 0 0 1"
+          type="mesh"
+          contype="0"
+          conaffinity="0"
+          group="2"
+          density="0"
+          mesh="ur5e_base_0"
+          material="ur5e_black"
+          name="base_visual_black"
+        />
+        <geom
+          pos="0 0 0"
+          quat="0 0 0 1"
+          type="mesh"
+          contype="0"
+          conaffinity="0"
+          group="2"
+          density="0"
+          mesh="ur5e_base_1"
+          material="ur5e_jointgray"
+          name="base_visual_jointgray"
+        />
+        <geom
+          pos="0 0 0"
+          quat="0 0 0 1"
+          type="mesh"
+          mesh="base"
+          group="3"
+          name="base2"
+        />
+        <body name="shoulder_link" pos="0 0 0.1625" gravcomp="1">
+          <inertial
+            pos="0 -0.00193 -0.02561"
+            mass="3.761"
+            diaginertia="0.0102675 0.0102675 0.00666"
+          />
+          <joint
+            name="shoulder_pan_joint"
+            pos="0 0 0"
+            axis="0 0 1"
+            range="-6.28319 6.28319"
+            actuatorfrcrange="-150 150"
+          />
+          <geom
+            quat="0 0 0 1"
+            type="mesh"
+            contype="0"
+            conaffinity="0"
+            group="2"
+            density="0"
+            mesh="ur5e_shoulder_0"
+            material="ur5e_blue"
+            name="shoulder_visual_blue"
+          />
+          <geom
+            quat="0 0 0 1"
+            type="mesh"
+            contype="0"
+            conaffinity="0"
+            group="2"
+            density="0"
+            mesh="ur5e_shoulder_1"
+            material="ur5e_black"
+            name="shoulder_visual_black"
+          />
+          <geom
+            quat="0 0 0 1"
+            type="mesh"
+            contype="0"
+            conaffinity="0"
+            group="2"
+            density="0"
+            mesh="ur5e_shoulder_2"
+            material="ur5e_jointgray"
+            name="shoulder_visual_jointgray"
+          />
+          <geom
+            quat="0 0 0 1"
+            type="mesh"
+            mesh="shoulder"
+            group="3"
+            name="shoulder2"
+          />
+          <body name="upper_arm_link" quat="0.707107 0.707107 0 0" gravcomp="1">
+            <inertial
+              pos="-0.2125 0 0.11336"
+              mass="8.058"
+              diaginertia="0.133886 0.133886 0.0151074"
+            />
+            <joint
+              name="shoulder_lift_joint"
+              pos="0 0 0"
+              axis="0 0 1"
+              range="-6.28319 6.28319"
+              actuatorfrcrange="-150 150"
+            />
+            <geom
+              pos="0 0 0.138"
+              quat="0.5 0.5 -0.5 -0.5"
+              type="mesh"
+              contype="0"
+              conaffinity="0"
+              group="2"
+              density="0"
+              mesh="ur5e_upperarm_0"
+              material="ur5e_linkgray"
+              name="upperarm_visual_linkgray"
+            />
+            <geom
+              pos="0 0 0.138"
+              quat="0.5 0.5 -0.5 -0.5"
+              type="mesh"
+              contype="0"
+              conaffinity="0"
+              group="2"
+              density="0"
+              mesh="ur5e_upperarm_1"
+              material="ur5e_black"
+              name="upperarm_visual_black"
+            />
+            <geom
+              pos="0 0 0.138"
+              quat="0.5 0.5 -0.5 -0.5"
+              type="mesh"
+              contype="0"
+              conaffinity="0"
+              group="2"
+              density="0"
+              mesh="ur5e_upperarm_2"
+              material="ur5e_jointgray"
+              name="upperarm_visual_jointgray"
+            />
+            <geom
+              pos="0 0 0.138"
+              quat="0.5 0.5 -0.5 -0.5"
+              type="mesh"
+              contype="0"
+              conaffinity="0"
+              group="2"
+              density="0"
+              mesh="ur5e_upperarm_3"
+              material="ur5e_blue"
+              name="upperarm_visual_blue"
+            />
+            <geom
+              pos="0 0 0.138"
+              quat="0.5 0.5 -0.5 -0.5"
+              type="mesh"
+              mesh="upperarm"
+              group="3"
+              name="upperarm2"
+            />
+            <body name="forearm_link" pos="-0.425 0 0" gravcomp="1">
+              <inertial
+                pos="-0.2422 0 0.0265"
+                mass="2.846"
+                diaginertia="0.0312094 0.0312094 0.004095"
+              />
+              <joint
+                name="elbow_joint"
+                pos="0 0 0"
+                axis="0 0 1"
+                range="-3.14159 3.14159"
+                actuatorfrcrange="-150 150"
+              />
+              <geom
+                pos="0 0 0.007"
+                quat="0.5 0.5 -0.5 -0.5"
+                type="mesh"
+                contype="0"
+                conaffinity="0"
+                group="2"
+                density="0"
+                mesh="ur5e_forearm_0"
+                material="ur5e_blue"
+                name="forearm_visual_blue"
+              />
+              <geom
+                pos="0 0 0.007"
+                quat="0.5 0.5 -0.5 -0.5"
+                type="mesh"
+                contype="0"
+                conaffinity="0"
+                group="2"
+                density="0"
+                mesh="ur5e_forearm_1"
+                material="ur5e_linkgray"
+                name="forearm_visual_linkgray"
+              />
+              <geom
+                pos="0 0 0.007"
+                quat="0.5 0.5 -0.5 -0.5"
+                type="mesh"
+                contype="0"
+                conaffinity="0"
+                group="2"
+                density="0"
+                mesh="ur5e_forearm_2"
+                material="ur5e_black"
+                name="forearm_visual_black"
+              />
+              <geom
+                pos="0 0 0.007"
+                quat="0.5 0.5 -0.5 -0.5"
+                type="mesh"
+                contype="0"
+                conaffinity="0"
+                group="2"
+                density="0"
+                mesh="ur5e_forearm_3"
+                material="ur5e_jointgray"
+                name="forearm_visual_jointgray"
+              />
+              <geom
+                pos="0 0 0.007"
+                quat="0.5 0.5 -0.5 -0.5"
+                type="mesh"
+                mesh="forearm"
+                group="3"
+                name="forearm2"
+              />
+              <body name="wrist_1_link" pos="-0.3922 0 0.1333" gravcomp="1">
+                <inertial
+                  pos="0 -0.01634 -0.0018"
+                  mass="1.37"
+                  diaginertia="0.0025599 0.0025599 0.0021942"
+                />
+                <joint
+                  name="wrist_1_joint"
+                  pos="0 0 0"
+                  axis="0 0 1"
+                  range="-6.28319 6.28319"
+                  actuatorfrcrange="-28 28"
+                />
+                <geom
+                  pos="0 0 -0.127"
+                  quat="0.707107 0.707107 0 0"
+                  type="mesh"
+                  contype="0"
+                  conaffinity="0"
+                  group="2"
+                  density="0"
+                  mesh="ur5e_wrist1_0"
+                  material="ur5e_black"
+                  name="wrist1_visual_black"
+                />
+                <geom
+                  pos="0 0 -0.127"
+                  quat="0.707107 0.707107 0 0"
+                  type="mesh"
+                  contype="0"
+                  conaffinity="0"
+                  group="2"
+                  density="0"
+                  mesh="ur5e_wrist1_1"
+                  material="ur5e_blue"
+                  name="wrist1_visual_blue"
+                />
+                <geom
+                  pos="0 0 -0.127"
+                  quat="0.707107 0.707107 0 0"
+                  type="mesh"
+                  contype="0"
+                  conaffinity="0"
+                  group="2"
+                  density="0"
+                  mesh="ur5e_wrist1_2"
+                  material="ur5e_jointgray"
+                  name="wrist1_visual_jointgray"
+                />
+                <geom
+                  pos="0 0 -0.127"
+                  quat="0.707107 0.707107 0 0"
+                  type="mesh"
+                  mesh="wrist1"
+                  group="3"
+                  name="wrist12"
+                />
+                <body
+                  name="wrist_2_link"
+                  pos="0 -0.0997 -2.04488e-11"
+                  quat="0.707107 0.707107 0 0"
+                  gravcomp="1"
+                >
+                  <inertial
+                    pos="0 0.01634 -0.0018"
+                    mass="1.3"
+                    diaginertia="0.0025599 0.0025599 0.0021942"
+                  />
+                  <joint
+                    name="wrist_2_joint"
+                    pos="0 0 0"
+                    axis="0 0 1"
+                    range="-6.28319 6.28319"
+                    actuatorfrcrange="-28 28"
+                  />
+                  <geom
+                    pos="0 0 -0.0997"
+                    quat="1 0 0 0"
+                    type="mesh"
+                    contype="0"
+                    conaffinity="0"
+                    group="2"
+                    density="0"
+                    mesh="ur5e_wrist2_0"
+                    material="ur5e_black"
+                    name="wrist2_visual_black"
+                  />
+                  <geom
+                    pos="0 0 -0.0997"
+                    quat="1 0 0 0"
+                    type="mesh"
+                    contype="0"
+                    conaffinity="0"
+                    group="2"
+                    density="0"
+                    mesh="ur5e_wrist2_1"
+                    material="ur5e_blue"
+                    name="wrist2_visual_blue"
+                  />
+                  <geom
+                    pos="0 0 -0.0997"
+                    quat="1 0 0 0"
+                    type="mesh"
+                    contype="0"
+                    conaffinity="0"
+                    group="2"
+                    density="0"
+                    mesh="ur5e_wrist2_2"
+                    material="ur5e_jointgray"
+                    name="wrist2_visual_jointgray"
+                  />
+                  <geom
+                    pos="0 0 -0.0997"
+                    quat="1 0 0 0"
+                    type="mesh"
+                    mesh="wrist2"
+                    group="3"
+                    name="wrist22"
+                  />
+                  <body
+                    name="wrist_3_link"
+                    pos="0 0.0996 -2.04283e-11"
+                    quat="0.707107 -0.707107 0 0"
+                    gravcomp="1"
+                  >
+                    <inertial
+                      pos="0 0 -0.001159"
+                      quat="0.5 0.5 -0.5 0.5"
+                      mass="0.365"
+                      diaginertia="0.000132117 9.89041e-05 9.89041e-05"
+                    />
+                    <joint
+                      name="wrist_3_joint"
+                      pos="0 0 0"
+                      axis="0 0 1"
+                      range="-6.28319 6.28319"
+                      actuatorfrcrange="-28 28"
+                    />
+                    <geom
+                      pos="0 0 -0.0989"
+                      quat="0.707107 0.707107 0 0"
+                      type="mesh"
+                      contype="0"
+                      conaffinity="0"
+                      group="2"
+                      density="0"
+                      mesh="ur5e_wrist3"
+                      material="ur5e_linkgray"
+                      name="wrist3_visual_linkgray"
+                    />
+                    <geom
+                      pos="0 0 -0.0989"
+                      quat="0.707107 0.707107 0 0"
+                      type="mesh"
+                      mesh="wrist3"
+                      group="3"
+                      name="wrist32"
+                    />
+                    <!--
+                      tcp_fts_sensor must sit on a body whose parent joint
+                      carries the EE load (wrist_3_joint) so MuJoCo's
+                      <force site>/<torque site> sensors have a constraint
+                      to measure. Putting it under an empty ft_frame body
+                      (no joint, no mass, no descendants) makes the sensor
+                      read zero. Identity orientation here aligns the
+                      site frame with tool0, matching frame_id: tool0
+                      and sensor_frame: tool0 in ros2_controllers.yaml.
+                      The URDF's ft_frame TF link still exists via
+                      ur_macro.xacro and remains published by
+                      robot_state_publisher.
+                    -->
+                    <site name="tcp_fts_sensor" size="0.01" pos="0 0 0" />
+                    <body name="flange" quat="0.5 -0.5 -0.5 -0.5" gravcomp="1">
+                      <body name="tool0" quat="0.5 0.5 0.5 0.5" gravcomp="1">
+                        <body name="realsense_camera_adapter_link" gravcomp="1">
+                          <geom
+                            type="mesh"
+                            contype="0"
+                            conaffinity="0"
+                            group="2"
+                            density="0"
+                            mesh="picknik_ur5_realsense_camera_adapter_rev2_collision"
+                            name="picknik_ur5_realsense_camera_adapter_rev2_collision"
+                          />
+                          <geom
+                            type="mesh"
+                            mesh="picknik_ur5_realsense_camera_adapter_rev2_collision"
+                            group="3"
+                            name="picknik_ur5_realsense_camera_adapter_rev2_collision2"
+                          />
+                          <body
+                            name="realsense_camera_adapter_tool0"
+                            pos="0 0 0.007"
+                            gravcomp="1"
+                          >
+                            <body name="ur_to_robotiq_link" gravcomp="1">
+                              <inertial
+                                pos="0 0 0"
+                                mass="0.01"
+                                diaginertia="4.4e-05 2.7e-05 2.7e-05"
+                              />
+                              <geom
+                                type="mesh"
+                                contype="0"
+                                conaffinity="0"
+                                group="2"
+                                density="0"
+                                mesh="ur_to_robotiq_adapter"
+                                name="ur_to_robotiq_adapter"
+                              />
+                              <geom
+                                type="mesh"
+                                mesh="ur_to_robotiq_adapter"
+                                group="3"
+                                name="ur_to_robotiq_adapter2"
+                              />
+                              <body
+                                name="gripper_mount_link"
+                                pos="0 0 0.011"
+                                gravcomp="1"
+                              >
+                                <body name="epick_base_link" gravcomp="1">
+                                  <body
+                                    name="epick_body"
+                                    pos="0 0 0.05115"
+                                    gravcomp="1"
+                                  >
+                                    <geom
+                                      pos="0 0 -0.05115"
+                                      type="mesh"
+                                      contype="0"
+                                      conaffinity="0"
+                                      group="2"
+                                      density="0"
+                                      rgba="0.25 0.25 0.25 1"
+                                      mesh="epick_body"
+                                      name="epick_body"
+                                    />
+                                    <geom
+                                      size="0.044 0.05115"
+                                      type="cylinder"
+                                      rgba="0.25 0.25 0.25 1"
+                                      group="3"
+                                      name="epick_body2"
+                                    />
+                                    <body
+                                      name="epick_extension"
+                                      pos="0 0 0.09515"
+                                      gravcomp="1"
+                                    >
+                                      <geom
+                                        size="0.005 0.044"
+                                        type="cylinder"
+                                        contype="0"
+                                        conaffinity="0"
+                                        group="2"
+                                        density="0"
+                                        rgba="0.25 0.25 0.25 1"
+                                        name="epick_extension"
+                                      />
+                                      <geom
+                                        size="0.005 0.044"
+                                        type="cylinder"
+                                        rgba="0.25 0.25 0.25 1"
+                                        group="3"
+                                        name="epick_extension2"
+                                      />
+                                      <body
+                                        name="epick_suction_cup"
+                                        pos="0 0 0.0515"
+                                        gravcomp="1"
+                                      >
+                                        <geom
+                                          size="0.012 0.0075"
+                                          type="cylinder"
+                                          contype="0"
+                                          conaffinity="0"
+                                          group="2"
+                                          density="0"
+                                          rgba="0.25 0.25 0.25 1"
+                                          name="epick_suction_cup"
+                                        />
+                                        <geom
+                                          size="0.012 0.0075"
+                                          type="cylinder"
+                                          rgba="0.25 0.25 0.25 1"
+                                          group="3"
+                                          name="epick_suction_cup2"
+                                        />
+                                        <body
+                                          name="epick_tip"
+                                          pos="0 0 0.0075"
+                                          gravcomp="1"
+                                        >
+                                          <body
+                                            name="epick_tcp"
+                                            pos="0 0 -0.005"
+                                            gravcomp="1"
+                                          >
+                                            <body
+                                              name="epick_vacuum_state"
+                                              gravcomp="1"
+                                            >
+                                              <inertial
+                                                pos="0 0 0"
+                                                mass="0.01"
+                                                diaginertia="1e-05 1e-05 1e-05"
+                                              />
+                                              <!-- suction cup site and geometry -->
+                                              <site name="suction_cup_epick" />
+                                              <geom
+                                                margin="0.03"
+                                                gap="0.03"
+                                                type="sphere"
+                                                size="0.01"
+                                                group="3"
+                                              />
+                                            </body>
+                                            <body
+                                              name="grasp_link"
+                                              gravcomp="1"
+                                            />
+                                          </body>
+                                        </body>
+                                      </body>
+                                    </body>
+                                  </body>
+                                </body>
+                              </body>
+                            </body>
+                          </body>
+                          <body
+                            name="d415_mount_link"
+                            pos="0 -0.067 0.0171"
+                            quat="0.525483 0.473147 -0.473147 0.525483"
+                            gravcomp="1"
+                          >
+                            <body
+                              name="wrist_mounted_camera_bottom_screw_frame"
+                              gravcomp="1"
+                            >
+                              <body
+                                name="wrist_mounted_camera_link"
+                                pos="0 0.02 0.0115"
+                                gravcomp="1"
+                              >
+                                <inertial
+                                  pos="0 0 0"
+                                  quat="0.707107 0.707107 0 0"
+                                  mass="0.072"
+                                  diaginertia="0.00388124 0.00387926 0.00049894"
+                                />
+                                <geom
+                                  size="0.010025 0.0495 0.0115"
+                                  pos="0 -0.02 0"
+                                  type="box"
+                                  contype="0"
+                                  conaffinity="0"
+                                  group="2"
+                                  density="0"
+                                  name="wrist_mounted_camera_link"
+                                />
+                                <geom
+                                  size="0.010025 0.0495 0.0115"
+                                  pos="0 -0.02 0"
+                                  type="box"
+                                  group="3"
+                                  name="wrist_mounted_camera_link2"
+                                />
+                                <body
+                                  name="wrist_mounted_camera_depth_frame"
+                                  gravcomp="1"
+                                >
+                                  <body
+                                    name="wrist_mounted_camera_depth_optical_frame"
+                                    quat="0.5 -0.5 0.5 -0.5"
+                                    gravcomp="1"
+                                  >
+                                    <!-- Wrist camera disabled in sim to save render cost; not used
+                                         on a regular basis. Re-enable when needed.
+                                    <camera
+                                      name="wrist_mounted_camera"
+                                      pos="0 0 0"
+                                      fovy="58"
+                                      mode="fixed"
+                                      resolution="1280 960"
+                                      quat="0.0 -1.0 0.0 0.0"
+                                    />
+                                    -->
+                                    <site
+                                      name="wrist_mounted_camera_optical_frame"
+                                      pos="0 0 0"
+                                      quat="1.0 0.0 0.0 0.0"
+                                    />
+                                  </body>
+                                </body>
+                                <body
+                                  name="wrist_mounted_camera_infra1_frame"
+                                  gravcomp="1"
+                                >
+                                  <body
+                                    name="wrist_mounted_camera_infra1_optical_frame"
+                                    quat="0.5 -0.5 0.5 -0.5"
+                                    gravcomp="1"
+                                  />
+                                </body>
+                                <body
+                                  name="wrist_mounted_camera_infra2_frame"
+                                  pos="0 -0.055 0"
+                                  gravcomp="1"
+                                >
+                                  <body
+                                    name="wrist_mounted_camera_infra2_optical_frame"
+                                    quat="0.5 -0.5 0.5 -0.5"
+                                    gravcomp="1"
+                                  />
+                                </body>
+                                <body
+                                  name="wrist_mounted_camera_color_frame"
+                                  pos="0 0.015 0"
+                                  gravcomp="1"
+                                >
+                                  <body
+                                    name="wrist_mounted_camera_color_optical_frame"
+                                    quat="0.5 -0.5 0.5 -0.5"
+                                    gravcomp="1"
+                                  />
+                                </body>
+                              </body>
+                            </body>
+                          </body>
+                          <body
+                            name="l515_mount_link"
+                            pos="0 -0.0406 0.0173"
+                            quat="0.525483 0.473147 -0.473147 0.525483"
+                            gravcomp="1"
+                          />
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="base" quat="0 0 0 1" gravcomp="1" />
+    </body>
+  </worldbody>
+
+  <sensor>
+    <force site="tcp_fts_sensor" />
+    <torque site="tcp_fts_sensor" />
+  </sensor>
+</mujoco>

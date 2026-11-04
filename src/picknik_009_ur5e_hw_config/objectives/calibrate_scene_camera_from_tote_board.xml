@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root
+  BTCPP_format="4"
+  main_tree_to_execute="Calibrate Scene Camera From Tote Board"
+>
+  <BehaviorTree
+    ID="Calibrate Scene Camera From Tote Board"
+    _description="Runs stage d.1 (Calibrate Wrist Camera On Tote Board) and then stage d.2: places the original scene D415 from the tote board pose that stage d.1 just saved, since the scene camera sees the same board. Saves the scene_camera_link section of cell_calibration.yaml, then runs Load Calibrated Scene, which places the tote and publishes world to scene_camera_link. The tote and the tote board must not have moved since stage d.1. See design_docs/board_based_calibration.md."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <!--The wrist stage first: it solves the wrist camera and saves the board pose this stage loads.-->
+      <SubTree
+        ID="Calibrate Wrist Camera On Tote Board"
+        _collapsed="true"
+        waypoint_prefix="{waypoint_prefix}"
+        board="{board}"
+        settle_seconds="{settle_seconds}"
+      />
+      <Action
+        ID="LoadPoseStampedFromYamlNamespace"
+        file_path="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="tote_board"
+        output="{tote_board_pose}"
+      />
+      <SubTree
+        ID="Calibrate Fixed Camera From Known Board"
+        _collapsed="true"
+        image_topic="/camera/scene_camera/color/image_raw"
+        camera_info_topic="/camera/scene_camera/color/camera_info"
+        board="{board}"
+        board_pose_world="{tote_board_pose}"
+        camera_root_frame="scene_camera_link"
+        camera_optical_frame="scene_camera_color_optical_frame"
+        sample_count="{sample_count}"
+        camera_root_pose_world="{scene_camera_link_pose}"
+      />
+      <Action
+        ID="SavePoseStampedToYaml"
+        yaml_filename="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="scene_camera_link"
+        overwrite="false"
+        message="{scene_camera_link_pose}"
+      />
+      <!--Places the scene from the new results and publishes the camera transforms for this run.-->
+      <SubTree
+        ID="Load Calibrated Scene"
+        _collapsed="true"
+        top_shelf_pose="{top_shelf_pose}"
+        bottom_shelf_pose="{bottom_shelf_pose}"
+        bin_calibrated_pose="{bin_calibrated_pose}"
+      />
+      <Action
+        ID="LogMessage"
+        log_level="info"
+        message="Stages d.1 and d.2 done. Saved the scene_camera_link section of cell_calibration.yaml and loaded the scene with it. Remove the tote board before filling the tote."
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Calibrate Scene Camera From Tote Board">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+      <input_port
+        name="waypoint_prefix"
+        default="tote_calibration"
+        type="std::string"
+      >
+        Prefix of the saved calibration waypoints for the wrist stage that runs
+        first.
+      </input_port>
+      <input_port name="settle_seconds" default="1.0" type="double">
+        Wait after each wrist-stage move before the image is taken.
+      </input_port>
+      <input_port
+        name="board"
+        default="[{squares_x: 7, squares_y: 5, square_length: 0.035, marker_length: 0.026, dictionary: DICT_4X4_50}]"
+        type="moveit_studio_msgs::msg::CharucoBoard"
+      >
+        The tote copy of the calibration board, unmoved since stage d.1. Must
+        be the same board as in stage d.1.
+      </input_port>
+      <input_port name="sample_count" default="10" type="int">
+        Number of scene camera images whose board poses are averaged.
+      </input_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>

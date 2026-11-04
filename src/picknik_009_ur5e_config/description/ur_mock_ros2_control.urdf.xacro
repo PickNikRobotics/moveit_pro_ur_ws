@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+  <!-- Mock ros2_control -->
+  <ros2_control name="ur_mock_ros2_control" type="system">
+    <hardware>
+      <plugin>mock_components/GenericSystem</plugin>
+    </hardware>
+
+    <joint name="shoulder_pan_joint">
+      <command_interface name="position" />
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="shoulder_lift_joint">
+      <command_interface name="position" />
+      <state_interface name="position">
+        <param name="initial_value">-1.5708</param>
+      </state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="elbow_joint">
+      <command_interface name="position" />
+      <state_interface name="position">
+        <param name="initial_value">1.5708</param>
+      </state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="wrist_1_joint">
+      <command_interface name="position" />
+      <state_interface name="position">
+        <param name="initial_value">-1.5708</param>
+      </state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="wrist_2_joint">
+      <command_interface name="position" />
+      <state_interface name="position">
+        <param name="initial_value">-1.5708</param>
+      </state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="wrist_3_joint">
+      <command_interface name="position" />
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <!-- <sensor name="tcp_fts_sensor">
+      <state_interface name="force.x" />
+      <state_interface name="force.y" />
+      <state_interface name="force.z" />
+      <state_interface name="torque.x" />
+      <state_interface name="torque.y" />
+      <state_interface name="torque.z" />
+    </sensor> -->
+  </ros2_control>
+</robot>

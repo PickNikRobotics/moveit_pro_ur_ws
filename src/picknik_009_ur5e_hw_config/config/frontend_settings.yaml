@@ -1,0 +1,67 @@
+# Frontend settings for the MoveIt Pro Desktop App when this config is active.
+#
+# Declares the custom view pane so it loads automatically — no operator typing a
+# URL into "Add Custom View Pane".
+#
+# THE HOST IN THESE URLS IS LOAD-BEARING, AND `localhost` IS WRONG. The Pro 10 Desktop
+# App validates every pane URL against the app's own hostname and the connected backend's
+# hostname, and its comparison canonicalizes then compares literally (falling back to an
+# IP-vs-IP check). `localhost` is not an IP and never equals `127.0.0.1`, so an otherwise
+# perfect `http://127.0.0.1:8731/...` is rejected with:
+#
+#     Custom pane host must match the desktop app or the connected backend.
+#
+# The pane is served by this workspace's own serve_custom_view_panes.py (:8731, launched
+# from picknik_009_ur5e_config/launch/agent_bridge.launch.xml), so the port is ours but the
+# host has to be spelled the way the app spells it.
+#
+# Why absolute :8731 and not the root-relative /api/packages/<pkg>/web/<file> form the app
+# also accepts: a backend-local pane is served through the app's own `moveit-pro-pane:`
+# scheme, and the app stamps `connect-src 'self'` onto it. This pane talks to
+# foxglove_bridge on :3201 over their own WebSocket, which that CSP forbids. Moving to the
+# backend-local route means rewriting the pane onto the app's injected ROS bridge — a
+# real change, not a URL swap. Absolute-URL panes are loaded straight from the pane server,
+# which sets no CSP, so the direct socket keeps working.
+#
+# Leave `enable_web_bridge` unset (it defaults to false). It does NOT gate the panes' own
+# socket; it opts into the app's injected bridge and, when true, additionally REQUIRES the
+# pane URL to be https — which this plain-HTTP pane server cannot satisfy.
+#
+# The cost is a hardcoded host, correct whenever the Desktop App runs on the agent host.
+# For split-host operation (Desktop App on a laptop, agent elsewhere) the operator adds the
+# LAN URL by hand — the pane server prints it in its startup banner — and that URL must use
+# the same hostname the app used to connect to the backend.
+#
+# CHANGING A `url:` BELOW IS NOT ENOUGH ON ITS OWN, AND THE FAILURE IS SILENT. These
+# entries are merged into the app's `customViewPanes:<config_package>` localStorage key
+# deduped by NAME:
+#
+#     const u = new Set(stored.map((h) => h.name));
+#     for (const h of yamlEntries) { if (u.has(h.name)) continue; ... }
+#
+# A stored pane with the same name wins, this entry is skipped on every connect, and the
+# OLD url keeps being resolved — so a corrected url here has no effect at all. (The stored
+# `id` is a hash of {name, url, enable_web_bridge} and does move with the url, but it is
+# not the dedup key, so it does not help.)
+#
+# Two ways out:
+#
+#   1. Have the operator delete the pane in the UI (Add/Edit Custom View Panes → remove)
+#      and reconnect. This is the remedy this workspace uses: one manual step per operator
+#      machine, and it leaves a clean list. Its one hazard is that skipping the step is
+#      indistinguishable from the fix not working, so it has to be spelled out rather than
+#      assumed — the steps live in each host's bring-up notes.
+#   2. Change the `name:` too. Non-colliding names are appended as fresh entries, so a new
+#      url takes effect on the next connect with no operator action — at the cost of
+#      stranding the old pane in every operator's list permanently and burning that name
+#      for reuse. An escape hatch for an urgent url change, not the default.
+#
+# Must live in the *leaf* launched config package: the loader reads
+# get_config_package()/share/config/frontend_settings.yaml and does NOT follow
+# based_on_package inheritance. Keep in sync with picknik_009_ur5e_config_sim.
+iframeViewports:
+  - name: Shelf Stocking App
+    url: http://127.0.0.1:8731/shelf_stocking.html
+  # Hardware only: the unshelve collections and shopping_list_server.py run only here.
+  - name: Shopping List
+    url: http://127.0.0.1:8731/shopping_list.html

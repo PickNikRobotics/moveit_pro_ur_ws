@@ -1,0 +1,100 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+  <!-- Shelf macro using box primitives for easy modification.
+       Dimensions derived from the original shelf.stl mesh. -->
+  <xacro:macro name="shelf" params="parent *origin">
+
+    <!-- Overall shelf dimensions -->
+    <xacro:property name="shelf_width" value="1.2192" />
+    <xacro:property name="shelf_depth" value="0.4826" />
+    <xacro:property name="shelf_height" value="1.3716" />
+
+    <!-- Panel thicknesses -->
+    <xacro:property name="side_panel_thickness" value="0.0381" />
+    <xacro:property name="back_panel_thickness" value="0.0762" />
+    <xacro:property name="shelf_board_thickness" value="0.0381" />
+    <xacro:property name="bottom_board_thickness" value="0.1905" />
+
+    <!-- Shelf board depth (front portion, excluding back panel) -->
+    <xacro:property name="board_depth" value="0.4064" />
+
+    <!-- Shelf board Z positions (bottom of each board) -->
+    <xacro:property name="shelf_2_z" value="0.4572" />
+    <xacro:property name="shelf_3_z" value="0.7620" />
+    <xacro:property name="shelf_4_z" value="1.2668" />
+
+    <xacro:property name="shelf_color" value="0.792 0.820 0.933 1" />
+
+    <link name="shelf">
+      <!-- Back panel: full width, full height -->
+      <visual>
+        <origin xyz="0 ${-(shelf_depth - back_panel_thickness/2)} ${shelf_height/2}" rpy="0 0 0" />
+        <geometry>
+          <box size="${shelf_width} ${back_panel_thickness} ${shelf_height}" />
+        </geometry>
+        <material name="shelf_material">
+          <color rgba="${shelf_color}" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 ${-(shelf_depth - back_panel_thickness/2)} ${shelf_height/2}" rpy="0 0 0" />
+        <geometry>
+          <box size="${shelf_width} ${back_panel_thickness} ${shelf_height}" />
+        </geometry>
+      </collision>
+
+      <!-- Bottom board (thicker base) -->
+      <visual>
+        <origin xyz="0 ${-board_depth/2} ${bottom_board_thickness/2}" rpy="0 0 0" />
+        <geometry>
+          <box size="${shelf_width} ${board_depth} ${bottom_board_thickness}" />
+        </geometry>
+        <material name="shelf_material" />
+      </visual>
+      <collision>
+        <origin xyz="0 ${-board_depth/2} ${bottom_board_thickness/2}" rpy="0 0 0" />
+        <geometry>
+          <box size="${shelf_width} ${board_depth} ${bottom_board_thickness}" />
+        </geometry>
+      </collision>
+
+      <!-- Shelf board 2 -->
+      <visual>
+        <origin xyz="0 ${-board_depth/2} ${shelf_2_z + shelf_board_thickness/2}" rpy="0 0 0" />
+        <geometry>
+          <box size="${shelf_width} ${board_depth} ${shelf_board_thickness}" />
+        </geometry>
+        <material name="shelf_material" />
+      </visual>
+      <collision>
+        <origin xyz="0 ${-board_depth/2} ${shelf_2_z + shelf_board_thickness/2}" rpy="0 0 0" />
+        <geometry>
+          <box size="${shelf_width} ${board_depth} ${shelf_board_thickness}" />
+        </geometry>
+      </collision>
+
+      <!-- Shelf board 4 -->
+      <visual>
+        <origin xyz="0 ${-board_depth/2} ${shelf_4_z + shelf_board_thickness/2}" rpy="0 0 0" />
+        <geometry>
+          <box size="${shelf_width} ${board_depth} ${shelf_board_thickness}" />
+        </geometry>
+        <material name="shelf_material" />
+      </visual>
+      <collision>
+        <origin xyz="0 ${-board_depth/2} ${shelf_4_z + shelf_board_thickness/2}" rpy="0 0 0" />
+        <geometry>
+          <box size="${shelf_width} ${board_depth} ${shelf_board_thickness}" />
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="world_to_shelf" type="fixed">
+      <parent link="${parent}"/>
+      <child link="shelf"/>
+      <xacro:insert_block name="origin"/>
+    </joint>
+
+  </xacro:macro>
+</robot>

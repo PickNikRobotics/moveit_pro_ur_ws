@@ -1,0 +1,628 @@
+<calibrated_scene>
+  <!--
+    TEMPLATE. The sim package build fills the pose placeholders from cell_calibration.yaml and
+    board_offsets.yaml (scripts/generate_calibrated_scene_mjcf.py) and installs the result as
+    mjcf/assets/calibrated_scene.xml, which additions.xml includes. Static bodies only: a joint
+    here would shift every keyframe qpos. See design_docs/board_based_calibration.md.
+  -->
+    <!-- Bin: 0.6096m x 0.381m x 0.185m (24" x 15" tote, walls trimmed to 18.5 cm).
+         Pose: the bin_tote.urdf origin that Load Calibrated Scene works out. -->
+    <body
+      name="calibrated_bin"
+      pos="${bin_pos}"
+      quat="${bin_quat}"
+      gravcomp="1"
+    >
+      <!-- Bottom -->
+      <geom
+        name="calibrated_bin_bottom"
+        type="box"
+        size="0.3048 0.1905 0.0025"
+        pos="0 0 -0.093"
+        material="bin_material"
+        group="2"
+      />
+      <!--
+        Wall overlap fix: the original front/back walls were 0.6096 m long
+        (full bin length) AND the left/right walls were 0.381 m long (full
+        bin width), so the four corner volumes overlapped in 0.025 x 0.025
+        x H pillars and z-fought during rendering. The fix is to shorten the
+        front/back x half-extent from 0.3048 to 0.2798. Why 0.2798: the side
+        walls have half-extent 0.0125 centered at x=0.2923, so their INNER
+        face is at x = 0.2923 - 0.0125 = 0.2798. Setting the front/back
+        half-extent to that value makes the front/back wall meet the side
+        wall's inner face exactly, with zero overlap. The side walls own the
+        full corners.
+      -->
+      <!-- Back wall (Y-) -->
+      <geom
+        name="calibrated_bin_back"
+        type="box"
+        size="0.2798 0.0125 0.0925"
+        pos="0 -0.178 0"
+        material="bin_material"
+        group="2"
+      />
+      <!-- Front wall (Y+) -->
+      <geom
+        name="calibrated_bin_front"
+        type="box"
+        size="0.2798 0.0125 0.0925"
+        pos="0 0.178 0"
+        material="bin_material"
+        group="2"
+      />
+      <!-- Right wall (X+) -->
+      <geom
+        name="calibrated_bin_right"
+        type="box"
+        size="0.0125 0.1905 0.0925"
+        pos="0.2923 0 0"
+        material="bin_material"
+        group="2"
+      />
+      <!-- Left wall (X-) -->
+      <geom
+        name="calibrated_bin_left"
+        type="box"
+        size="0.0125 0.1905 0.0925"
+        pos="-0.2923 0 0"
+        material="bin_material"
+        group="2"
+      />
+      <site name="calibrated_bin_tf" pos="0 0 0" size="0.01" rgba="0 0 0 0" />
+    </body>
+
+    <!-- Top Shelf -->
+    <body
+      name="calibrated_top_shelf"
+      pos="${top_shelf_pos}"
+      quat="${top_shelf_quat}"
+      gravcomp="1"
+    >
+      <geom
+        name="calibrated_top_shelf_visual"
+        type="mesh"
+        mesh="shelf_only_mesh"
+        material="shelf_metal_material"
+        contype="0"
+        conaffinity="0"
+        group="2"
+      />
+      <geom
+        name="calibrated_top_shelf_collision"
+        type="mesh"
+        mesh="shelf_only_mesh"
+        group="3"
+      />
+      <site
+        name="calibrated_top_shelf_tf"
+        pos="0 0 0"
+        size="0.01"
+        rgba="0 1 0 0.35"
+      />
+    </body>
+
+    <!-- Bottom Shelf -->
+    <body
+      name="calibrated_bottom_shelf"
+      pos="${bottom_shelf_pos}"
+      quat="${bottom_shelf_quat}"
+      gravcomp="1"
+    >
+      <geom
+        name="calibrated_bottom_shelf_visual"
+        type="mesh"
+        mesh="shelf_only_mesh"
+        material="shelf_metal_material"
+        contype="0"
+        conaffinity="0"
+        group="2"
+      />
+      <geom
+        name="calibrated_bottom_shelf_collision"
+        type="mesh"
+        mesh="shelf_only_mesh"
+        group="3"
+      />
+      <site
+        name="calibrated_bottom_shelf_tf"
+        pos="0 0 0"
+        size="0.01"
+        rgba="0 1 0 0.35"
+      />
+    </body>
+
+    <!-- Shelf Back Box: 1.27m x 0.08m x 1.8288m -->
+    <body
+      name="shelf_back"
+      pos="${shelf_back_pos}"
+      quat="${shelf_back_quat}"
+      gravcomp="1"
+    >
+      <geom
+        name="shelf_back_geom"
+        type="box"
+        size="0.635 0.04 0.9144"
+        material="shelf_pegboard_material"
+        group="2"
+      />
+      <site name="shelf_back_tf" pos="0 0 0" size="0.01" rgba="0 1 0 0.35" />
+    </body>
+
+    <!-- Shelf Base Box: 1.27m x 0.48m x 0.20m -->
+    <body
+      name="shelf_base"
+      pos="${shelf_base_pos}"
+      quat="${shelf_base_quat}"
+      gravcomp="1"
+    >
+      <geom
+        name="shelf_base_geom"
+        type="box"
+        size="0.635 0.24 0.10"
+        material="shelf_metal_material"
+        group="2"
+      />
+      <site name="shelf_base_tf" pos="0 0 0" size="0.01" rgba="0 1 0 0.35" />
+    </body>
+
+    <!--
+      Decorative shelving row: four visual-only copies of the calibrated
+      center shelf (two on each side) at lateral offsets that line them up
+      into a continuous grocery-aisle row. Each decorative unit reuses the
+      same shelf_only_mesh, shelf_pegboard, and shelf_metal materials as the
+      center shelf, but every geom is contype="0" conaffinity="0" group="2"
+      and there is NO collision counterpart geom — they exist purely to
+      dress the scene and are never reachable by the robot at this lateral
+      distance. No <contact><exclude> rules are needed because the geoms
+      have contype/conaffinity disabled.
+    -->
+
+    <!-- Decorative shelf unit (left, -1) — visual-only, no collision -->
+    <body name="shelving_row_left_1" pos="-1.32 0 0">
+      <body
+        name="calibrated_top_shelf_left_1"
+        pos="${top_shelf_pos}"
+        quat="${top_shelf_quat}"
+        gravcomp="1"
+      >
+        <geom
+          name="calibrated_top_shelf_visual_left_1"
+          type="mesh"
+          mesh="shelf_only_mesh"
+          material="shelf_metal_material"
+          contype="0"
+          conaffinity="0"
+          group="2"
+        />
+        <site
+          name="calibrated_top_shelf_tf_left_1"
+          pos="0 0 0"
+          size="0.01"
+          rgba="0 1 0 0.35"
+        />
+      </body>
+      <body
+        name="calibrated_bottom_shelf_left_1"
+        pos="${bottom_shelf_pos}"
+        quat="${bottom_shelf_quat}"
+        gravcomp="1"
+      >
+        <geom
+          name="calibrated_bottom_shelf_visual_left_1"
+          type="mesh"
+          mesh="shelf_only_mesh"
+          material="shelf_metal_material"
+          contype="0"
+          conaffinity="0"
+          group="2"
+        />
+        <site
+          name="calibrated_bottom_shelf_tf_left_1"
+          pos="0 0 0"
+          size="0.01"
+          rgba="0 1 0 0.35"
+        />
+      </body>
+      <body
+        name="shelf_back_left_1"
+        pos="${shelf_back_pos}"
+        quat="${shelf_back_quat}"
+        gravcomp="1"
+      >
+        <geom
+          name="shelf_back_geom_left_1"
+          type="box"
+          size="0.635 0.04 0.9144"
+          material="shelf_pegboard_material"
+          contype="0"
+          conaffinity="0"
+          group="2"
+        />
+        <site
+          name="shelf_back_tf_left_1"
+          pos="0 0 0"
+          size="0.01"
+          rgba="0 1 0 0.35"
+        />
+      </body>
+      <body
+        name="shelf_base_left_1"
+        pos="${shelf_base_pos}"
+        quat="${shelf_base_quat}"
+        gravcomp="1"
+      >
+        <geom
+          name="shelf_base_geom_left_1"
+          type="box"
+          size="0.635 0.24 0.10"
+          material="shelf_metal_material"
+          contype="0"
+          conaffinity="0"
+          group="2"
+        />
+        <site
+          name="shelf_base_tf_left_1"
+          pos="0 0 0"
+          size="0.01"
+          rgba="0 1 0 0.35"
+        />
+      </body>
+    </body>
+    <!-- Decorative shelf unit (left, -2) — visual-only, no collision -->
+    <body name="shelving_row_left_2" pos="-2.64 0 0">
+      <body
+        name="calibrated_top_shelf_left_2"
+        pos="${top_shelf_pos}"
+        quat="${top_shelf_quat}"
+        gravcomp="1"
+      >
+        <geom
+          name="calibrated_top_shelf_visual_left_2"
+          type="mesh"
+          mesh="shelf_only_mesh"
+          material="shelf_metal_material"
+          contype="0"
+          conaffinity="0"
+          group="2"
+        />
+        <site
+          name="calibrated_top_shelf_tf_left_2"
+          pos="0 0 0"
+          size="0.01"
+          rgba="0 1 0 0.35"
+        />
+      </body>
+      <body
+        name="calibrated_bottom_shelf_left_2"
+        pos="${bottom_shelf_pos}"
+        quat="${bottom_shelf_quat}"
+        gravcomp="1"
+      >
+        <geom
+          name="calibrated_bottom_shelf_visual_left_2"
+          type="mesh"
+          mesh="shelf_only_mesh"
+          material="shelf_metal_material"
+          contype="0"
+          conaffinity="0"
+          group="2"
+        />
+        <site
+          name="calibrated_bottom_shelf_tf_left_2"
+          pos="0 0 0"
+          size="0.01"
+          rgba="0 1 0 0.35"
+        />
+      </body>
+      <body
+        name="shelf_back_left_2"
+        pos="${shelf_back_pos}"
+        quat="${shelf_back_quat}"
+        gravcomp="1"
+      >
+        <geom
+          name="shelf_back_geom_left_2"
+          type="box"
+          size="0.635 0.04 0.9144"
+          material="shelf_pegboard_material"
+          contype="0"
+          conaffinity="0"
+          group="2"
+        />
+        <site
+          name="shelf_back_tf_left_2"
+          pos="0 0 0"
+          size="0.01"
+          rgba="0 1 0 0.35"
+        />
+      </body>
+      <body
+        name="shelf_base_left_2"
+        pos="${shelf_base_pos}"
+        quat="${shelf_base_quat}"
+        gravcomp="1"
+      >
+        <geom
+          name="shelf_base_geom_left_2"
+          type="box"
+          size="0.635 0.24 0.10"
+          material="shelf_metal_material"
+          contype="0"
+          conaffinity="0"
+          group="2"
+        />
+        <site
+          name="shelf_base_tf_left_2"
+          pos="0 0 0"
+          size="0.01"
+          rgba="0 1 0 0.35"
+        />
+      </body>
+    </body>
+    <!-- Decorative shelf unit (right, +1) — visual-only, no collision -->
+    <body name="shelving_row_right_1" pos="1.32 0 0">
+      <body
+        name="calibrated_top_shelf_right_1"
+        pos="${top_shelf_pos}"
+        quat="${top_shelf_quat}"
+        gravcomp="1"
+      >
+        <geom
+          name="calibrated_top_shelf_visual_right_1"
+          type="mesh"
+          mesh="shelf_only_mesh"
+          material="shelf_metal_material"
+          contype="0"
+          conaffinity="0"
+          group="2"
+        />
+        <site
+          name="calibrated_top_shelf_tf_right_1"
+          pos="0 0 0"
+          size="0.01"
+          rgba="0 1 0 0.35"
+        />
+      </body>
+      <body
+        name="calibrated_bottom_shelf_right_1"
+        pos="${bottom_shelf_pos}"
+        quat="${bottom_shelf_quat}"
+        gravcomp="1"
+      >
+        <geom
+          name="calibrated_bottom_shelf_visual_right_1"
+          type="mesh"
+          mesh="shelf_only_mesh"
+          material="shelf_metal_material"
+          contype="0"
+          conaffinity="0"
+          group="2"
+        />
+        <site
+          name="calibrated_bottom_shelf_tf_right_1"
+          pos="0 0 0"
+          size="0.01"
+          rgba="0 1 0 0.35"
+        />
+      </body>
+      <body
+        name="shelf_back_right_1"
+        pos="${shelf_back_pos}"
+        quat="${shelf_back_quat}"
+        gravcomp="1"
+      >
+        <geom
+          name="shelf_back_geom_right_1"
+          type="box"
+          size="0.635 0.04 0.9144"
+          material="shelf_pegboard_material"
+          contype="0"
+          conaffinity="0"
+          group="2"
+        />
+        <site
+          name="shelf_back_tf_right_1"
+          pos="0 0 0"
+          size="0.01"
+          rgba="0 1 0 0.35"
+        />
+      </body>
+      <body
+        name="shelf_base_right_1"
+        pos="${shelf_base_pos}"
+        quat="${shelf_base_quat}"
+        gravcomp="1"
+      >
+        <geom
+          name="shelf_base_geom_right_1"
+          type="box"
+          size="0.635 0.24 0.10"
+          material="shelf_metal_material"
+          contype="0"
+          conaffinity="0"
+          group="2"
+        />
+        <site
+          name="shelf_base_tf_right_1"
+          pos="0 0 0"
+          size="0.01"
+          rgba="0 1 0 0.35"
+        />
+      </body>
+    </body>
+    <!-- Decorative shelf unit (right, +2) — visual-only, no collision -->
+    <body name="shelving_row_right_2" pos="2.64 0 0">
+      <body
+        name="calibrated_top_shelf_right_2"
+        pos="${top_shelf_pos}"
+        quat="${top_shelf_quat}"
+        gravcomp="1"
+      >
+        <geom
+          name="calibrated_top_shelf_visual_right_2"
+          type="mesh"
+          mesh="shelf_only_mesh"
+          material="shelf_metal_material"
+          contype="0"
+          conaffinity="0"
+          group="2"
+        />
+        <site
+          name="calibrated_top_shelf_tf_right_2"
+          pos="0 0 0"
+          size="0.01"
+          rgba="0 1 0 0.35"
+        />
+      </body>
+      <body
+        name="calibrated_bottom_shelf_right_2"
+        pos="${bottom_shelf_pos}"
+        quat="${bottom_shelf_quat}"
+        gravcomp="1"
+      >
+        <geom
+          name="calibrated_bottom_shelf_visual_right_2"
+          type="mesh"
+          mesh="shelf_only_mesh"
+          material="shelf_metal_material"
+          contype="0"
+          conaffinity="0"
+          group="2"
+        />
+        <site
+          name="calibrated_bottom_shelf_tf_right_2"
+          pos="0 0 0"
+          size="0.01"
+          rgba="0 1 0 0.35"
+        />
+      </body>
+      <body
+        name="shelf_back_right_2"
+        pos="${shelf_back_pos}"
+        quat="${shelf_back_quat}"
+        gravcomp="1"
+      >
+        <geom
+          name="shelf_back_geom_right_2"
+          type="box"
+          size="0.635 0.04 0.9144"
+          material="shelf_pegboard_material"
+          contype="0"
+          conaffinity="0"
+          group="2"
+        />
+        <site
+          name="shelf_back_tf_right_2"
+          pos="0 0 0"
+          size="0.01"
+          rgba="0 1 0 0.35"
+        />
+      </body>
+      <body
+        name="shelf_base_right_2"
+        pos="${shelf_base_pos}"
+        quat="${shelf_base_quat}"
+        gravcomp="1"
+      >
+        <geom
+          name="shelf_base_geom_right_2"
+          type="box"
+          size="0.635 0.24 0.10"
+          material="shelf_metal_material"
+          contype="0"
+          conaffinity="0"
+          group="2"
+        />
+        <site
+          name="shelf_base_tf_right_2"
+          pos="0 0 0"
+          size="0.01"
+          rgba="0 1 0 0.35"
+        />
+      </body>
+    </body>
+
+    <!-- Decorative products on the flanking units: the outer body follows the calibrated back wall;
+         the inner body undoes the back-wall position they were laid out for. -->
+    <body name="shelved_products" pos="${shelf_back_pos}">
+      <body name="shelved_products_layout" pos="0.06 -0.9678 -0.1357">
+        <include file="assets/shelved_products.xml" />
+      </body>
+    </body>
+
+    <!-- Scene camera (D415): body at the scene_camera_link section of cell_calibration.yaml.
+         Camera and optical site sit at the color sensor offset. See design_docs/camera_naming.md. -->
+    <body
+      name="calibrated_camera"
+      pos="${scene_camera_link_pos}"
+      quat="${scene_camera_link_quat}"
+      gravcomp="1"
+    >
+      <geom
+        name="calibrated_camera_visual"
+        type="box"
+        size="0.010025 0.0495 0.0115"
+        pos="0 -0.02 0"
+        contype="0"
+        conaffinity="0"
+        group="2"
+      />
+      <site
+        name="scene_camera_optical_frame"
+        pos="0 0.015 0"
+        quat="0.5 -0.5 0.5 -0.5"
+      />
+      <camera
+        name="scene_camera"
+        pos="0 0.015 0"
+        fovy="58"
+        mode="fixed"
+        resolution="1280 960"
+        quat="0.5 0.5 -0.5 -0.5"
+      />
+    </body>
+
+    <!-- Shelf camera (ZED 2i): body at the shelf_cam_camera_link section of cell_calibration.yaml.
+         Camera and optical site sit at the left lens as in zed_wrapper's zed2i URDF; the box
+         matches description/shelf_cam.urdf. -->
+    <body
+      name="calibrated_shelf_cam"
+      pos="${shelf_cam_camera_link_pos}"
+      quat="${shelf_cam_camera_link_quat}"
+      gravcomp="1"
+    >
+      <geom
+        name="calibrated_shelf_cam_visual"
+        type="box"
+        size="0.01905 0.0889 0.0127"
+        pos="-0.01 0 0.015"
+        rgba="0.3 0.3 0.3 1"
+        contype="0"
+        conaffinity="0"
+        group="2"
+      />
+      <geom
+        name="calibrated_shelf_cam_collision"
+        type="box"
+        size="0.01905 0.0889 0.0127"
+        pos="-0.01 0 0.015"
+        group="3"
+      />
+      <site
+        name="shelf_cam_left_camera_optical_frame"
+        pos="-0.01 0.06 0.015"
+        quat="0.5 -0.5 0.5 -0.5"
+      />
+      <!-- Same focal length as the real camera's grab mode; the frame size is the sim's shared buffer. -->
+      <camera
+        name="shelf_cam_left_camera"
+        pos="-0.01 0.06 0.015"
+        fovy="83.94"
+        mode="fixed"
+        resolution="1280 960"
+        quat="0.5 0.5 -0.5 -0.5"
+      />
+    </body>
+</calibrated_scene>

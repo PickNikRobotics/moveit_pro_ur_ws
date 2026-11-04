@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Get Wrist Point Cloud">
+  <!-- ////////// -->
+  <BehaviorTree ID="Get Wrist Point Cloud" _description="" _favorite="false">
+    <Control ID="Sequence" name="TopLevelSequence">
+      <Action
+        ID="GetPointCloud"
+        message_timeout_sec="5.000000"
+        message_out="{point_cloud}"
+        publisher_timeout_sec="5.000000"
+        topic_name="/wrist_mounted_camera/points"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Get Wrist Point Cloud">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="6. HW/Sim Switching Subtrees" />
+      </MetadataFields>
+      <inout_port
+        name="point_cloud"
+        default="{point_cloud}"
+        type="sensor_msgs::msg::PointCloud2"
+      />
+    </SubTree>
+  </TreeNodesModel>
+</root>

@@ -3,3 +3,31 @@ install/
 log/
 .vscode/
 .idea/
+.claude/
+src/picknik_009_ur5e_config_sim/objectives/gemini_points/gemini_response.yaml
+src/picknik_009_ur5e_config_sim/objectives/calibration/*.yaml
+# Runtime-generated symlink, recreated each run by serve_custom_view_panes.sh.
+src/shelf_stocking/src/shelf_stocking_objectives/web/exemplars.yaml
+# Pick-results log written by the PickLog* behaviors during Looping End-to-End Multipick runs.
+pick_results.log
+# Python bytecode cache next to the host-side scripts.
+__pycache__/
+# MuJoCo runtime log dumped to CWD when the sim launches.
+MUJOCO_LOG.TXT
+# Optional debug crops written by RotateAndCropProductImage when save_image_dir is set.
+gemini_orientation_images/
+# Launch console capture written to CWD by the run scripts.
+output.log
+# pnpm content-addressable store created when the pane server's deps are installed.
+.pnpm-store/
+# Python bytecode cache next to the host-side scripts.
+__pycache__/
+# MoveIt Pro 10 reads the workspace's own .env (GOOGLE_GEMINI_API_KEY, ...); never commit a key.
+.env
+
+# Kept locally, not published: host bring-up notes (lab network, hostnames), the
+# RTPC time-sync runbook, and agent instructions.
+computer_setup/
+design_docs/rtpc_time_sync.md
+CLAUDE.md
+**/CLAUDE.md

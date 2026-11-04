@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<!-- Shelf camera (ZED 2i) collision body, placed at the shelf_cam_camera_link pose from stage c. -->
+<!-- Frame as in zed_wrapper: x along the viewing axis, y along the stereo baseline, z up from the mount. -->
+<!-- Box: depth along x, width along y, height along z; centred on the wrapper's camera body centre. -->
+<robot name="shelf_cam">
+  <link name="shelf_cam_body_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="-0.01 0 0.015"/>
+      <geometry>
+        <box size="0.0381 0.1778 0.0254"/>
+      </geometry>
+      <material name="shelf_cam_grey">
+        <color rgba="0.3 0.3 0.3 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="-0.01 0 0.015"/>
+      <geometry>
+        <box size="0.0381 0.1778 0.0254"/>
+      </geometry>
+    </collision>
+  </link>
+</robot>

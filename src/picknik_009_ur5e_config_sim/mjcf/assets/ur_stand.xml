@@ -1,0 +1,42 @@
+<ur_stand_fragment>
+  <asset>
+    <!--
+      Painted-aluminum-extrusion pedestal: solid deep saturated blue with
+      polished-paint sheen. The earlier procedural-stripe attempt aliased
+      into chunky cartoonish bars on the STL (no authored UVs, so MuJoCo's
+      per-face axis projection produced uneven stripe widths across the
+      cart's frame tubes). Solid color reads cleaner. Authoring UVs on the
+      ur_stand mesh would unlock real T-slot fluting, but that's a separate
+      piece of work.
+    -->
+    <material
+      name="ur_stand_material"
+      rgba="0.13 0.34 0.65 1"
+      specular="0.6"
+      shininess="0.85"
+      reflectance="0.05"
+    />
+    <mesh name="ur_stand_mesh" file="ur_stand.stl" />
+  </asset>
+
+  <worldbody>
+    <body name="ur_stand" pos="0 0 0" gravcomp="1">
+      <geom
+        name="ur_stand_visual"
+        type="mesh"
+        mesh="ur_stand_mesh"
+        material="ur_stand_material"
+        contype="0"
+        conaffinity="0"
+        group="2"
+        density="0"
+      />
+      <geom
+        name="ur_stand_collision"
+        type="mesh"
+        mesh="ur_stand_mesh"
+        group="3"
+      />
+    </body>
+  </worldbody>
+</ur_stand_fragment>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root
+  BTCPP_format="4"
+  main_tree_to_execute="Calibrate Wrist Camera On Tote Board"
+>
+  <BehaviorTree
+    ID="Calibrate Wrist Camera On Tote Board"
+    _description="Stage d.1 of the board calibration, also run as the first step of Calibrate Scene Camera From Tote Board: a second Calibrate Eye In Hand Camera run, on the tote copy of the calibration board (identical to the wall copy), lying face up in the empty tote. Saves this second wrist camera solve and the tote board pose, saves the difference between the two wrist solves (the wrist_camera_solve_difference section of cell_calibration.yaml: the tote-board solve expressed in the wall-board solve; near zero means the two runs agree). Load Calibrated Scene works out the tote from the tote board pose. First generate waypoints over the tote with Generate Calibration Waypoints and this waypoint_prefix. See design_docs/board_based_calibration.md."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <SubTree
+        ID="Calibrate Eye In Hand Camera"
+        _collapsed="true"
+        waypoint_prefix="{waypoint_prefix}"
+        image_topic="/camera/wrist_mounted_camera/color/image_raw"
+        camera_info_topic="/camera/wrist_mounted_camera/color/camera_info"
+        camera_name="wrist_mounted_camera"
+        point_cloud_topic="/camera/wrist_mounted_camera/depth/color/points"
+        joint_group_name="manipulator"
+        end_effector_frame="grasp_link"
+        base_frame="world"
+        board="{board}"
+        settle_seconds="{settle_seconds}"
+        calibrated_camera_pose="{wrist_camera_pose_tote}"
+        calibrated_board_pose="{tote_board_pose}"
+        used_sample_count="{used_sample_count}"
+        rotation_residual="{rotation_residual}"
+        translation_residual="{translation_residual}"
+      />
+      <Action
+        ID="SavePoseStampedToYaml"
+        yaml_filename="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="tote_board"
+        overwrite="false"
+        message="{tote_board_pose}"
+      />
+      <SubTree
+        ID="Compute Wrist Camera Mount From Solve"
+        _collapsed="true"
+        wrist_camera_solve="{wrist_camera_pose_tote}"
+        mount_origin="{wrist_camera_mount_candidate}"
+      />
+      <Action
+        ID="SavePoseStampedToYaml"
+        yaml_filename="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="wrist_camera_mount_candidate_tote_board"
+        overwrite="false"
+        message="{wrist_camera_mount_candidate}"
+      />
+      <!--Compare the two wrist solves when stage b has run; skip quietly otherwise.-->
+      <Decorator ID="ForceSuccess">
+        <Control ID="Sequence">
+          <Action
+            ID="LoadPoseStampedFromYamlNamespace"
+            file_path="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+            namespace="wrist_camera_solve_wall_board"
+            output="{wrist_camera_pose_wall}"
+          />
+          <Action
+            ID="CalculatePoseOffset"
+            source_pose="{wrist_camera_pose_wall}"
+            destination_pose="{wrist_camera_pose_tote}"
+            source_to_destination_pose="{wrist_solve_difference}"
+          />
+          <Action
+            ID="SavePoseStampedToYaml"
+            yaml_filename="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+            namespace="wrist_camera_solve_difference"
+            overwrite="false"
+            message="{wrist_solve_difference}"
+          />
+        </Control>
+      </Decorator>
+      <Action
+        ID="LogMessage"
+        log_level="info"
+        message="Stage d.1 done. Saved the second wrist solve, the tote board pose and the wrist_camera_solve_difference section of cell_calibration.yaml. Calibrate Scene Camera From Tote Board runs this stage itself; run it on its own only to redo the wrist solve. Do not move the tote or the tote board."
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Calibrate Wrist Camera On Tote Board">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+      <input_port
+        name="waypoint_prefix"
+        default="tote_calibration"
+        type="std::string"
+      >
+        Prefix of the saved calibration waypoints that view the tote board.
+      </input_port>
+      <input_port
+        name="board"
+        default="[{squares_x: 7, squares_y: 5, square_length: 0.035, marker_length: 0.026, dictionary: DICT_4X4_50}]"
+        type="moveit_studio_msgs::msg::CharucoBoard"
+      >
+        The tote copy of the two identical 3D-printed calibration boards. Must
+        match the print.
+      </input_port>
+      <input_port name="settle_seconds" default="1.0" type="double">
+        Wait after each move before the image is taken.
+      </input_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>

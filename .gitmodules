@@ -1,3 +1,7 @@
+[submodule "src/shelf_stocking"]
+	path = src/shelf_stocking
+	url = https://github.com/PickNikRoboticsServices/shelf_stocking_ws.git
+	branch = shelf-stocking-objectives
 [submodule "src/external_dependencies/Universal_Robots_ROS2_Description"]
 	path = src/external_dependencies/Universal_Robots_ROS2_Description
 	url = https://github.com/PickNikRobotics/Universal_Robots_ROS2_Description.git
@@ -13,3 +17,16 @@
 [submodule "src/external_dependencies/moveit_studio_ur_pstop_manager"]
 	path = src/external_dependencies/moveit_studio_ur_pstop_manager
 	url = https://github.com/PickNikRobotics/moveit_studio_ur_pstop_manager.git
+[submodule "src/external_dependencies/ros2_epick_gripper"]
+	path = src/external_dependencies/ros2_epick_gripper
+	url = https://github.com/PickNikRobotics/ros2_epick_gripper.git
+	branch = epick-body-box-collision
+[submodule "src/picknik_009_ur5e_config_sim/mjcf/assets/ycb_dataset"]
+	path = src/picknik_009_ur5e_config_sim/mjcf/assets/ycb_dataset
+	url = https://github.com/PickNikRobotics/YCB_Dataset.git
+[submodule "src/external_dependencies/zed-ros2-wrapper"]
+	path = src/external_dependencies/zed-ros2-wrapper
+	url = https://github.com/stereolabs/zed-ros2-wrapper.git
+[submodule "src/external_dependencies/zed-ros2-interfaces"]
+	path = src/external_dependencies/zed-ros2-interfaces
+	url = https://github.com/stereolabs/zed-ros2-interfaces.git

@@ -1,0 +1,35 @@
+bin_layouts:
+  - layout_1
+
+# Each layout contains:
+
+# primitive_names: A list of primitive names included in the layout.
+# For each primitive:
+# type: The type of the primitive (e.g., cube, cylinder, sphere).
+# dimensions: The dimensions of the primitive
+#             (e.g., length;width;height for cube, radius;radius;height for cylinder, radius;radius;radius for sphere).
+#             cylinder: double values for radius are required to maintain compatibility with the PublisherMarkers Behavior
+#             sphere: double values for radius are required to maintain compatibility with the PublisherMarkers Behavior
+# position: The position of the primitive in the bin (x;y;z). (wrt to world frame)
+# orientation: The orientation of the primitive in quaternion format (x;y;z;w). (wrt to world frame)
+layout_1:
+
+  primitive_names:
+    - cube_1
+    - cylinder_1
+    - sphere_1
+  cube_1:
+    type: cube
+    dimensions: 0.1;0.1;0.1
+    position: 1.0;0.5;0.0
+    orientation: 0.0;0.0;0.0;1.0
+  cylinder_1:
+    type: cylinder
+    dimensions: 0.1;0.1;0.1
+    position: 1.0;-0.5;0.0
+    orientation: 0.0;0.0;0.0;1.0
+  sphere_1:
+    type: sphere
+    dimensions: 0.1;0.1;0.1
+    position: 1.0;0.0;0.0
+    orientation: 0.0;0.0;0.0;1.0

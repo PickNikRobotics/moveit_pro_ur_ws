@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root
+  BTCPP_format="4"
+  main_tree_to_execute="Calibrate Fixed Camera From Known Board"
+>
+  <BehaviorTree
+    ID="Calibrate Fixed Camera From Known Board"
+    _description="Solves the pose of a fixed camera from one ChArUco board whose world pose is already known. It detects the board in several images, averages the board pose in the camera frame, and computes world_T_camera = world_T_board * inverse(camera_T_board). It then converts the optical-frame result to the camera's root link with the driver's own link-to-optical transform. The camera and the board must both stay still. See design_docs/board_based_calibration.md."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <Action
+        ID="GetCameraInfo"
+        topic_name="{camera_info_topic}"
+        message_out="{camera_info}"
+      />
+      <Action ID="ResetPoseStampedVector" vector="{board_poses_in_camera}" />
+      <!--A frame with no board pose keeps the previous pose, so the first image must see the board.-->
+      <Decorator ID="RepeatUnlessFailureEachTick" num_cycles="{sample_count}">
+        <Control ID="Sequence">
+          <Action
+            ID="GetImage"
+            topic_name="{image_topic}"
+            message_out="{image}"
+          />
+          <Action
+            ID="DetectCharucoBoard"
+            image="{image}"
+            camera_info="{camera_info}"
+            board="{board}"
+            detections="{detections}"
+            board_pose="{board_pose_in_camera}"
+          />
+          <Action
+            ID="PushBackVector"
+            input_vector="{board_poses_in_camera}"
+            element="{board_pose_in_camera}"
+            output_vector="{board_poses_in_camera}"
+          />
+        </Control>
+      </Decorator>
+      <Action
+        ID="AveragePoseStampedVector"
+        pose_stamped_vector="{board_poses_in_camera}"
+        reference_frame=""
+        average_pose_stamped="{board_pose_in_camera_average}"
+      />
+      <!--The board pose in world stands in for the tag: same math as the old scene camera chain.-->
+      <Action
+        ID="ComputeCameraPoseFromTag"
+        tag_pose_world="{board_pose_world}"
+        tag_pose_camera="{board_pose_in_camera_average}"
+        camera_pose_world="{optical_pose_world}"
+      />
+      <Action
+        ID="GetLatestTransform"
+        target_frame_id="{camera_root_frame}"
+        source_frame_id="{camera_optical_frame}"
+        transform="{optical_in_root_transform}"
+      />
+      <Action
+        ID="ConvertTransformStampedToPoseStamped"
+        transform_stamped="{optical_in_root_transform}"
+        pose_stamped="{optical_in_root}"
+      />
+      <!--world_T_root = world_T_optical * inverse(root_T_optical).-->
+      <Action
+        ID="ComputeCameraPoseFromTag"
+        tag_pose_world="{optical_pose_world}"
+        tag_pose_camera="{optical_in_root}"
+        camera_pose_world="{camera_root_pose_world}"
+      />
+      <Action
+        ID="VisualizePose"
+        marker_lifetime="0.000000"
+        marker_name="{camera_root_frame}"
+        marker_size="0.100000"
+        pose="{camera_root_pose_world}"
+        marker_text="{camera_root_frame}"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Calibrate Fixed Camera From Known Board">
+      <MetadataFields>
+        <Metadata runnable="false" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+      <input_port
+        name="image_topic"
+        default="/camera/scene_camera/color/image_raw"
+        type="std::string"
+      >
+        Color image topic of the fixed camera.
+      </input_port>
+      <input_port
+        name="camera_info_topic"
+        default="/camera/scene_camera/color/camera_info"
+        type="std::string"
+      >
+        camera_info topic paired with image_topic. Image and camera_info must
+        share a frame_id, and it must equal camera_optical_frame.
+      </input_port>
+      <input_port
+        name="board"
+        default="{board}"
+        type="moveit_studio_msgs::msg::CharucoBoard"
+      >
+        The ChArUco board the camera sees. Must match the print exactly.
+      </input_port>
+      <input_port
+        name="board_pose_world"
+        default="{board_pose_world}"
+        type="geometry_msgs::msg::PoseStamped"
+      >
+        The board pose in world, from an eye-in-hand calibration run.
+      </input_port>
+      <input_port
+        name="camera_root_frame"
+        default="scene_camera_link"
+        type="std::string"
+      >
+        The camera's root link, the frame whose parent is world.
+      </input_port>
+      <input_port
+        name="camera_optical_frame"
+        default="scene_camera_color_optical_frame"
+        type="std::string"
+      >
+        The frame_id of the camera's color image.
+      </input_port>
+      <input_port name="sample_count" default="10" type="int">
+        Number of images whose board poses are averaged.
+      </input_port>
+      <output_port
+        name="camera_root_pose_world"
+        default="{camera_root_pose_world}"
+        type="geometry_msgs::msg::PoseStamped"
+      >
+        The camera root link pose in world.
+      </output_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>

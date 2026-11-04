@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Check Epick Grasp Status">
+  <!-- ////////// -->
+  <BehaviorTree
+    ID="Check Epick Grasp Status"
+    _description="This _sim version always returns grasp SUCCESS"
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <Action
+        ID="GetEpickObjectDetectionStatus"
+        topic_name="/object_detection_status"
+        message_out="{vacuum_status}"
+      />
+      <Control ID="Fallback">
+        <Action
+          ID="CompareEpickObjectDetectionStatus"
+          value1="{vacuum_status}"
+          value2="OBJECT_DETECTED_AT_MAX_PRESSURE"
+        />
+        <Action
+          ID="CompareEpickObjectDetectionStatus"
+          value1="{vacuum_status}"
+          value2="OBJECT_DETECTED_AT_MIN_PRESSURE"
+        />
+      </Control>
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Check Epick Grasp Status">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="6. HW/Sim Switching Subtrees" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

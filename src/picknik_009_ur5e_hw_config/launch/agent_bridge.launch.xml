@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<launch>
+  <!-- Default true so single-host deployments (RTPC running the full stack, or any host
+       where this config drives both the agent and the drivers) bring up the USB RealSense
+       cameras as part of agent_bridge. Split-host deployments (Jetson agent / RTPC drivers)
+       must override this to false at launch time, because the cameras are physically
+       attached to the RTPC and already launched there by robot_drivers_to_persist.launch.py
+       — if the agent host also tries to start them, pro_rs_launch.py fails on the Jetson
+       because the devices aren't on its USB bus. The Jetson bring-up script
+       (reset_backend_for_jetson_hw_no_drivers.sh) passes launch_cameras:=false explicitly. -->
+  <arg name="launch_cameras" default="true" />
+  <include
+    file="$(find-pkg-share moveit_studio_agent)/launch/studio_agent_bridge.launch.xml"
+  />
+  <group if="$(var launch_cameras)">
+    <include
+      file="$(find-pkg-share picknik_009_ur5e_hw_config)/launch/cameras.launch.xml"
+    />
+  </group>
+  <!-- Custom view panes ARE served by scripts/serve_custom_view_panes.py on
+       127.0.0.1:8731 — the include lives in the BASE package's
+       agent_bridge.launch.xml, which is the only one MoveIt Pro 10 loads (see
+       design_docs/custom_view_pane_transport.md). Note this whole file is dead: no
+       config overrides runtime_launch_file, so nothing reads it. -->
+  <!-- Meta Quest teleop input. Runs on the agent host (where the headset is
+       plugged in over USB) as part of agent_bridge. Integrated-path overrides:
+       route through /pose_jog (collision-checked), gate on the UI's Cartesian
+       Jog toggle (/quest_oculus/enabled), and leave controller activation to the
+       Request Teleoperation objective. The headset must be worn for the on-device
+       app's XR session to start, and a controller must be tracked, before the
+       toggle reports available; the toggle is greyed when no headset is attached.
+       Static Quest->world TF defaults assume the operator faces the same direction
+       as the robot; override qx/qy/qz/qw if left/right or fwd/back feel inverted. -->
+  <include
+    file="$(find-pkg-share quest_oculus)/launch/quest_oculus_teleop.launch.py"
+  >
+    <arg name="require_enable" value="true" />
+    <arg name="auto_switch_to_vfc" value="false" />
+    <arg name="cmd_topic" value="/pose_jog/manipulator" />
+    <arg name="tip_frame_id" value="grasp_link" />
+    <arg name="gripper_action_name" value="/epick_controller/gripper_cmd" />
+  </include>
+</launch>

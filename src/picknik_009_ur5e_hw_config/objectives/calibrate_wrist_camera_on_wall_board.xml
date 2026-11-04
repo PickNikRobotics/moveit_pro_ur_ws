@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root
+  BTCPP_format="4"
+  main_tree_to_execute="Calibrate Wrist Camera On Wall Board"
+>
+  <BehaviorTree
+    ID="Calibrate Wrist Camera On Wall Board"
+    _description="Stage b of the board calibration, also run as the first step of Calibrate Shelf Cam From Wall Board. Runs the product's Calibrate Eye In Hand Camera on the wall copy of the calibration ChArUco board, mounted mid-wall on the back wall, saves the wrist camera solve and the back-wall board pose. Load Calibrated Scene works out the shelving from that board pose. First generate waypoints with Generate Calibration Waypoints and the same waypoint_prefix, and select the picknik_009_ur5e_hw_calibration_config package so the cameras run at the calibration resolution. The wall board must not move until stage c has finished. See design_docs/board_based_calibration.md."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <SubTree
+        ID="Calibrate Eye In Hand Camera"
+        _collapsed="true"
+        waypoint_prefix="{waypoint_prefix}"
+        image_topic="/camera/wrist_mounted_camera/color/image_raw"
+        camera_info_topic="/camera/wrist_mounted_camera/color/camera_info"
+        camera_name="wrist_mounted_camera"
+        point_cloud_topic="/camera/wrist_mounted_camera/depth/color/points"
+        joint_group_name="manipulator"
+        end_effector_frame="grasp_link"
+        base_frame="world"
+        board="{board}"
+        settle_seconds="{settle_seconds}"
+        calibrated_camera_pose="{wrist_camera_pose}"
+        calibrated_board_pose="{wall_board_pose}"
+        used_sample_count="{used_sample_count}"
+        rotation_residual="{rotation_residual}"
+        translation_residual="{translation_residual}"
+      />
+      <!--The Objective writes no file, so save both results before anything can fail.-->
+      <Action
+        ID="SavePoseStampedToYaml"
+        yaml_filename="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="wrist_camera_solve_wall_board"
+        overwrite="false"
+        message="{wrist_camera_pose}"
+      />
+      <Action
+        ID="SavePoseStampedToYaml"
+        yaml_filename="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="wall_board"
+        overwrite="false"
+        message="{wall_board_pose}"
+      />
+      <SubTree
+        ID="Compute Wrist Camera Mount From Solve"
+        _collapsed="true"
+        wrist_camera_solve="{wrist_camera_pose}"
+        mount_origin="{wrist_camera_mount_candidate}"
+      />
+      <Action
+        ID="SavePoseStampedToYaml"
+        yaml_filename="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="wrist_camera_mount_candidate_wall_board"
+        overwrite="false"
+        message="{wrist_camera_mount_candidate}"
+      />
+      <Action
+        ID="LogMessage"
+        log_level="info"
+        message="Stage b done. Saved the wrist camera solve (color optical frame in grasp_link) and the back-wall board pose. Calibrate Shelf Cam From Wall Board runs this stage itself; run it on its own only to redo the wrist solve. Do not move the wall board until stage c is done."
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Calibrate Wrist Camera On Wall Board">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+      <input_port
+        name="waypoint_prefix"
+        default="wall_calibration"
+        type="std::string"
+      >
+        Prefix of the saved calibration waypoints that view the back-wall board.
+      </input_port>
+      <input_port
+        name="board"
+        default="[{squares_x: 7, squares_y: 5, square_length: 0.035, marker_length: 0.026, dictionary: DICT_4X4_50}]"
+        type="moveit_studio_msgs::msg::CharucoBoard"
+      >
+        The wall copy of the two identical 3D-printed calibration boards, on the
+        back wall. Must match the print.
+      </input_port>
+      <input_port name="settle_seconds" default="1.0" type="double">
+        Wait after each move before the image is taken.
+      </input_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>

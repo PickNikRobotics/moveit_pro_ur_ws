@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<!-- Table collision object. Origin at geometric center.
+     Dimensions: 1.8288 x 0.46 x 0.74 m -->
+<robot name="calibration_table" xmlns:xacro="http://wiki.ros.org/xacro">
+  <link name="calibration_table">
+    <visual>
+      <geometry><box size="1.8288 0.46 0.74"/></geometry>
+      <material name="table_color"><color rgba="0.6 0.4 0.2 1.0"/></material>
+    </visual>
+    <collision>
+      <geometry><box size="1.8288 0.46 0.74"/></geometry>
+    </collision>
+  </link>
+</robot>

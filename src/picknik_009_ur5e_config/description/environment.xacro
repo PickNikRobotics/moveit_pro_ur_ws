@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="environment" params="parent xyz:='0 0 0' rpy:='0 0 0'">
+    <!-- All environment objects (table, bin, pole, camera) are now placed dynamically
+         by the "Calibrate Bin" and "Load Calibrated Scene" objectives.
+         Do not add static objects here. -->
+  </xacro:macro>
+</robot>

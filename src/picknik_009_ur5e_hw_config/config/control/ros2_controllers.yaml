@@ -1,0 +1,139 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 500  # Hz — UR e-Series (URControl 5.x) caps RTDE at 500 Hz; the UR
+                      # hardware rejects a higher rate ("Invalid target frequency of
+                      # RTDE connection") and fails to configure ur5e.
+
+    # Run the controller-manager update loop under SCHED_FIFO at priority 80. Without this
+    # the loop runs SCHED_OTHER / nice 0 and gets preempted for tens of milliseconds under
+    # ordinary agent load (perception, video streaming, the desktop app), which blows the
+    # UR reverse-interface watchdog: the robot closes the socket ("Connection to reverse
+    # interface dropped"), the control program stops, and protective_stop_manager_node
+    # latches a RECOVERABLE_FAULT that the UI reports as a protective stop.
+    # The drivers container is privileged with an rtprio=99 ulimit, so no host change is
+    # needed. `lock_memory` is deliberately NOT set: memlock inside the container is only
+    # 8 MB, so mlockall would fail. See design_docs/control_loop_realtime_priority.md.
+    thread_priority: 80
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+    policy_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+    io_and_status_controller:
+      type: ur_controllers/GPIOController
+    force_torque_sensor_broadcaster:
+      type: force_torque_sensor_broadcaster/ForceTorqueSensorBroadcaster
+    joint_trajectory_admittance_controller:
+      type: joint_trajectory_admittance_controller/JointTrajectoryAdmittanceController
+    velocity_force_controller:
+      type: velocity_force_controller/VelocityForceController
+    joint_velocity_controller:
+      type: joint_velocity_controller/JointVelocityController
+    epick_controller:
+      type: epick_controllers/EpickGripperActionController
+    epick_status_publisher_controller:
+      type: epick_controllers/EpickStatusPublisherController
+
+# Publishes /policy_state_broadcaster/joint_states in ExecutePolicy's observation order: the `manipulator` joints, then the EPick `gripper` joint. Set it as the Training Config's joint states topic, because Trainer datasets keep the recorded joint order without names and the default broadcaster sorts joints alphabetically. See src/shelf_stocking/design_docs/policy_suction_channel.md.
+policy_state_broadcaster:
+  ros__parameters:
+    use_local_topics: true
+    joints:
+      - shoulder_pan_joint
+      - shoulder_lift_joint
+      - elbow_joint
+      - wrist_1_joint
+      - wrist_2_joint
+      - wrist_3_joint
+      - gripper
+    interfaces:
+      - position
+
+io_and_status_controller:
+  ros__parameters:
+    tf_prefix: ""
+
+force_torque_sensor_broadcaster:
+  ros__parameters:
+    sensor_name: tcp_fts_sensor
+    state_interface_names:
+      - force.x
+      - force.y
+      - force.z
+      - torque.x
+      - torque.y
+      - torque.z
+    frame_id: tool0
+
+joint_trajectory_admittance_controller:
+  ros__parameters:
+    planning_group_name: manipulator
+    sensor_frames: ["tool0"]
+    ee_frames: ["grasp_link"]
+    ft_sensor_name: tcp_fts_sensor
+    default_path_tolerance: 0.0873
+    stop_accelerations:
+      - 30.0
+      - 30.0
+      - 30.0
+      - 30.0
+      - 30.0
+      - 30.0
+
+velocity_force_controller:
+  ros__parameters:
+    planning_group_name: manipulator
+    sensor_frame: tool0
+    ee_frame: grasp_link
+    ft_sensor_name: tcp_fts_sensor
+    ft_force_deadband: 2.0
+    ft_torque_deadband: 1.0
+    max_joint_velocity:
+      - 0.524
+      - 0.524
+      - 0.524
+      - 1.047
+      - 1.047
+      - 1.047
+    max_joint_acceleration:
+      - 52.4
+      - 52.4
+      - 52.4
+      - 52.4
+      - 52.4
+      - 52.4
+    max_cartesian_velocity:
+      - 0.25
+      - 0.25
+      - 0.25
+      - 1.5707
+      - 1.5707
+      - 1.5707
+    max_cartesian_acceleration:
+      - 20.0
+      - 20.0
+      - 20.0
+      - 40.0
+      - 40.0
+      - 40.0
+
+joint_velocity_controller:
+  ros__parameters:
+    planning_group_name: manipulator
+    max_joint_velocity:
+      - 0.524
+      - 0.524
+      - 0.524
+      - 1.047
+      - 1.047
+      - 1.047
+    max_joint_acceleration:
+      - 52.4
+      - 52.4
+      - 52.4
+      - 52.4
+      - 52.4
+      - 52.4
+    command_interfaces: ["position"]
+    joint_limit_position_tolerance: 0.02
+    command_timeout: 0.2
+    state_publish_rate: 20

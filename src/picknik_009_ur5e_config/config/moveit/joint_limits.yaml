@@ -1,0 +1,116 @@
+# Joints limits
+#
+# Sources:
+#
+#  - Universal Robots e-Series, User Manual, UR5e, Version 5.8
+#    https://s3-eu-west-1.amazonaws.com/ur-support-site/69091/99404_UR5e_User_Manual_en_Global.pdf
+#  - Support > Articles > UR articles > Max. joint torques
+#    https://www.universal-robots.com/articles/ur-articles/max-joint-torques
+#    retrieved: 2020-06-16, last modified: 2020-06-09
+#
+# NOTE: UR does not publish per-joint angular acceleration limits — only max
+# joint torques (150 / 28 Nm) and max joint velocities (180 deg/s). UR
+# engineers landed 5.0 rad/s² as the conservative default in upstream
+# `ur_moveit_config` (UniversalRobots/Universal_Robots_ROS2_Driver PR #645),
+# rationalized in UniversalRobots/Universal_Robots_ROS2_Description issue #46
+# ("the robot does not inherently have any limits on joint accelerations
+# (only on torques)"). We use 1.0 rad/s² here — well under upstream's
+# 5.0 because every motion in this workspace runs through
+# `joint_trajectory_admittance_controller`, whose compliance widens the
+# tracking-error window vs. the stock `scaled_joint_trajectory_controller`
+# upstream's default assumes. URScript-level practical maxima for `movej`
+# sit around 14 rad/s² (UR forum), so 1.0 is still ~14× under the
+# practical ceiling.
+# 2026-10-16: the six arm joints are raised from 1.0 to 2.5 rad/s² so trained policies
+# can run through ExecutePolicy. ExecutePolicy fits every committed policy window to end
+# at rest and rejects the window if that fallback stop, or the blend into the next chunk,
+# exceeds these limits. The cracker-box policy at half its training speed failed at 1.0
+# and ran at 2.5. This also lets motion planned at full acceleration scaling accelerate
+# harder everywhere in the workspace, still half of upstream's 5.0.
+# 2026-11-02: back to 1.0. At 2.5 every move planned at full or near-full acceleration
+# scaling was up to 2.5x harsher than the speeds the shelf-stocking objectives were tuned
+# at: the arm fell 5 deg behind on an empty free-space move and pstopped (C157) carrying a
+# product. A policy rollout needs the cap raised again for that session.
+# See design_docs/policy_rollout.md.
+# NOTE: Arm-joint max_velocity is set to the UR5e datasheet ceiling (180 deg/s).
+joint_limits:
+  shoulder_pan_joint:
+    has_acceleration_limits: true
+    has_effort_limits: true
+    has_position_limits: true
+    has_velocity_limits: true
+    max_acceleration: 1.0
+    max_effort: 150.0
+    max_position: !degrees  180.0
+    max_velocity: !degrees  180.0
+    min_position: !degrees -180.0
+  shoulder_lift_joint:
+    has_acceleration_limits: true
+    has_effort_limits: true
+    has_position_limits: true
+    has_velocity_limits: true
+    max_acceleration: 1.0
+    max_effort: 150.0
+    max_position: !degrees  15.0
+    max_velocity: !degrees  180.0
+    # Lowered from -200° (2026-11-02): the unshelve viewpoints keep the upper
+    # arm near horizontal (about -172°), and reaching down to the bottom shelf
+    # from there ran into -200° on the approach, the press and the pull-out.
+    min_position: !degrees -230.0
+  elbow_joint:
+    has_acceleration_limits: true
+    has_effort_limits: true
+    has_position_limits: true
+    has_velocity_limits: true
+    max_acceleration: 1.0
+    max_effort: 150.0
+    # Asymmetric range -10° .. +150° tuned for this workspace's bin-stocking
+    # geometry: the bin sits in front of the base, so the elbow needs the +
+    # range to reach over and into it, while the - side is clipped well short
+    # of the shoulder-lift collision (it would otherwise reach approx ±π
+    # before the shoulder gets in the way; see ros-industrial/universal_robot#265
+    # for the underlying physical constraint that motivated clipping the elbow
+    # range here at all).
+    #
+    # The tighter -10° lower bound also keeps the planner inside a single
+    # connected search space — the search space splits into two disconnected
+    # sections at the unreachable shoulder-collision boundary, so leaving any
+    # margin past that boundary creates planning problems.
+    max_position: !degrees  150.0
+    max_velocity: !degrees  180.0
+    min_position: !degrees -2.0
+  wrist_1_joint:
+    has_acceleration_limits: true
+    has_effort_limits: true
+    has_position_limits: true
+    has_velocity_limits: true
+    max_acceleration: 1.0
+    max_effort: 28.0
+    max_position: !degrees  180.0
+    max_velocity: !degrees  180.0
+    min_position: !degrees -180.0
+  wrist_2_joint:
+    has_acceleration_limits: true
+    has_effort_limits: true
+    has_position_limits: true
+    has_velocity_limits: true
+    max_acceleration: 1.0
+    max_effort: 28.0
+    max_position: !degrees  180.0
+    max_velocity: !degrees  180.0
+    min_position: !degrees -180.0
+  wrist_3_joint:
+    has_acceleration_limits: true
+    has_effort_limits: true
+    has_position_limits: true
+    has_velocity_limits: true
+    max_acceleration: 1.0
+    max_effort: 28.0
+    max_position: !degrees  220.0
+    max_velocity: !degrees  180.0
+    min_position: !degrees -220.0
+  robotiq_85_left_knuckle_joint:
+    has_velocity_limits: true
+    max_velocity: 0.5
+    has_acceleration_limits: true
+    max_acceleration: 1.0

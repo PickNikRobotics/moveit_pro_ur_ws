@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Randomize Sim Products">
+  <!--Hardware no-op stub. The sim config implements this as a real
+      MuJoCo keyframe shuffle (see picknik_009_ur5e_config_sim/objectives/
+      randomize_sim_products.xml), but on physical hardware there is no
+      simulator state to randomize — the products are wherever the
+      operator placed them. We keep an entry with the same BehaviorTree
+      ID so callers (e.g. End-to-End Parallel Pipeline's MainSequence)
+      can reference "Randomize Sim Products" unconditionally and have it
+      succeed-and-continue on hw without branching by config.-->
+  <BehaviorTree
+    ID="Randomize Sim Products"
+    _description="No-op on hardware. Real implementation lives in the sim config."
+    _favorite="false"
+  >
+    <AlwaysSuccess />
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Randomize Sim Products">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="6. HW/Sim Switching Subtrees" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

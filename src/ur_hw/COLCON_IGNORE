@@ -1,0 +1,3 @@
+# Pro 9 package, not yet migrated to MoveIt Pro 10 (needs moveit_studio_common /
+# moveit_studio_package(), which Pro 10 does not ship). Skipped by colcon and by the
+# Dockerfile's rosdep install. See design_docs/moveit_pro_10_build.md.

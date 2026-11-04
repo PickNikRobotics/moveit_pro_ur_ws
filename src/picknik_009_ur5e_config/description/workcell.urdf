@@ -1,0 +1,149 @@
+<?xml version="1.0" ?>
+<robot name="workcell" xmlns:xacro="http://wiki.ros.org/xacro">
+  <!--
+    9-box approximation of the 80/20 aluminum workcell frame. The high-poly
+    workcell.stl (~14k tris) lived here for visual+collision, but
+    its triangle count made the MoveIt Pro 3D Visualizer planning scene slow
+    to render. The boxes below are sized from the STL's per-extrusion
+    axis-aligned bounding boxes so the silhouette and reach-through gaps
+    match the source mesh.
+
+    Local frame matches the original STL: origin at the workcell's
+    front-right-bottom corner, mesh-X toward workcell-left (the back wall
+    side), mesh-Y toward workcell-back (away from the operator), mesh-Z up.
+    The +90 deg yaw and world placement of this URDF are applied at the
+    AddURDF call site in load_calibrated_scene.xml.
+
+    Frame layout (see boxes below):
+      - Two vertical 3"x1.5" corner posts at the workcell's back-side
+        (boxes 8, 9), spanning z=0.04..1.26.
+      - Three horizontal cross-rails connecting them: bottom (5), mid (6,
+        at z=0.66 where the scene-camera mount plate sits), and top (4).
+      - Four bottom-frame rails (2, 3, 5, 7) forming a 0.61 x 0.91 m
+        rectangle at the table top.
+      - One top transverse crossbeam (1) cantilevering from the back wall
+        forward over the workspace; this is the beam the scene-camera mount
+        hangs under.
+  -->
+  <material name="workcell_material">
+    <color rgba="0.6 0.6 0.65 1"/>
+  </material>
+  <link name="workcell">
+    <!-- 1. Top transverse crossbeam (back-wall top out to front, mid-Y) -->
+    <visual>
+      <origin xyz="-0.4285 0.483 1.276" rpy="0 0 0"/>
+      <geometry><box size="0.609 0.080 0.040"/></geometry>
+      <material name="workcell_material"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.4285 0.483 1.276" rpy="0 0 0"/>
+      <geometry><box size="0.609 0.080 0.040"/></geometry>
+    </collision>
+
+    <!-- 2. Bottom-frame front rail -->
+    <visual>
+      <origin xyz="-0.3485 0.046 0.017" rpy="0 0 0"/>
+      <geometry><box size="0.609 0.040 0.040"/></geometry>
+      <material name="workcell_material"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.3485 0.046 0.017" rpy="0 0 0"/>
+      <geometry><box size="0.609 0.040 0.040"/></geometry>
+    </collision>
+
+    <!-- 3. Bottom-frame back rail -->
+    <visual>
+      <origin xyz="-0.3485 0.920 0.017" rpy="0 0 0"/>
+      <geometry><box size="0.609 0.040 0.040"/></geometry>
+      <material name="workcell_material"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.3485 0.920 0.017" rpy="0 0 0"/>
+      <geometry><box size="0.609 0.040 0.040"/></geometry>
+    </collision>
+
+    <!-- 4. Back-wall top rail (front-to-back, at top of posts) -->
+    <visual>
+      <origin xyz="-0.713 0.483 1.236" rpy="0 0 0"/>
+      <geometry><box size="0.040 0.914 0.040"/></geometry>
+      <material name="workcell_material"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.713 0.483 1.236" rpy="0 0 0"/>
+      <geometry><box size="0.040 0.914 0.040"/></geometry>
+    </collision>
+
+    <!-- 5. Back-wall bottom rail (also the bottom-frame's back-side rail) -->
+    <visual>
+      <origin xyz="-0.673 0.483 0.017" rpy="0 0 0"/>
+      <geometry><box size="0.040 0.914 0.040"/></geometry>
+      <material name="workcell_material"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.673 0.483 0.017" rpy="0 0 0"/>
+      <geometry><box size="0.040 0.914 0.040"/></geometry>
+    </collision>
+
+    <!-- 6. Back-wall mid rail (scene-camera mount crossbar, z=0.66) -->
+    <visual>
+      <origin xyz="-0.673 0.483 0.657" rpy="0 0 0"/>
+      <geometry><box size="0.040 0.914 0.040"/></geometry>
+      <material name="workcell_material"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.673 0.483 0.657" rpy="0 0 0"/>
+      <geometry><box size="0.040 0.914 0.040"/></geometry>
+    </collision>
+
+    <!-- 7. Bottom-frame front-side rail (the rail opposite the back wall) -->
+    <visual>
+      <origin xyz="-0.024 0.483 0.017" rpy="0 0 0"/>
+      <geometry><box size="0.040 0.914 0.040"/></geometry>
+      <material name="workcell_material"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.024 0.483 0.017" rpy="0 0 0"/>
+      <geometry><box size="0.040 0.914 0.040"/></geometry>
+    </collision>
+
+    <!-- 8. Back-wall vertical post (workcell-front corner, 3"x1.5" extrusion) -->
+    <visual>
+      <origin xyz="-0.653 0.046 0.647" rpy="0 0 0"/>
+      <geometry><box size="0.080 0.040 1.219"/></geometry>
+      <material name="workcell_material"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.653 0.046 0.647" rpy="0 0 0"/>
+      <geometry><box size="0.080 0.040 1.219"/></geometry>
+    </collision>
+
+    <!-- 9. Back-wall vertical post (workcell-back corner, 3"x1.5" extrusion) -->
+    <visual>
+      <origin xyz="-0.653 0.920 0.647" rpy="0 0 0"/>
+      <geometry><box size="0.080 0.040 1.219"/></geometry>
+      <material name="workcell_material"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.653 0.920 0.647" rpy="0 0 0"/>
+      <geometry><box size="0.080 0.040 1.219"/></geometry>
+    </collision>
+
+    <!-- 10. Overhead ring light: source mesh was an annulus (OD=0.458,
+         ID=0.342, axial thickness 0.076, axis along workcell-Z). The URDF
+         side uses a flat box sized to the disk's bounding box — the MJCF
+         keeps a true cylinder (renders correctly in MuJoCo) but the
+         MoveIt Pro 3D Visualizer mis-renders flat URDF cylinders and
+         doesn't reliably pick up a low-poly STL stand-in for them, so the
+         planning scene gets a square footprint instead of a circular one
+         (negligible for a 76 mm-thick overhead element). -->
+    <visual>
+      <origin xyz="-0.376 0.470 1.204" rpy="0 0 0"/>
+      <geometry><box size="0.458 0.458 0.076"/></geometry>
+      <material name="workcell_material"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.376 0.470 1.204" rpy="0 0 0"/>
+      <geometry><box size="0.458 0.458 0.076"/></geometry>
+    </collision>
+  </link>
+</robot>

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Test Wrist Camera Calibration">
+  <BehaviorTree
+    ID="Test Wrist Camera Calibration"
+    _description="Shows how close the arm gets to a point picked from the wrist camera, for comparing wrist camera mounts. Per test: teleop to a viewpoint, snapshot the wrist camera, click a point (it is turned into a pose exactly as a Gemini pick point is), and the arm moves the cup to hover just off that point along the surface normal. Look at where the cup ended up against the feature you clicked, then resume to go back to the viewpoint. Repeats until stopped. Nothing is saved. See design_docs/wrist_camera_touch_off_check.md."
+    _favorite="false"
+  >
+    <Decorator
+      ID="RepeatUnlessFailureEachTick"
+      name="RepeatTests"
+      num_cycles="-1"
+    >
+      <Control ID="Sequence" name="OneTest">
+        <SubTree
+          ID="Request Teleoperation"
+          name="TeleopToViewpoint"
+          _collapsed="true"
+          enable_user_interaction="true"
+          user_interaction_prompt="Move the arm to a viewpoint where the wrist camera sees a sharp feature (a box corner, a printed mark) with room for the cup in front of it, then Continue."
+          controller_action_server="/joint_trajectory_admittance_controller/follow_joint_trajectory"
+          max_ik_solutions="8"
+          max_mtc_solutions="1"
+          initial_teleop_mode="3"
+          joint_trajectory_controller_name="joint_trajectory_admittance_controller"
+          default_planning_group="manipulator"
+          default_ik_frame="grasp_link"
+          link_padding="0.0"
+          execution_pipeline="jtac"
+          velocity_scale_factor="0.2"
+          require_user_approval="true"
+        />
+        <!--Same capture as the unshelve perception and the touch-off check:
+            image and cloud with the arm still, the cloud shown at its own
+            stamp's transform so it does not follow the arm when it moves.-->
+        <SubTree
+          ID="Get Wrist Image"
+          _collapsed="true"
+          image="{image}"
+          camera_info="{camera_info}"
+        />
+        <SubTree
+          ID="Get Wrist Point Cloud"
+          _collapsed="true"
+          point_cloud="{point_cloud}"
+        />
+        <Action ID="ClearSnapshot" name="ClearPreviousCloud" />
+        <Action
+          ID="SendPointCloudToUI"
+          point_cloud="{point_cloud}"
+          pcd_topic="/pcd_pointcloud_captures"
+          use_latest_transform="false"
+        />
+        <!--The arm has not moved since the capture, so grasp_link now is the
+            viewpoint to come back to.-->
+        <Action
+          ID="CreatePoseStamped"
+          name="ViewpointGraspLink"
+          pose_stamped="{viewpoint_pose}"
+          orientation_xyzw="0;0;0;1"
+          position_xyz="0;0;0"
+          reference_frame="grasp_link"
+        />
+        <Action
+          ID="TransformPoseFrame"
+          name="ViewpointToWorld"
+          input_pose="{viewpoint_pose}"
+          target_frame_id="world"
+          output_pose="{viewpoint_pose}"
+        />
+        <Action
+          ID="GetPointsFromUser"
+          name="ClickPoint"
+          view_name="/camera/wrist_mounted_camera/color/image_raw"
+          point_names="test_point"
+          point_prompts="Click the point the cup should go to (a sharp feature makes the miss easy to see)."
+          pixel_coords="{clicked_points}"
+        />
+        <!--Exactly the pick-point conversion the collections use: normalized
+            color pixel, colour camera_info so the depth-grid cloud is projected
+            into the colour image, same neighbour radius.-->
+        <Action
+          ID="GetPoseFromPixelCoords"
+          name="ClickedPixelToPose"
+          output_poses="{estimated_poses}"
+          neighbor_radius="0.02"
+          camera_info="{camera_info}"
+          pixel_coords="{clicked_points}"
+          downsample_fraction="0.100000"
+          point_cloud="{point_cloud}"
+        />
+        <Action
+          ID="GetElementOfVector"
+          name="EstimatedPose"
+          element="{estimated_pose}"
+          index="0"
+          vector_in="{estimated_poses}"
+        />
+        <!--As in the unshelve collection: the surface normal points out of the
+            surface and the cup approaches along grasp_link +Z, so turn it half
+            a turn about Y, then back off along the approach axis.-->
+        <Action
+          ID="TransformPose"
+          name="PointZIntoSurface"
+          input_pose="{estimated_pose}"
+          translation_xyz="0;0;0"
+          quaternion_xyzw="0;1;0;0"
+          output_pose="{estimated_pose}"
+          visualize_pose="false"
+          marker_text=""
+          marker_size="0.100000"
+          marker_lifetime="0.000000"
+        />
+        <Action
+          ID="TransformPose"
+          name="HoverOffPoint"
+          input_pose="{estimated_pose}"
+          translation_xyz="{hover_offset}"
+          quaternion_xyzw="0;0;0;1"
+          output_pose="{hover_pose}"
+          visualize_pose="false"
+          marker_text=""
+          marker_size="0.100000"
+          marker_lifetime="0.000000"
+        />
+        <!--To world at once: the wrist camera frames are on /tf, so a later
+            lookup at the capture stamp can fall off the TF buffer.-->
+        <Action
+          ID="TransformPoseFrame"
+          name="EstimatedPoseToWorld"
+          input_pose="{estimated_pose}"
+          target_frame_id="world"
+          output_pose="{estimated_pose}"
+        />
+        <Action
+          ID="TransformPoseFrame"
+          name="HoverPoseToWorld"
+          input_pose="{hover_pose}"
+          target_frame_id="world"
+          output_pose="{hover_pose}"
+        />
+        <Action
+          ID="VisualizePose"
+          name="ShowEstimatedPoint"
+          pose="{estimated_pose}"
+          marker_name="wrist_test_estimated"
+          marker_text="estimated"
+          marker_size="0.050000"
+          marker_lifetime="0.000000"
+        />
+        <Action
+          ID="VisualizePose"
+          name="ShowHoverPose"
+          pose="{hover_pose}"
+          marker_name="wrist_test_hover"
+          marker_text="hover"
+          marker_size="0.050000"
+          marker_lifetime="0.000000"
+        />
+        <!--Teleop can leave a jogging controller active.-->
+        <Action
+          ID="SwitchController"
+          name="ActivateJTAC"
+          controller_switch_action_name="/controller_manager/switch_controller"
+          controller_list_action_name="/controller_manager/list_controllers"
+          timeout="-1.000000"
+          activate_asap="true"
+          strictness="1"
+          automatic_deactivation="true"
+          automatic_activation="true"
+          deactivate_controllers=""
+          activate_controllers="joint_trajectory_admittance_controller"
+        />
+        <!--The production straight-line approach planner, so the cup comes in
+            the way a pick does. It may turn the pose about the cup's own axis,
+            which does not move the cup's centre.-->
+        <Action
+          ID="PlanApproachTrajectory"
+          name="PlanToHover"
+          grasp_pose="{hover_pose}"
+          planning_group_name="manipulator"
+          tip_link="grasp_link"
+          velocity_scale_factor="{velocity_scale}"
+          acceleration_scale_factor="{velocity_scale}"
+          trajectory_sampling_rate="50"
+          joint_space_step="0.100000"
+          cartesian_space_step="0.020000"
+          joint_trajectory_msg="{hover_trajectory}"
+          debug_solution="{debug_solution}"
+        />
+        <Action
+          ID="VisualizeMTCSolution"
+          solution="{debug_solution}"
+          cartesian_path_links="grasp_link"
+          line_width="0.005000"
+          line_color_rgb="30;144;255"
+          marker_name="mtc_plan"
+        />
+        <Action
+          ID="ExecuteTrajectory"
+          name="MoveToHover"
+          goal_duration_tolerance="-1.000000"
+          joint_trajectory_msg="{hover_trajectory}"
+          controller_action_name="/joint_trajectory_admittance_controller/follow_joint_trajectory"
+          execution_pipeline="jtac"
+        />
+        <Action
+          ID="BreakpointSubscriber"
+          name="InspectTheMiss"
+          message="The cup should now be centred on the point you clicked, backed off along the surface normal by hover_offset. A sideways miss is the wrist camera's error across the view; a gap larger or smaller than the hover offset is its error in depth. Resume to go back to the viewpoint."
+        />
+        <Action
+          ID="PlanApproachTrajectory"
+          name="PlanBackToViewpoint"
+          grasp_pose="{viewpoint_pose}"
+          planning_group_name="manipulator"
+          tip_link="grasp_link"
+          velocity_scale_factor="{velocity_scale}"
+          acceleration_scale_factor="{velocity_scale}"
+          trajectory_sampling_rate="50"
+          joint_space_step="0.100000"
+          cartesian_space_step="0.020000"
+          joint_trajectory_msg="{return_trajectory}"
+          debug_solution="{debug_solution}"
+        />
+        <Action
+          ID="ExecuteTrajectory"
+          name="MoveBackToViewpoint"
+          goal_duration_tolerance="-1.000000"
+          joint_trajectory_msg="{return_trajectory}"
+          controller_action_name="/joint_trajectory_admittance_controller/follow_joint_trajectory"
+          execution_pipeline="jtac"
+        />
+      </Control>
+    </Decorator>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Test Wrist Camera Calibration">
+      <input_port name="hover_offset" default="0;0;-0.02" type="std::string">
+        Where grasp_link stops relative to the clicked point, in the cup's
+        frame (+Z points into the surface), as x;y;z in metres. The default
+        stops it 2 cm in front of the surface, so a depth error of up to that
+        much shows as a gap instead of the cup pressing into the feature.
+      </input_port>
+      <input_port name="velocity_scale" default="0.05" type="double">
+        Velocity and acceleration scale for the moves to the hover pose and
+        back.
+      </input_port>
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

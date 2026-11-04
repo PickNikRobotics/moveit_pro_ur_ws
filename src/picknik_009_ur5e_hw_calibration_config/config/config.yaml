@@ -1,0 +1,10 @@
+# Calibration sessions only: select this package instead of
+# picknik_009_ur5e_hw_config while running the 3. Calibration Routine Objectives.
+# It changes one thing: the drivers launch file, which starts the cameras in
+# calibration_mode. See design_docs/board_based_calibration.md.
+based_on_package: "picknik_009_ur5e_hw_config"
+
+hardware:
+  additional_driver_launch_file:
+    package: "picknik_009_ur5e_hw_calibration_config"
+    path: "launch/robot_drivers_to_persist.launch.py"

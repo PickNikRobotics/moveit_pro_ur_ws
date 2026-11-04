@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Calibrate Cameras">
+  <BehaviorTree
+    ID="Calibrate Cameras"
+    _description="Calibrates all three cameras in order: Calibrate Shelf Cam From Wall Board (wrist camera on the wall board, then the shelf_cam ZED), then Calibrate Scene Camera From Tote Board (wrist camera on the tote board, then the scene D415). The two boards are far enough apart that no camera sees both, so neither is covered. Saves every result, places the shelving and the tote, and publishes both fixed-camera transforms. See design_docs/board_based_calibration.md."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <SubTree
+        ID="Calibrate Shelf Cam From Wall Board"
+        _collapsed="true"
+        waypoint_prefix="wall_calibration"
+        settle_seconds="1.0"
+        board="[{squares_x: 7, squares_y: 5, square_length: 0.035, marker_length: 0.026, dictionary: DICT_4X4_50}]"
+        sample_count="10"
+      />
+      <SubTree
+        ID="Calibrate Scene Camera From Tote Board"
+        _collapsed="true"
+        waypoint_prefix="tote_calibration"
+        settle_seconds="1.0"
+        board="[{squares_x: 7, squares_y: 5, square_length: 0.035, marker_length: 0.026, dictionary: DICT_4X4_50}]"
+        sample_count="10"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Calibrate Cameras">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

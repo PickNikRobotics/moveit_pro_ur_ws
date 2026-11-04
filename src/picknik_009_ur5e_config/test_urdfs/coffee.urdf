@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<!-- Coffee: cylinder 11cm diameter x 14cm tall -->
+<robot name="coffee">
+  <link name="coffee_link">
+    <visual>
+      <geometry>
+        <cylinder radius="0.055" length="0.14"/>
+      </geometry>
+      <material name="coffee_color">
+        <color rgba="0.36 0.25 0.20 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.055" length="0.14"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.4"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+</robot>

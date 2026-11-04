@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root
+  BTCPP_format="4"
+  main_tree_to_execute="Compute Wrist Camera Mount From Solve"
+>
+  <BehaviorTree
+    ID="Compute Wrist Camera Mount From Solve"
+    _description="Turns a wrist camera solve (the color optical frame in grasp_link, from Calibrate Eye In Hand Camera) into the origin the robot xacro uses for the camera: the camera's bottom screw frame in d415_mount_link. Uses the camera's internal frames and the grasp_link to d415_mount_link chain from the current robot model. See design_docs/board_based_calibration.md."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <Action
+        ID="GetLatestTransform"
+        target_frame_id="wrist_mounted_camera_bottom_screw_frame"
+        source_frame_id="wrist_mounted_camera_color_optical_frame"
+        transform="{optical_in_screw_transform}"
+      />
+      <Action
+        ID="ConvertTransformStampedToPoseStamped"
+        transform_stamped="{optical_in_screw_transform}"
+        pose_stamped="{optical_in_screw}"
+      />
+      <!--screw_T_grasp = screw_T_optical * inverse(grasp_T_optical).-->
+      <Action
+        ID="ComputeCameraPoseFromTag"
+        tag_pose_world="{optical_in_screw}"
+        tag_pose_camera="{wrist_camera_solve}"
+        camera_pose_world="{grasp_in_screw}"
+      />
+      <Action
+        ID="GetLatestTransform"
+        target_frame_id="d415_mount_link"
+        source_frame_id="grasp_link"
+        transform="{grasp_in_mount_transform}"
+      />
+      <Action
+        ID="ConvertTransformStampedToPoseStamped"
+        transform_stamped="{grasp_in_mount_transform}"
+        pose_stamped="{grasp_in_mount}"
+      />
+      <!--mount_T_screw = mount_T_grasp * inverse(screw_T_grasp).-->
+      <Action
+        ID="ComputeCameraPoseFromTag"
+        tag_pose_world="{grasp_in_mount}"
+        tag_pose_camera="{grasp_in_screw}"
+        camera_pose_world="{mount_origin}"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Compute Wrist Camera Mount From Solve">
+      <MetadataFields>
+        <Metadata runnable="false" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+      <input_port
+        name="wrist_camera_solve"
+        default="{wrist_camera_solve}"
+        type="geometry_msgs::msg::PoseStamped"
+      >
+        The wrist camera color optical frame in grasp_link.
+      </input_port>
+      <output_port name="mount_origin" type="geometry_msgs::msg::PoseStamped">
+        The camera bottom screw frame in d415_mount_link: the robot xacro's
+        wrist camera origin.
+      </output_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>

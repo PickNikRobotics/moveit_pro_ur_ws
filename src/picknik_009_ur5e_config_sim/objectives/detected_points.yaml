@@ -1,0 +1,80 @@
+---
+header:
+  stamp:
+    sec: 1776936636
+    nanosec: 733655299
+  frame_id: scene_camera_optical_frame
+point:
+  x: 0.65000000000000002
+  y: 0.40000000000000002
+  z: 0
+---
+header:
+  stamp:
+    sec: 1776936636
+    nanosec: 733655299
+  frame_id: scene_camera_optical_frame
+point:
+  x: 0.28999999999999998
+  y: 0.41999999999999998
+  z: 0
+---
+header:
+  stamp:
+    sec: 1776936636
+    nanosec: 733655299
+  frame_id: scene_camera_optical_frame
+point:
+  x: 0.56000000000000005
+  y: 0.62
+  z: 0
+---
+header:
+  stamp:
+    sec: 1776936636
+    nanosec: 733655299
+  frame_id: scene_camera_optical_frame
+point:
+  x: 0.44
+  y: 0.60999999999999999
+  z: 0
+---
+header:
+  stamp:
+    sec: 1776936636
+    nanosec: 733655299
+  frame_id: scene_camera_optical_frame
+point:
+  x: 0.41999999999999998
+  y: 0.39000000000000001
+  z: 0
+---
+header:
+  stamp:
+    sec: 1776936636
+    nanosec: 733655299
+  frame_id: scene_camera_optical_frame
+point:
+  x: 0.75
+  y: 0.62
+  z: 0
+---
+header:
+  stamp:
+    sec: 1776936636
+    nanosec: 733655299
+  frame_id: scene_camera_optical_frame
+point:
+  x: 0.31
+  y: 0.67000000000000004
+  z: 0
+---
+header:
+  stamp:
+    sec: 1776936636
+    nanosec: 733655299
+  frame_id: scene_camera_optical_frame
+point:
+  x: 0.40000000000000002
+  y: 0.48999999999999999
+  z: 0

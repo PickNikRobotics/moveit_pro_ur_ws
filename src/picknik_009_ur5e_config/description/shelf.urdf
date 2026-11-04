@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<robot name="shelf" xmlns:xacro="http://wiki.ros.org/xacro">
+  <link name="shelf">
+    <visual>
+      <geometry>
+        <mesh filename="package://picknik_009_ur5e_config/description/shelf.stl"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://picknik_009_ur5e_config/description/shelf.stl"/>
+      </geometry>
+    </collision>
+  </link>
+</robot>

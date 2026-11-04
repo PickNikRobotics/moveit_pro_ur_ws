@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<package format="3">
+  <name>picknik_009_ur5e_2f85_hw_config</name>
+  <version>0.1.0</version>
+
+  <description>
+    UR5e 009 hardware config with a Robotiq 2F-85 2-finger gripper instead of the
+    EPick: SRDF, controllers and the 2-finger versions of the shelf-stocking gripper
+    switching subtrees.
+  </description>
+
+  <maintainer email="support@picknik.ai">MoveIt Pro User</maintainer>
+
+  <license>Proprietary</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>picknik_009_ur5e_hw_config</exec_depend>
+  <exec_depend>robotiq_description</exec_depend>
+  <exec_depend>robotiq_driver</exec_depend>
+  <exec_depend>shelf_stocking_objectives</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_cmake_lint_cmake</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

@@ -12,6 +12,17 @@
 #
 # See https://github.com/pre-commit/pre-commit
 exclude: ^src/external_dependencies/
+
+# Pin the node version so pre-commit's nodeenv does not try to auto-detect the
+# latest stable Node.js version. Ubuntu's nodeenv 0.13.4 (python3-nodeenv)
+# parses nodejs.org/dist/latest/ with a regex that fails on the current HTML
+# format (hrefs are now absolute "/dist/latest/node-v..." paths), so
+# get_last_stable_node_version() raises IndexError and every node-language
+# hook (markdown-link-check, prettier) fails to install. Pinning a version
+# skips that codepath entirely.
+default_language_version:
+  node: 22.11.0
+
 repos:
   # Standard hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -29,11 +40,6 @@ repos:
         exclude: (\.(svg|stl|dae))$
       - id: mixed-line-ending
       - id: fix-byte-order-marker
-
-  - repo: https://github.com/psf/black
-    rev: 22.3.0
-    hooks:
-      - id: black
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.0.0
@@ -67,6 +73,11 @@ repos:
     rev: v3.10.3
     hooks:
       - id: markdown-link-check
+        # markdown-link-check does not auto-discover .markdown-link-check.json;
+        # pass it explicitly so the private-repo URL whitelist is actually
+        # applied (otherwise unauthenticated fetches 404 on README.md links
+        # to internal PickNik GitHub repos and fail every local commit).
+        args: ["-c", ".markdown-link-check.json"]
 
   # NOTE: Broken on arm64. Will need to bump once https://github.com/hadolint/hadolint/issues/840 is fixed.
   - repo: https://github.com/hadolint/hadolint

@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Check Wrist Camera By Touch-Off">
+  <BehaviorTree
+    ID="Check Wrist Camera By Touch-Off"
+    _description="Measure how far the wrist camera's pick points are from reality. Per sample: teleop to a viewpoint, snapshot the wrist camera, click a feature in the image (it is turned into a point exactly as a Gemini pick point is), teleop the cup tip onto that feature, and save both to calibration/wrist_touch_off_samples.yaml. scripts/wrist_touch_off_report.py prints each sample's error and fits a camera mount correction. See design_docs/wrist_camera_touch_off_check.md."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <!--Continue the numbering after the samples already in the file, so a
+          re-run adds samples instead of overwriting them (the UI does not pass
+          Objective inputs, so sample_prefix cannot be changed per run). Probe
+          <prefix>_<n>_error_world, the last section a finished sample writes,
+          for n = 1, 2, ... until one is missing; a missing file counts as none.-->
+      <Action
+        ID="Script"
+        name="InitSampleIndex"
+        code="sample_index := 0; run_count := 0"
+      />
+      <Decorator ID="ForceSuccess" name="CountExistingSamples">
+        <Decorator
+          ID="RepeatUnlessFailureEachTick"
+          name="ProbeUntilMissing"
+          num_cycles="1000"
+        >
+          <Control ID="Sequence" name="ProbeNextSample">
+            <Action
+              ID="Script"
+              name="NextProbeName"
+              code="probe_index := sample_index; probe_index += 1; probe_ns := sample_prefix .. '_' .. probe_index .. '_error_world'"
+            />
+            <Action
+              ID="LoadPoseStampedFromYamlNamespace"
+              name="ProbeSample"
+              file_path="{samples_file}"
+              namespace="{probe_ns}"
+              output="{probe_pose}"
+            />
+            <Action ID="Script" name="CountSample" code="sample_index += 1" />
+          </Control>
+        </Decorator>
+      </Decorator>
+      <Action
+        ID="Script"
+        name="ExistingSamplesMessage"
+        code="existing_message := sample_index .. ' earlier sample(s) with prefix ' .. sample_prefix .. ' found in the samples file; new samples are numbered after them.'"
+      />
+      <Action
+        ID="LogMessage"
+        log_level="info"
+        message="{existing_message}"
+      />
+      <Decorator
+        ID="RepeatUnlessFailureEachTick"
+        name="RepeatSamples"
+        num_cycles="{num_samples}"
+      >
+        <Control ID="Sequence" name="OneSample">
+          <Action
+            ID="Script"
+            name="NameThisSample"
+            code="sample_index += 1; run_count += 1; sample := sample_prefix .. '_' .. sample_index; ns_estimated_camera := sample .. '_estimated_camera'; ns_estimated_world := sample .. '_estimated_world'; ns_snapshot_grasp := sample .. '_snapshot_grasp_link_world'; ns_touched := sample .. '_touched_grasp_link_world'; ns_error := sample .. '_error_world'; view_prompt := 'Sample ' .. sample_index .. ' (' .. run_count .. ' of ' .. num_samples .. ' this run): move the arm to a viewpoint where the wrist camera sees a sharp feature, then Continue. Use a different pose each sample.'; touch_prompt := 'Sample ' .. sample_index .. ': jog the suction cup tip until its lip just touches the feature you clicked (do not press), then Continue.'"
+          />
+          <!--Every sample from its own arm pose: the fit is only meaningful
+              across poses, because a single pose cannot separate a mount error
+              from the forward-kinematics error at that pose.-->
+          <SubTree
+            ID="Request Teleoperation"
+            name="TeleopToViewpoint"
+            _collapsed="true"
+            enable_user_interaction="true"
+            user_interaction_prompt="{view_prompt}"
+            controller_action_server="/joint_trajectory_admittance_controller/follow_joint_trajectory"
+            max_ik_solutions="8"
+            max_mtc_solutions="1"
+            initial_teleop_mode="3"
+            joint_trajectory_controller_name="joint_trajectory_admittance_controller"
+            default_planning_group="manipulator"
+            default_ik_frame="grasp_link"
+            link_padding="0.0"
+            execution_pipeline="jtac"
+            velocity_scale_factor="0.2"
+            require_user_approval="true"
+          />
+          <!--Same capture as the unshelve perception: image and cloud with the
+              arm still, the cloud shown at its own stamp's transform so it does
+              not follow the arm when it moves for the touch.-->
+          <SubTree
+            ID="Get Wrist Image"
+            _collapsed="true"
+            image="{image}"
+            camera_info="{camera_info}"
+          />
+          <SubTree
+            ID="Get Wrist Point Cloud"
+            _collapsed="true"
+            point_cloud="{point_cloud}"
+          />
+          <Action ID="ClearSnapshot" name="ClearPreviousCloud" />
+          <Action
+            ID="SendPointCloudToUI"
+            point_cloud="{point_cloud}"
+            pcd_topic="/pcd_pointcloud_captures"
+            use_latest_transform="false"
+          />
+          <!--The arm has not moved since the capture, so grasp_link now is
+              grasp_link at the snapshot.-->
+          <Action
+            ID="CreatePoseStamped"
+            name="SnapshotGraspLink"
+            pose_stamped="{snapshot_grasp_link_world}"
+            orientation_xyzw="0;0;0;1"
+            position_xyz="0;0;0"
+            reference_frame="grasp_link"
+          />
+          <Action
+            ID="TransformPoseFrame"
+            name="SnapshotGraspLinkToWorld"
+            input_pose="{snapshot_grasp_link_world}"
+            target_frame_id="world"
+            output_pose="{snapshot_grasp_link_world}"
+          />
+          <Action
+            ID="GetPointsFromUser"
+            name="ClickFeature"
+            view_name="/camera/wrist_mounted_camera/color/image_raw"
+            point_names="touch_point"
+            point_prompts="Click a sharp feature you can touch with the cup tip (a box corner, a printed mark)."
+            pixel_coords="{clicked_points}"
+          />
+          <!--Exactly the pick-point conversion the collections use: normalized
+              color pixel, colour camera_info so the depth-grid cloud is
+              projected into the colour image, same neighbour radius.-->
+          <Action
+            ID="GetPoseFromPixelCoords"
+            name="ClickedPixelToPose"
+            output_poses="{estimated_poses}"
+            neighbor_radius="0.02"
+            camera_info="{camera_info}"
+            pixel_coords="{clicked_points}"
+            downsample_fraction="0.100000"
+            point_cloud="{point_cloud}"
+          />
+          <Action
+            ID="GetElementOfVector"
+            name="EstimatedPoseInCamera"
+            element="{estimated_camera}"
+            index="0"
+            vector_in="{estimated_poses}"
+          />
+          <!--To world at once: the wrist camera frames are on /tf, so a later
+              lookup at this stamp can fall off the TF buffer.-->
+          <Action
+            ID="TransformPoseFrame"
+            name="EstimatedPoseToWorld"
+            input_pose="{estimated_camera}"
+            target_frame_id="world"
+            output_pose="{estimated_world}"
+          />
+          <Action
+            ID="VisualizePose"
+            name="ShowEstimatedPoint"
+            pose="{estimated_world}"
+            marker_name="touch_off_estimated"
+            marker_text="estimated"
+            marker_size="0.050000"
+            marker_lifetime="0.000000"
+          />
+          <SubTree
+            ID="Request Teleoperation"
+            name="TeleopCupOntoFeature"
+            _collapsed="true"
+            enable_user_interaction="true"
+            user_interaction_prompt="{touch_prompt}"
+            controller_action_server="/joint_trajectory_admittance_controller/follow_joint_trajectory"
+            max_ik_solutions="8"
+            max_mtc_solutions="1"
+            initial_teleop_mode="3"
+            joint_trajectory_controller_name="joint_trajectory_admittance_controller"
+            default_planning_group="manipulator"
+            default_ik_frame="grasp_link"
+            link_padding="0.0"
+            execution_pipeline="jtac"
+            velocity_scale_factor="0.1"
+            require_user_approval="true"
+          />
+          <Action
+            ID="CreatePoseStamped"
+            name="TouchedGraspLink"
+            pose_stamped="{touched_grasp_link_world}"
+            orientation_xyzw="0;0;0;1"
+            position_xyz="0;0;0"
+            reference_frame="grasp_link"
+          />
+          <Action
+            ID="TransformPoseFrame"
+            name="TouchedGraspLinkToWorld"
+            input_pose="{touched_grasp_link_world}"
+            target_frame_id="world"
+            output_pose="{touched_grasp_link_world}"
+          />
+          <Action
+            ID="VisualizePose"
+            name="ShowTouchedPoint"
+            pose="{touched_grasp_link_world}"
+            marker_name="touch_off_touched"
+            marker_text="touched"
+            marker_size="0.050000"
+            marker_lifetime="0.000000"
+          />
+          <!--Error in world axes: the estimate's orientation is the surface
+              normal, so it is replaced with identity first, which makes the
+              offset's translation touched minus estimated in world.-->
+          <Action
+            ID="OverridePoseOrientation"
+            name="EstimateInWorldAxes"
+            input_pose="{estimated_world}"
+            orientation_xyzw="0;0;0;1"
+            output_pose="{estimated_world_axes}"
+          />
+          <Action
+            ID="CalculatePoseOffset"
+            name="TouchMinusEstimate"
+            source_pose="{estimated_world_axes}"
+            destination_pose="{touched_grasp_link_world}"
+            source_to_destination_pose="{error_world}"
+          />
+          <Action
+            ID="SavePoseStampedToYaml"
+            name="SaveEstimatedCamera"
+            yaml_filename="{samples_file}"
+            namespace="{ns_estimated_camera}"
+            overwrite="false"
+            message="{estimated_camera}"
+          />
+          <Action
+            ID="SavePoseStampedToYaml"
+            name="SaveEstimatedWorld"
+            yaml_filename="{samples_file}"
+            namespace="{ns_estimated_world}"
+            overwrite="false"
+            message="{estimated_world}"
+          />
+          <Action
+            ID="SavePoseStampedToYaml"
+            name="SaveSnapshotGraspLink"
+            yaml_filename="{samples_file}"
+            namespace="{ns_snapshot_grasp}"
+            overwrite="false"
+            message="{snapshot_grasp_link_world}"
+          />
+          <Action
+            ID="SavePoseStampedToYaml"
+            name="SaveTouchedGraspLink"
+            yaml_filename="{samples_file}"
+            namespace="{ns_touched}"
+            overwrite="false"
+            message="{touched_grasp_link_world}"
+          />
+          <Action
+            ID="SavePoseStampedToYaml"
+            name="SaveError"
+            yaml_filename="{samples_file}"
+            namespace="{ns_error}"
+            overwrite="false"
+            message="{error_world}"
+          />
+          <Action
+            ID="Script"
+            name="SavedMessage"
+            code="saved_message := sample .. ' saved; run scripts/wrist_touch_off_report.py for the error and the fitted correction.'"
+          />
+          <Action
+            ID="LogMessage"
+            log_level="info"
+            message="{saved_message}"
+          />
+        </Control>
+      </Decorator>
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Check Wrist Camera By Touch-Off">
+      <input_port name="num_samples" default="4" type="int">
+        Samples to take this run, each from a different arm pose and distance.
+        Four in total is the fewest the report can both fit and leave-one-out
+        check. Each
+        sample is written to the file as soon as its touch is done, so
+        aborting keeps every finished sample and loses only one in progress.
+      </input_port>
+      <input_port name="sample_prefix" default="touch" type="std::string">
+        Prefix of each sample's sections in the samples file. New samples are
+        numbered after the ones already in the file with this prefix, so a
+        re-run adds to them. Change it to start a separate set.
+      </input_port>
+      <input_port
+        name="samples_file"
+        default="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/wrist_touch_off_samples.yaml"
+        type="std::string"
+      >
+        File the samples are appended to.
+      </input_port>
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

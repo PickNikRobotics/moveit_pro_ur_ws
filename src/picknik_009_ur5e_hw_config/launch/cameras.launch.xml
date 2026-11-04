@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<launch>
+  <!--
+    Serials are pinned per camera so the two D415s cannot swap roles between boots
+    (the RealSense driver enumerates in bus order, which is not stable). See
+    design_docs/camera_naming.md for the naming contract these feed.
+
+    A serial that is not on the bus is NOT a launch failure: the driver logs
+    "The requested device ... is NOT found. Will Try again." and retries forever,
+    so the node comes up, registers nothing, and never publishes. Downstream that
+    surfaces as a GetImage / GetPointCloud five-second timeout naming the topic
+    rather than anything mentioning a camera. Read the RealSense serial from the
+    driver log or rs-enumerate-devices: lsusb prints a different USB serial string.
+  -->
+
+  <arg
+    name="launch_wrist_camera"
+    default="true"
+    description="Whether to launch the wrist-mounted D415. Set false on a host
+                 where that camera is not attached: a missing serial does not fail
+                 the launch, it only adds a node that retries forever."
+  />
+  <arg
+    name="launch_shelf_cam"
+    default="true"
+    description="Whether to launch the shelf_cam ZED 2i. Needs the ZED SDK and
+                 zed_wrapper in the container (design_docs/zed_shelf_cam.md)."
+  />
+  <arg
+    name="calibration_mode"
+    default="false"
+    description="Run the cameras at the calibration-only resolutions. Set by the
+                 picknik_009_ur5e_hw_calibration_config package, never by normal
+                 runs. See design_docs/board_based_calibration.md."
+  />
+
+  <!-- Calibration mode raises the D415 color resolution and the ZED resolution. -->
+  <!-- Color runs at 30 Hz so the Trainer's 10 fps divides it evenly (a D415 has
+       no 10 Hz mode). Depth stays at 6 Hz: nothing records it, and it carries the
+       point cloud. See design_docs/cracker_box_pick_drop_collection.md. -->
+  <let
+    name="d415_color_profile"
+    value="640x480x30"
+    unless="$(var calibration_mode)"
+  />
+  <let
+    name="d415_color_profile"
+    value="1280x720x6"
+    if="$(var calibration_mode)"
+  />
+  <let
+    name="shelf_cam_params"
+    value="$(find-pkg-share picknik_009_ur5e_hw_config)/config/zed_shelf_cam.yaml"
+    unless="$(var calibration_mode)"
+  />
+  <let
+    name="shelf_cam_params"
+    value="$(find-pkg-share picknik_009_ur5e_hw_config)/config/zed_shelf_cam_calibration.yaml"
+    if="$(var calibration_mode)"
+  />
+
+  <!-- Scene camera (original, over the tote). -->
+  <include
+    file="$(find-pkg-share picknik_009_ur5e_hw_config)/launch/pro_rs_launch.py"
+  >
+    <arg name="camera_name" value="scene_camera" />
+    <arg name="serial_no" value="'141722063195'" />
+    <arg name="device_type" value="D415" />
+    <!-- No hardware reset on open. A reset makes the camera re-enumerate with new
+         /dev/video* and /dev/bus/usb numbers, and the drivers container's /dev is a
+         snapshot taken when it starts, so the node can only find the camera again if
+         it happens to get its old numbers back. With two D415s resetting at once
+         that is a race, and losing it leaves the camera "NOT found" until the next
+         restart. A wedged camera (UVC "Protocol error") now needs a replug followed
+         by a drivers restart. See design_docs/camera_naming.md. -->
+    <arg name="initial_reset" value="false" />
+    <arg name="depth_module.depth_profile" value="640x480x6" />
+    <arg name="rgb_camera.color_profile" value="$(var d415_color_profile)" />
+    <arg name="pointcloud.enable" value="True" />
+    <arg name="pointcloud.ordered_pc" value="True" />
+    <arg name="decimation_filter.enable" value="False" />
+    <!--
+      Load-bearing, and upstream defaults it to false. With pointcloud.enable
+      true but alignment off, the point cloud publisher registers and then never
+      emits a message - so the failure looks like a GetPointCloud five-second
+      timeout rather than a camera or driver error. Do not drop this.
+    -->
+    <arg name="align_depth.enable" value="True" />
+    <!--
+      Fill small depth holes. Shiny flat tops (the tuna lid) lose depth under
+      the D415's projector, and when a Gemini point lands in such a hole
+      GetPoseFromPixelCoords finds no cloud point near it and fails the whole
+      perception cycle. The spatial filter's hole filling is bounded by
+      holes_fill, unlike hole_filling_filter, which fills every hole, including
+      the shadows beside products, with a neighbour's depth.
+      See design_docs/camera_naming.md.
+    -->
+    <arg name="spatial_filter.enable" value="True" />
+    <arg name="spatial_filter.holes_fill" value="3" />
+  </include>
+
+  <!--
+    Wrist camera. Everything reached through the "Get Wrist Image" / "Get Wrist
+    Point Cloud" switching subtrees stays dead while launch_wrist_camera is false.
+  -->
+  <include
+    file="$(find-pkg-share picknik_009_ur5e_hw_config)/launch/pro_rs_launch.py"
+    if="$(var launch_wrist_camera)"
+  >
+    <arg name="camera_name" value="wrist_mounted_camera" />
+    <arg name="serial_no" value="'135322066258'" />
+    <arg name="device_type" value="D415" />
+    <!-- No hardware reset on open: see the scene camera block. -->
+    <arg name="initial_reset" value="false" />
+    <arg name="depth_module.depth_profile" value="640x480x6" />
+    <arg name="rgb_camera.color_profile" value="$(var d415_color_profile)" />
+    <arg name="pointcloud.enable" value="True" />
+    <arg name="pointcloud.ordered_pc" value="True" />
+    <arg name="decimation_filter.enable" value="False" />
+    <!-- Load-bearing: see the scene camera block. -->
+    <arg name="align_depth.enable" value="True" />
+  </include>
+
+  <!--
+    Wrist cloud on the COLOR pixel grid, for GraspScout's seal check. The
+    driver's depth/color/points is organized on the depth grid, so a color pixel
+    does not index it; the GraspScout objectives therefore never pass it and
+    read this topic instead, falling back to image-only (no seal check) when it
+    is missing. Built from the driver's aligned_depth_to_color stream, which
+    needs align_depth.enable above. See design_docs/camera_naming.md.
+  -->
+  <node
+    pkg="depth_image_proc"
+    exec="point_cloud_xyz_node"
+    name="wrist_mounted_camera_aligned_points"
+    namespace="/camera"
+    if="$(var launch_wrist_camera)"
+  >
+    <remap
+      from="image_rect"
+      to="/camera/wrist_mounted_camera/aligned_depth_to_color/image_raw"
+    />
+    <remap
+      from="camera_info"
+      to="/camera/wrist_mounted_camera/aligned_depth_to_color/camera_info"
+    />
+    <remap from="points" to="/camera/wrist_mounted_camera/aligned_points" />
+  </node>
+
+  <!--
+    Shelf camera, a ZED 2i. pro_zed_launch.py maps its topics onto the
+    /camera/<name>/... layout the RealSense cameras use (design_docs/zed_shelf_cam.md).
+  -->
+  <include
+    file="$(find-pkg-share picknik_009_ur5e_hw_config)/launch/pro_zed_launch.py"
+    if="$(var launch_shelf_cam)"
+  >
+    <arg name="camera_name" value="shelf_cam" />
+    <arg name="camera_model" value="zed2i" />
+    <arg name="serial_number" value="34758561" />
+    <arg name="ros_params_override_path" value="$(var shelf_cam_params)" />
+  </include>
+</launch>

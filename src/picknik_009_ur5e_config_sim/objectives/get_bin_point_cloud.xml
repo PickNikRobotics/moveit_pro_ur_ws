@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Get Bin Point Cloud">
+  <BehaviorTree ID="Get Bin Point Cloud" _description="" _favorite="false">
+    <Control ID="Sequence" name="TopLevelSequence" _collapsed="false">
+      <Action
+        ID="GetPointCloud"
+        message_timeout_sec="5.000000"
+        message_out="{point_cloud}"
+        publisher_timeout_sec="5.000000"
+        topic_name="/camera/scene_camera/depth/color/points"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Get Bin Point Cloud">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="6. HW/Sim Switching Subtrees" />
+      </MetadataFields>
+      <inout_port name="point_cloud" default="{point_cloud}" />
+    </SubTree>
+  </TreeNodesModel>
+</root>

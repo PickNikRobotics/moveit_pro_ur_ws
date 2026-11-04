@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<!-- Scene camera (Intel RealSense D415), generated from realsense_d415.urdf.xacro -->
+<robot name="scene_camera">
+  <link name="scene_camera_bottom_screw_frame"/>
+  <joint name="scene_camera_link_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0.02 0.0115"/>
+    <parent link="scene_camera_bottom_screw_frame"/>
+    <child link="scene_camera_link"/>
+  </joint>
+  <link name="scene_camera_link">
+    <visual>
+      <origin rpy="1.5707963267948966 0 1.5707963267948966" xyz="0.00987 -0.02 0"/>
+      <geometry>
+        <mesh filename="package://picknik_009_ur5e_config/meshes/d415.stl"/>
+      </geometry>
+      <material name="rs_aluminum">
+        <color rgba="0.5 0.5 0.5 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 -0.02 0"/>
+      <geometry>
+        <box size="0.02005 0.099 0.023"/>
+      </geometry>
+    </collision>
+  </link>
+</robot>

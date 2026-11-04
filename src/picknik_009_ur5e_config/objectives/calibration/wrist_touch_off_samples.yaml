@@ -1,0 +1,400 @@
+touch_1_estimated_camera:
+  header:
+    stamp:
+      sec: 1793665332
+      nanosec: 118501953
+    frame_id: wrist_mounted_camera_depth_optical_frame
+  pose:
+    position:
+      x: -0.14822283387184143
+      y: 0.056917119771242142
+      z: 0.69100004434585571
+    orientation:
+      x: 0.94367910775704344
+      y: 0.0010337618308308932
+      z: -0.021847558569652731
+      w: 0.3301384691066393
+touch_1_estimated_world:
+  header:
+    stamp:
+      sec: 1793665332
+      nanosec: 118501953
+    frame_id: world
+  pose:
+    position:
+      x: -0.18055065985815999
+      y: 0.63394258211058219
+      z: -0.15524956264646672
+    orientation:
+      x: -0.02686663083222264
+      y: -0.028445936342867462
+      z: -0.0036062435483810557
+      w: 0.99922772511619606
+touch_1_snapshot_grasp_link_world:
+  header:
+    stamp:
+      sec: 1793665332
+      nanosec: 220630153
+    frame_id: world
+  pose:
+    position:
+      x: -0.016106485761996851
+      y: 0.37736547546279881
+      z: 0.23237008642247262
+    orientation:
+      x: -0.0067604045675575507
+      y: 0.93519891169327729
+      z: 0.35401020053649646
+      w: 0.0058369867142617007
+touch_1_touched_grasp_link_world:
+  header:
+    stamp:
+      sec: 1793665405
+      nanosec: 143174682
+    frame_id: world
+  pose:
+    position:
+      x: -0.16262352188932566
+      y: 0.6278836911932919
+      z: -0.14561918543029437
+    orientation:
+      x: -0.003947677883073924
+      y: 0.9999568109884317
+      z: -0.0034068655679737447
+      w: 0.0076931959665140024
+touch_1_error_world:
+  header:
+    stamp:
+      sec: 1793665332
+      nanosec: 118501953
+    frame_id: world
+  pose:
+    position:
+      x: 0.017927137968834328
+      y: -0.0060588909172902827
+      z: 0.0096303772161723533
+    orientation:
+      x: -0.003947677883073924
+      y: 0.9999568109884317
+      z: -0.0034068655679737451
+      w: 0.0076931959665140024
+touch_2_estimated_camera:
+  header:
+    stamp:
+      sec: 1793665423
+      nanosec: 604185059
+    frame_id: wrist_mounted_camera_depth_optical_frame
+  pose:
+    position:
+      x: -0.10105007886886597
+      y: 0.0095256008207798004
+      z: 0.49000000953674316
+    orientation:
+      x: -0.11609898417162458
+      y: 0.98620594892042079
+      z: 0.071829432293702547
+      w: -0.093591729611757726
+touch_2_estimated_world:
+  header:
+    stamp:
+      sec: 1793665423
+      nanosec: 604185059
+    frame_id: world
+  pose:
+    position:
+      x: -0.17608148462709541
+      y: 0.63425410535628712
+      z: -0.1516525301719942
+    orientation:
+      x: -0.0093693205928191553
+      y: -0.0065958745930688656
+      z: 0.99403369288060051
+      w: 0.10847003284193699
+touch_2_snapshot_grasp_link_world:
+  header:
+    stamp:
+      sec: 1793665423
+      nanosec: 705838410
+    frame_id: world
+  pose:
+    position:
+      x: -0.008917365980882698
+      y: 0.63065722473735897
+      z: 0.086392971720861467
+    orientation:
+      x: -0.0036095633461674615
+      y: 0.99582420552268114
+      z: -0.0037184736656574549
+      w: -0.09114436735843244
+touch_2_touched_grasp_link_world:
+  header:
+    stamp:
+      sec: 1793665496
+      nanosec: 557936635
+    frame_id: world
+  pose:
+    position:
+      x: -0.16568057314252671
+      y: 0.62353679610035595
+      z: -0.14885243688205019
+    orientation:
+      x: -0.0038961542063956586
+      y: 0.99984013657042015
+      z: -0.015558133766862626
+      w: 0.0079035282586866502
+touch_2_error_world:
+  header:
+    stamp:
+      sec: 1793665423
+      nanosec: 604185059
+    frame_id: world
+  pose:
+    position:
+      x: 0.010400911484568703
+      y: -0.010717309255931173
+      z: 0.0028000932899440167
+    orientation:
+      x: -0.0038961542063956594
+      y: 0.99984013657042026
+      z: -0.015558133766862629
+      w: 0.0079035282586866519
+touch_3_estimated_camera:
+  header:
+    stamp:
+      sec: 1793665546
+      nanosec: 436281006
+    frame_id: wrist_mounted_camera_depth_optical_frame
+  pose:
+    position:
+      x: -0.11493007093667984
+      y: 0.042752448469400406
+      z: 0.45500001311302185
+    orientation:
+      x: 0.29620989910766005
+      y: 0.86162735375658828
+      z: -0.067816335316028112
+      w: 0.4065205701676215
+touch_3_estimated_world:
+  header:
+    stamp:
+      sec: 1793665546
+      nanosec: 436281006
+    frame_id: world
+  pose:
+    position:
+      x: -0.18212886401944695
+      y: 0.6245455643201987
+      z: -0.1604434725040168
+    orientation:
+      x: 0.013564633611511827
+      y: 0.0050770841660031764
+      z: 0.97179798032815445
+      w: -0.23536977841404669
+touch_3_snapshot_grasp_link_world:
+  header:
+    stamp:
+      sec: 1793665546
+      nanosec: 541589651
+    frame_id: world
+  pose:
+    position:
+      x: -0.24469576747749089
+      y: 0.53825839668737452
+      z: 0.081462711131122426
+    orientation:
+      x: 0.064499899547868583
+      y: 0.90363793614073296
+      z: 0.20074876865148664
+      w: 0.37279776717483631
+touch_3_touched_grasp_link_world:
+  header:
+    stamp:
+      sec: 1793665597
+      nanosec: 952402848
+    frame_id: world
+  pose:
+    position:
+      x: -0.16869528548294646
+      y: 0.62428463663572242
+      z: -0.14979852603218749
+    orientation:
+      x: -0.024562221052524962
+      y: 0.99956448787208396
+      z: -0.0096819729750612735
+      w: -0.013182992122262366
+touch_3_error_world:
+  header:
+    stamp:
+      sec: 1793665546
+      nanosec: 436281006
+    frame_id: world
+  pose:
+    position:
+      x: 0.013433578536500485
+      y: -0.00026092768447627535
+      z: 0.010644946471829314
+    orientation:
+      x: -0.024562221052524959
+      y: 0.99956448787208396
+      z: -0.0096819729750612735
+      w: -0.013182992122262364
+touch_4_estimated_camera:
+  header:
+    stamp:
+      sec: 1793665880
+      nanosec: 898378906
+    frame_id: wrist_mounted_camera_depth_optical_frame
+  pose:
+    position:
+      x: 0.015217953361570835
+      y: -0.10295838117599487
+      z: 0.42800003290176392
+    orientation:
+      x: 0.98005286739518227
+      y: 0.041577400354614623
+      z: -0.010667561159919995
+      w: -0.19404616813969461
+touch_4_estimated_world:
+  header:
+    stamp:
+      sec: 1793665880
+      nanosec: 898378906
+    frame_id: world
+  pose:
+    position:
+      x: -0.17395482086990219
+      y: 0.63294777308445827
+      z: -0.14830072102025926
+    orientation:
+      x: 0.00043878259199853269
+      y: -0.0050579401113621811
+      z: -0.014313114138958478
+      w: 0.9998846788413257
+touch_4_snapshot_grasp_link_world:
+  header:
+    stamp:
+      sec: 1793665881
+      nanosec: 15653575
+    frame_id: world
+  pose:
+    position:
+      x: -0.15969660518606243
+      y: 0.57392604659299262
+      z: 0.092407929809905531
+    orientation:
+      x: -0.026112110594302511
+      y: 0.98946220015763375
+      z: -0.14207733713491602
+      w: -0.0098357720681788944
+touch_4_touched_grasp_link_world:
+  header:
+    stamp:
+      sec: 1793665920
+      nanosec: 715599487
+    frame_id: world
+  pose:
+    position:
+      x: -0.17018362676549692
+      y: 0.62673264898374126
+      z: -0.1492766059284952
+    orientation:
+      x: -0.024429681900777364
+      y: 0.99960604541692188
+      z: -0.0035021932931763936
+      w: -0.013367095806742151
+touch_4_error_world:
+  header:
+    stamp:
+      sec: 1793665880
+      nanosec: 898378906
+    frame_id: world
+  pose:
+    position:
+      x: 0.0037711941044052677
+      y: -0.0062151241007170066
+      z: -0.0009758849082359411
+    orientation:
+      x: -0.024429681900777371
+      y: 0.999606045416922
+      z: -0.0035021932931763944
+      w: -0.013367095806742155
+touch_5_estimated_camera:
+  header:
+    stamp:
+      sec: 1793665948
+      nanosec: 563539063
+    frame_id: wrist_mounted_camera_depth_optical_frame
+  pose:
+    position:
+      x: 0.12751871347427368
+      y: 0.02218058705329895
+      z: 0.42200002074241638
+    orientation:
+      x: 0.91098040811762337
+      y: -0.40735360924473141
+      z: -0.017873204737352842
+      w: -0.062115597474693134
+touch_5_estimated_world:
+  header:
+    stamp:
+      sec: 1793665948
+      nanosec: 563539063
+    frame_id: world
+  pose:
+    position:
+      x: -0.16505458834828077
+      y: 0.62696570076144398
+      z: -0.15064705952168073
+    orientation:
+      x: -0.008077784488965907
+      y: -0.010106757090372802
+      z: -0.8524939670820012
+      w: 0.52257701072282803
+touch_5_snapshot_grasp_link_world:
+  header:
+    stamp:
+      sec: 1793665948
+      nanosec: 668511931
+    frame_id: world
+  pose:
+    position:
+      x: -0.05633300700429586
+      y: 0.6570199286352949
+      z: 0.041756006223033326
+    orientation:
+      x: 0.99150040298581521
+      y: 0.12936212310213771
+      z: -0.013709147367923207
+      w: 0.0021098018670034726
+touch_5_touched_grasp_link_world:
+  header:
+    stamp:
+      sec: 1793665993
+      nanosec: 823672008
+    frame_id: world
+  pose:
+    position:
+      x: -0.16754899931462686
+      y: 0.62587656569105865
+      z: -0.1459084349495153
+    orientation:
+      x: 0.99150286297356072
+      y: 0.1293400120875286
+      z: -0.013742198033818967
+      w: 0.0020942735326769158
+touch_5_error_world:
+  header:
+    stamp:
+      sec: 1793665948
+      nanosec: 563539063
+    frame_id: world
+  pose:
+    position:
+      x: -0.0024944109663460889
+      y: -0.0010891350703853275
+      z: 0.004738624572165423
+    orientation:
+      x: 0.99150286297356072
+      y: 0.1293400120875286
+      z: -0.013742198033818967
+      w: 0.0020942735326769158

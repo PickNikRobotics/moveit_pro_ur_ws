@@ -1,0 +1,95 @@
+<mujoco model="picknik_009_ur5e_config_sim_scene">
+  <include file="assets/robot_description.xml" />
+  <include file="assets/ur_stand.xml" />
+  <include file="assets/additions.xml" />
+  <include file="assets/extra_objects.xml" />
+
+  <!-- welds for suction -->
+  <equality>
+    <weld
+      name="epick_vacuum_state-tomato_soup_can_1"
+      body1="tomato_soup_can_1"
+      body2="epick_vacuum_state"
+      active="false"
+      torquescale="5"
+    />
+    <weld
+      name="epick_vacuum_state-tuna_fish_can_static"
+      body1="tuna_fish_can_static"
+      body2="epick_vacuum_state"
+      active="false"
+      torquescale="5"
+    />
+    <weld
+      name="epick_vacuum_state-sugar_box_static"
+      body1="sugar_box_static"
+      body2="epick_vacuum_state"
+      active="false"
+      torquescale="5"
+    />
+    <weld
+      name="epick_vacuum_state-sugar_box_static_2"
+      body1="sugar_box_static_2"
+      body2="epick_vacuum_state"
+      active="false"
+      torquescale="5"
+    />
+    <weld
+      name="epick_vacuum_state-cracker_box_static"
+      body1="cracker_box_static"
+      body2="epick_vacuum_state"
+      active="false"
+      torquescale="5"
+    />
+    <weld
+      name="epick_vacuum_state-cracker_box_static_2"
+      body1="cracker_box_static_2"
+      body2="epick_vacuum_state"
+      active="false"
+      torquescale="5"
+    />
+    <weld
+      name="epick_vacuum_state-gelatin_box_static"
+      body1="gelatin_box_static"
+      body2="epick_vacuum_state"
+      active="false"
+      torquescale="5"
+    />
+    <weld
+      name="epick_vacuum_state-gelatin_box_static_2"
+      body1="gelatin_box_static_2"
+      body2="epick_vacuum_state"
+      active="false"
+      torquescale="5"
+    />
+    <weld
+      name="epick_vacuum_state-master_chef_can_static"
+      body1="master_chef_can_static"
+      body2="epick_vacuum_state"
+      active="false"
+      torquescale="5"
+    />
+    <weld
+      name="epick_vacuum_state-potted_meat_can_static"
+      body1="potted_meat_can_static"
+      body2="epick_vacuum_state"
+      active="false"
+      torquescale="5"
+    />
+    <weld
+      name="epick_vacuum_state-pudding_box_static"
+      body1="pudding_box_static"
+      body2="epick_vacuum_state"
+      active="false"
+      torquescale="5"
+    />
+    <weld
+      name="epick_vacuum_state-pudding_box_static_2"
+      body1="pudding_box_static_2"
+      body2="epick_vacuum_state"
+      active="false"
+      torquescale="5"
+    />
+  </equality>
+  <include file="keyframes.xml" />
+</mujoco>

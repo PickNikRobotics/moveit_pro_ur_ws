@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Place Shelving From Wall Board">
+  <BehaviorTree
+    ID="Place Shelving From Wall Board"
+    _description="Works out the shelf back wall, the two racks and the shelf base from the back-wall ChArUco board pose. The board pose plus the measured wall_corner_in_wall_board section of objectives/calibration/board_offsets.yaml gives the wall's front-face top-left corner; the file's fixed geometry sections place the rest. Orientations stay world-aligned. Outputs the four poses; Load Calibrated Scene calls it at every load. See design_docs/board_based_calibration.md."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <!--Read each offset before any typed use of its key: the text entry must come first.-->
+      <Action
+        ID="ReadYamlValue"
+        package_name="picknik_009_ur5e_config"
+        relative_file_path="objectives/calibration/board_offsets.yaml"
+        key1="wall_corner_in_wall_board"
+        key2="xyz"
+        key3=""
+        key4=""
+        key5=""
+        value="{wall_corner_in_board}"
+      />
+      <Action
+        ID="ReadYamlValue"
+        package_name="picknik_009_ur5e_config"
+        relative_file_path="objectives/calibration/board_offsets.yaml"
+        key1="wall_center_from_wall_corner"
+        key2="xyz"
+        key3=""
+        key4=""
+        key5=""
+        value="{wall_center_offset}"
+      />
+      <Action
+        ID="ReadYamlValue"
+        package_name="picknik_009_ur5e_config"
+        relative_file_path="objectives/calibration/board_offsets.yaml"
+        key1="top_rack_from_wall_corner"
+        key2="xyz"
+        key3=""
+        key4=""
+        key5=""
+        value="{top_rack_offset}"
+      />
+      <Action
+        ID="ReadYamlValue"
+        package_name="picknik_009_ur5e_config"
+        relative_file_path="objectives/calibration/board_offsets.yaml"
+        key1="bottom_rack_from_wall_corner"
+        key2="xyz"
+        key3=""
+        key4=""
+        key5=""
+        value="{bottom_rack_offset}"
+      />
+      <Action
+        ID="ReadYamlValue"
+        package_name="picknik_009_ur5e_config"
+        relative_file_path="objectives/calibration/board_offsets.yaml"
+        key1="shelf_base_from_wall_corner"
+        key2="xyz"
+        key3=""
+        key4=""
+        key5=""
+        value="{shelf_base_offset}"
+      />
+      <!--Board frame to the wall corner: the measured offset is in the board frame.-->
+      <Action
+        ID="TransformPose"
+        input_pose="{wall_board_pose}"
+        translation_xyz="{wall_corner_in_board}"
+        quaternion_xyzw="0;0;0;1"
+        output_pose="{wall_corner_pose}"
+      />
+      <!--Only the board position is used; the wall stays square to world.-->
+      <Action
+        ID="OverridePoseOrientation"
+        input_pose="{wall_corner_pose}"
+        orientation_xyzw="0;0;0;1"
+        output_pose="{wall_corner_pose}"
+      />
+      <Action
+        ID="VisualizePose"
+        marker_lifetime="0.000000"
+        marker_name="wall_top_left_corner"
+        marker_size="0.100000"
+        pose="{wall_corner_pose}"
+        marker_text="Wall top-left corner"
+      />
+      <Action
+        ID="TransformPose"
+        input_pose="{wall_corner_pose}"
+        translation_xyz="{wall_center_offset}"
+        quaternion_xyzw="0;0;0;1"
+        output_pose="{shelf_back_pose}"
+      />
+      <!--Racks keep the half-turn yaw the chunky_shelf_only mesh needs.-->
+      <Action
+        ID="TransformPose"
+        input_pose="{wall_corner_pose}"
+        translation_xyz="{top_rack_offset}"
+        quaternion_xyzw="0;0;1;0"
+        output_pose="{top_shelf_pose}"
+      />
+      <Action
+        ID="TransformPose"
+        input_pose="{wall_corner_pose}"
+        translation_xyz="{bottom_rack_offset}"
+        quaternion_xyzw="0;0;1;0"
+        output_pose="{bottom_shelf_pose}"
+      />
+      <Action
+        ID="TransformPose"
+        input_pose="{wall_corner_pose}"
+        translation_xyz="{shelf_base_offset}"
+        quaternion_xyzw="0;0;0;1"
+        output_pose="{shelf_base_pose}"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Place Shelving From Wall Board">
+      <MetadataFields>
+        <Metadata runnable="false" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+      <input_port
+        name="wall_board_pose"
+        default="{wall_board_pose}"
+        type="geometry_msgs::msg::PoseStamped"
+      >
+        Back-wall board pose in world: the pattern's top-left outer corner,
+        x right, y down the page, z into the wall.
+      </input_port>
+      <output_port
+        name="shelf_back_pose"
+        type="geometry_msgs::msg::PoseStamped"
+      >
+        Back-wall box centre in world.
+      </output_port>
+      <output_port name="top_shelf_pose" type="geometry_msgs::msg::PoseStamped">
+        Top rack reference point in world.
+      </output_port>
+      <output_port
+        name="bottom_shelf_pose"
+        type="geometry_msgs::msg::PoseStamped"
+      >
+        Bottom rack reference point in world.
+      </output_port>
+      <output_port
+        name="shelf_base_pose"
+        type="geometry_msgs::msg::PoseStamped"
+      >
+        Shelf base box centre in world.
+      </output_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Get Wrist Pointcloud">
+  <BehaviorTree
+    ID="Get Wrist Pointcloud"
+    _description="Captures one point cloud from the wrist camera, the same way Get Wrist Point Cloud does, and shows it in the MoveIt Pro 3D Visualizer. The previous snapshot is cleared first so only this capture is shown. Run it to check what the wrist camera sees and how its cloud lines up with the planning scene."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="CaptureAndShowWristCloud">
+      <SubTree
+        ID="Get Wrist Point Cloud"
+        _collapsed="true"
+        point_cloud="{point_cloud}"
+      />
+      <Action ID="ClearSnapshot" name="ClearPreviousCloud" />
+      <!--use_latest_transform is off: the wrist camera's frames are on /tf,
+          so the cloud is placed with the transform at its own stamp.-->
+      <Action
+        ID="SendPointCloudToUI"
+        name="ShowWristCloud"
+        point_cloud="{point_cloud}"
+        pcd_topic="/pcd_pointcloud_captures"
+        use_latest_transform="false"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Get Wrist Pointcloud">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="7. Utilities" />
+      </MetadataFields>
+      <output_port
+        name="point_cloud"
+        default="{point_cloud}"
+        type="sensor_msgs::msg::PointCloud2"
+      >
+        The captured wrist cloud.
+      </output_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>

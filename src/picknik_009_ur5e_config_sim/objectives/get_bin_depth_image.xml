@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Get Bin Depth Image">
+  <BehaviorTree ID="Get Bin Depth Image" _description="" _favorite="false">
+    <Control ID="Sequence" name="TopLevelSequence" _collapsed="false">
+      <Action
+        ID="GetImage"
+        topic_name="/camera/scene_camera/depth/image_rect_raw"
+        message_out="{depth_image}"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Get Bin Depth Image">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="6. HW/Sim Switching Subtrees" />
+      </MetadataFields>
+      <inout_port
+        name="depth_image"
+        default="{depth_image}"
+        type="sensor_msgs::msg::Image"
+      />
+    </SubTree>
+  </TreeNodesModel>
+</root>

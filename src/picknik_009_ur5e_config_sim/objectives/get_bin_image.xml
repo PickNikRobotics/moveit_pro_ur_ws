@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Get Bin Image">
+  <BehaviorTree ID="Get Bin Image" _description="" _favorite="false">
+    <Control ID="Sequence" name="TopLevelSequence" _collapsed="false">
+      <Action
+        ID="GetImage"
+        topic_name="/camera/scene_camera/color/image_raw"
+        message_out="{image}"
+      />
+      <Action
+        ID="GetCameraInfo"
+        topic_name="/camera/scene_camera/color/camera_info"
+        message_out="{camera_info}"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Get Bin Image">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="6. HW/Sim Switching Subtrees" />
+      </MetadataFields>
+      <inout_port name="image" default="{image}" />
+      <inout_port name="camera_info" default="{camera_info}" />
+    </SubTree>
+  </TreeNodesModel>
+</root>

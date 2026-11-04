@@ -1,0 +1,50 @@
+based_on_package: "picknik_009_ur5e_hw_config"
+
+# The UR5e 009 cell with a Robotiq 2F-85 2-finger gripper in place of the EPick.
+# Everything not listed here (arm, cameras, calibration, drivers launch) comes from
+# picknik_009_ur5e_hw_config. See design_docs/end_effector_variants.md.
+
+# [Required]
+hardware:
+  robot_description:
+    srdf:
+      package: "picknik_009_ur5e_2f85_hw_config"
+      path: "config/moveit/picknik_009_ur5e_2f85.srdf"
+    urdf_params:
+      - end_effector: "robotiq_2f85"
+      # Real robotiq_driver. Set "true" to run the fingers on mock hardware with the real arm.
+      - gripper_use_fake_hardware: "false"
+      # The Robotiq USB-RS485 bridge on the Agent PC, as for the EPick. Not the UR tool port.
+      - robotiq_2f85_com_port: "/dev/ttyUSB0"
+
+objectives:
+  objective_library_paths:
+    # The 2F-85's generic Open/Close Gripper. x4 sorts after x1 base / x2 sim / x3 hw.
+    # See design_docs/objective_library_precedence.md.
+    x4_2f85_objectives:
+      package_name: "picknik_009_ur5e_2f85_hw_config"
+      relative_path: "objectives"
+    # The shelf-stocking application's 2F-85 adapter: its gripper switching subtrees and
+    # favourite wrappers. y sorts after x4, so these replace the shared EPick files of the
+    # same name. They live in the src/shelf_stocking submodule, not in this workspace.
+    y_shelf_stocking_robotiq_2f85:
+      package_name: "shelf_stocking_objectives"
+      relative_path: "adapters/robotiq_2f85"
+
+# Configuration for launching ros2_control processes.
+# [Required, if using ros2_control]
+ros2_control:
+  config:
+    package: "picknik_009_ur5e_2f85_hw_config"
+    path: "config/control/ros2_controllers.yaml"
+  controllers_active_at_startup:
+    - "force_torque_sensor_broadcaster"
+    - "robotiq_gripper_controller"
+    - "joint_state_broadcaster"
+    - "io_and_status_controller"
+  controllers_inactive_at_startup:
+    - "joint_trajectory_admittance_controller"
+    - "velocity_force_controller"
+    - "joint_velocity_controller"
+  controllers_not_managed: []
+  controller_shared_topics: []

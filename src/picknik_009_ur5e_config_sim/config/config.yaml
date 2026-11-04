@@ -1,0 +1,44 @@
+#
+#  Simulation config for Dev-009 UR5e + EPick gripper
+#  Inherits from picknik_009_ur5e_config, overrides for fake hardware
+#
+
+based_on_package: "picknik_009_ur5e_config"
+
+hardware:
+  # `simulated` and `simulated_robot_driver_persist_launch_file` were removed in MoveIt Pro
+  # 10.0. Mock hardware is now selected purely by `use_fake_hardware: "true"` below. The
+  # custom view panes are served by serve_custom_view_panes.py on 127.0.0.1:8731, launched from
+  # the base package's agent_bridge.launch.xml and declared in this package's frontend_settings.yaml.
+
+  robot_description:
+    urdf_params:
+      - use_fake_hardware: "true"
+      - fake_hw_mode: "mujoco"
+      - robot_ip: "0.0.0.0"
+      - has_tool_changer: "false"
+
+objectives:
+  objective_library_paths:
+    # The x<N>_ prefix is load-bearing: Pro 10 picks the winning file by the ALPHABETICAL order of these ids (see design_docs/objective_library_precedence.md). Keep x1 base < x2 sim < x3 hw.
+    x2_sim_objectives:
+      package_name: "picknik_009_ur5e_config_sim"
+      relative_path: "objectives"
+
+ros2_control:
+  config:
+    package: "picknik_009_ur5e_config_sim"
+    path: "config/control/ros2_controllers.yaml"
+  controllers_active_at_startup:
+    - "force_torque_sensor_broadcaster"
+    - "epick_controller"
+    # - "epick_status_publisher_controller"
+    - "joint_state_broadcaster"
+    - "policy_state_broadcaster"
+    # - "io_and_status_controller"
+  controllers_inactive_at_startup:
+    - "joint_trajectory_admittance_controller"
+    - "velocity_force_controller"
+    - "joint_velocity_controller"
+  controllers_not_managed: []
+  controller_shared_topics: []

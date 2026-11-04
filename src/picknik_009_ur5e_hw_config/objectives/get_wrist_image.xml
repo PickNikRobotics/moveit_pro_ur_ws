@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Get Wrist Image">
+  <!-- ////////// -->
+  <BehaviorTree ID="Get Wrist Image" _description="" _favorite="false">
+    <Control ID="Sequence" name="TopLevelSequence">
+      <Action
+        ID="GetImage"
+        topic_name="/camera/wrist_mounted_camera/color/image_raw"
+        message_out="{image}"
+      />
+      <Action
+        ID="GetCameraInfo"
+        topic_name="/camera/wrist_mounted_camera/color/camera_info"
+        message_out="{camera_info}"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Get Wrist Image">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="6. HW/Sim Switching Subtrees" />
+      </MetadataFields>
+      <inout_port
+        name="image"
+        default="{image}"
+        type="sensor_msgs::msg::Image"
+      />
+      <inout_port
+        name="camera_info"
+        default="{camera_info}"
+        type="sensor_msgs::msg::CameraInfo"
+      />
+    </SubTree>
+  </TreeNodesModel>
+</root>

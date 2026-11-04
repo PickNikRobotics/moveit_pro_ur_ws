@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Randomize Sim Products">
+  <BehaviorTree ID="Randomize Sim Products" _description="" _favorite="false">
+    <Control
+      _uuid="Gne0UQ3nTmqG6AVkSVacqw"
+      name="TopLevelSequence"
+      _collapsed="false"
+      _skipIf="false"
+      ID="Sequence"
+    >
+      <!--Marketing-mode branch: pin to the "default" keyframe instead of
+          picking a random keyframe, so demo runs are deterministic. The
+          input_vector="default;1;2;3;4;5" form is preserved in git history
+          if random selection is needed again.-->
+      <Action
+        _uuid="23dfa271-a2e2-4afc-bb46-e8d559d97eb3"
+        ID="SetBlackboard"
+        name="PinKeyframeToDefault"
+        _skipIf="false"
+        output_key="keyframe"
+        value="default"
+      />
+      <Action
+        _uuid="640c749d-41ea-4f8d-a4b8-4bcda25359e0"
+        ID="ResetMujocoKeyframe"
+        name="ResetMujocoKeyframe"
+        _skipIf="false"
+        wait_for_server_available_timeout="3.000000"
+        response_timeout="10.000000"
+        keyframe_name="{keyframe}"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Randomize Sim Products">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="6. HW/Sim Switching Subtrees" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

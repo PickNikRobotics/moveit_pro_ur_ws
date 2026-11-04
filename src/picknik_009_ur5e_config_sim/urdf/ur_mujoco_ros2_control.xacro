@@ -1,0 +1,105 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+  <!-- MuJoCo ros2_control -->
+  <ros2_control name="ur_mujoco_ros2_control" type="system">
+    <hardware>
+      <plugin>picknik_mujoco_ros/MujocoSystem</plugin>
+      <param name="mujoco_model">mjcf/scene.xml</param>
+      <param name="mujoco_model_package">picknik_009_ur5e_config_sim</param>
+      <param name="mujoco_keyframe">default</param>
+      <param name="render_publish_rate">10</param>
+      <param name="tf_publish_rate">60</param>
+      <param name="lidar_publish_rate">10</param>
+      <param name="mujoco_viewer">false</param>
+      <!-- The EPick `gripper` joint has no MJCF counterpart; the EPick fake driver provides its state in sim. -->
+      <param name="ignore_joint_validation">gripper</param>
+    </hardware>
+
+    <joint name="shoulder_pan_joint">
+      <command_interface name="position" />
+      <state_interface name="position">
+        <param name="initial_value">-1.7247421537211254</param>
+      </state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="shoulder_lift_joint">
+      <command_interface name="position" />
+      <state_interface name="position">
+        <param name="initial_value">-1.634448340833275</param>
+      </state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="elbow_joint">
+      <command_interface name="position" />
+      <state_interface name="position">
+        <param name="initial_value">1.3683251489074058</param>
+      </state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="wrist_1_joint">
+      <command_interface name="position" />
+      <state_interface name="position">
+        <param name="initial_value">-1.6557413036074322</param>
+      </state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="wrist_2_joint">
+      <command_interface name="position" />
+      <state_interface name="position">
+        <param name="initial_value">-1.5335255945699477</param>
+      </state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="wrist_3_joint">
+      <command_interface name="position" />
+      <state_interface name="position">
+        <param name="initial_value">-0.1013943676741379</param>
+      </state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <sensor name="tcp_fts_sensor">
+      <state_interface name="force.x" />
+      <state_interface name="force.y" />
+      <state_interface name="force.z" />
+      <state_interface name="torque.x" />
+      <state_interface name="torque.y" />
+      <state_interface name="torque.z" />
+    </sensor>
+    <!-- Per-camera ROS topic overrides consumed by picknik_mujoco_ros's
+         apply_camera_sensor_overrides (see moveit_pro PR #18783). The <sensor name>
+         must match the MJCF camera name. Recognized <param> keys are rgb_topic,
+         depth_topic, points_topic, camera_info_topic. Absolute topic names
+         (leading "/") escape the MuJoCo node namespace; the layout here mirrors
+         the RealSense ROS2 driver topics so sim and HW publish under the same
+         names for the same logical streams. -->
+    <sensor name="scene_camera">
+      <param name="rgb_topic">/camera/scene_camera/color/image_raw</param>
+      <param name="depth_topic">/camera/scene_camera/depth/image_rect_raw</param>
+      <param name="points_topic">/camera/scene_camera/depth/color/points</param>
+      <param name="camera_info_topic">/camera/scene_camera/color/camera_info</param>
+    </sensor>
+    <!-- Wrist camera disabled in sim (paired with the commented-out MJCF camera in
+         robot_description.xml). Re-enable both when the wrist camera is needed again.
+    <sensor name="wrist_mounted_camera">
+      <param name="rgb_topic">/camera/wrist_mounted_camera/color/image_raw</param>
+      <param name="depth_topic">/camera/wrist_mounted_camera/depth/image_rect_raw</param>
+      <param name="points_topic">/camera/wrist_mounted_camera/depth/color/points</param>
+      <param name="camera_info_topic">/camera/wrist_mounted_camera/color/camera_info</param>
+    </sensor>
+    -->
+    <!-- shelf_cam ZED 2i: the MJCF camera is named after the hardware left optical frame, so the image
+         frame_id matches; topics are the hardware ones after pro_zed_launch.py's remaps. -->
+    <sensor name="shelf_cam_left_camera">
+      <param name="rgb_topic">/camera/shelf_cam/color/image_raw</param>
+      <param name="depth_topic">/camera/shelf_cam/depth/image_rect_raw</param>
+      <param name="points_topic">/camera/shelf_cam/depth/color/points</param>
+      <param name="camera_info_topic">/camera/shelf_cam/color/camera_info</param>
+    </sensor>
+    <!-- overview_camera is RGB_ONLY in MJCF (user="1"); no depth/points are rendered or
+         published, so only rgb_topic and camera_info_topic are overridden. -->
+    <sensor name="overview_camera">
+      <param name="rgb_topic">/camera/overview_camera/color/image_raw</param>
+      <param name="camera_info_topic">/camera/overview_camera/color/camera_info</param>
+    </sensor>
+  </ros2_control>
+</robot>

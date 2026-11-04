@@ -1,0 +1,79 @@
+<?xml version="1.0" ?>
+<!-- Bin tote: bottom slab + four walls. Wall height reduced to 0.185 m (from
+     the original 0.1905 m / 7.5"). Origin sits at the bottom slab's center
+     in X/Y, with the bottom slab below z=0 (origin "-0.09275") so the slab
+     bottom face is at z = -0.09525 in link frame. -->
+<robot name="bin_tote">
+  <link name="bin_tote_link">
+    <!-- Bottom -->
+    <visual>
+      <geometry>
+        <box size="0.6096 0.381 0.005"/>
+      </geometry>
+      <origin xyz="0 0 -0.09275"/>
+      <material name="tote_color">
+        <color rgba="0.5 0.5 0.5 1.0"/>
+      </material>
+    </visual>
+    <!-- Back wall (-X) -->
+    <visual>
+      <geometry>
+        <box size="0.025 0.381 0.185"/>
+      </geometry>
+      <origin xyz="-0.2923 0 0"/>
+      <material name="tote_color"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.025 0.381 0.185"/>
+      </geometry>
+      <origin xyz="-0.2923 0 0"/>
+    </collision>
+    <!-- Front wall (+X) -->
+    <visual>
+      <geometry>
+        <box size="0.025 0.381 0.185"/>
+      </geometry>
+      <origin xyz="0.2923 0 0"/>
+      <material name="tote_color"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.025 0.381 0.185"/>
+      </geometry>
+      <origin xyz="0.2923 0 0"/>
+    </collision>
+    <!-- Right wall (-Y) -->
+    <visual>
+      <geometry>
+        <box size="0.6096 0.025 0.185"/>
+      </geometry>
+      <origin xyz="0 -0.178 0"/>
+      <material name="tote_color"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.6096 0.025 0.185"/>
+      </geometry>
+      <origin xyz="0 -0.178 0"/>
+    </collision>
+    <!-- Left wall (+Y) -->
+    <visual>
+      <geometry>
+        <box size="0.6096 0.025 0.185"/>
+      </geometry>
+      <origin xyz="0 0.178 0"/>
+      <material name="tote_color"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.6096 0.025 0.185"/>
+      </geometry>
+      <origin xyz="0 0.178 0"/>
+    </collision>
+    <inertial>
+      <mass value="1"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+  </link>
+</robot>

@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<!-- Camera mounting pole. Origin at geometric center.
+     Square pole: 0.03 x 0.03 x 0.7112 m -->
+<robot name="calibration_pole">
+  <link name="calibration_pole">
+    <visual>
+      <geometry><box size="0.03 0.03 0.7112"/></geometry>
+      <material name="aluminum"><color rgba="0.7 0.7 0.7 1.0"/></material>
+    </visual>
+    <collision>
+      <geometry><box size="0.03 0.03 0.7112"/></geometry>
+    </collision>
+  </link>
+</robot>
