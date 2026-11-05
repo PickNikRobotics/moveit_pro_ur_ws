@@ -74,6 +74,9 @@
        FTDI USB-RS485 bridge the EPick used (see epick_usb_port below), not the
        arm's tool port (tool_device_name). -->
   <xacro:arg name="robotiq_2f85_com_port" default="/dev/ttyUSB0" />
+  <!-- robotiq_2f85 only: grip force as a fraction of the 2F-85's 235 N maximum, read
+       once by robotiq_driver at start-up. 0.5 is the driver's default. -->
+  <xacro:arg name="robotiq_2f85_force_multiplier" default="0.5" />
   <xacro:arg name="epick_extension_radius" default="0.005" />
   <xacro:arg name="epick_extension_length" default="0.1" />
   <xacro:arg name="epick_suction_cup_radius" default="0.012" />
@@ -284,6 +287,7 @@
       use_fake_hardware="$(arg gripper_use_fake_hardware)"
       sim_gazebo="false"
       com_port="$(arg robotiq_2f85_com_port)"
+      gripper_force_multiplier="$(arg robotiq_2f85_force_multiplier)"
     >
       <origin xyz="0 0 0" rpy="0 0 0"/>
     </xacro:robotiq_gripper>
