@@ -2,14 +2,14 @@
 <root BTCPP_format="4" main_tree_to_execute="Open Gripper">
   <BehaviorTree
     ID="Open Gripper"
-    _description="Open the Robotiq 2F-85."
+    _description="Open the Robotiq 2F-85 fully (0.0 rad, about 85 mm between the pads; 0.05 left about 80 mm)."
     _favorite="false"
   >
     <Control ID="Sequence" name="root">
       <Action
         ID="MoveGripperAction"
         gripper_command_action_name="/robotiq_gripper_controller/gripper_cmd"
-        position="0.05"
+        position="0.0"
         timeout="15.000000"
       />
     </Control>

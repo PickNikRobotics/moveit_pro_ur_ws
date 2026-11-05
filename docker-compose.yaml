@@ -1,0 +1,18 @@
+# Workspace overrides, layered by the moveit_pro CLI on top of /opt/moveit_pro/docker-compose.yaml
+# (moveit_pro_docker_wrapper.get_all_compose_files adds <workspace>/docker-compose.yaml when it
+# exists). Declare only services that exist in that file, and only the keys being overridden:
+# compose appends list values, so restating an entry the installed file already has is an error.
+services:
+  drivers:
+    volumes:
+      # The host's live USB device directory, in place of the start-time /dev snapshot.
+      # When the ZED SDK resets the shelf_cam, the camera's sensor MCU (the f881 HID
+      # interface) re-enumerates under a new device number; without this the container
+      # never gets that node, the SDK's recovery fails ("MCU Permissions denied",
+      # "Recovery failed: unable to communicate with the camera"), and only a drivers
+      # restart brings the camera back. The installed file already makes drivers
+      # privileged and allows c 189:* (usb_device), so the missing node is the only
+      # obstacle. Ported from shelf_stocking_ws; see its design_docs/zed_shelf_cam.md.
+      # Takes effect when the stack is started again through the moveit_pro CLI (the
+      # container is recreated); `docker restart` keeps the old mounts.
+      - /dev/bus/usb:/dev/bus/usb

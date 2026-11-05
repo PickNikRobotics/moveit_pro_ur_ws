@@ -65,3 +65,6 @@ iframeViewports:
   # Hardware only: the unshelve collections and shopping_list_server.py run only here.
   - name: Shopping List
     url: http://127.0.0.1:8731/shopping_list.html
+  # Live wrist force/torque (display-only tare). Served from shelf_stocking_objectives/web.
+  - name: Force Torque
+    url: http://127.0.0.1:8731/force_torque.html

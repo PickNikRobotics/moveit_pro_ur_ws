@@ -56,7 +56,12 @@ joint_limits:
     # Lowered from -200° (2026-11-02): the unshelve viewpoints keep the upper
     # arm near horizontal (about -172°), and reaching down to the bottom shelf
     # from there ran into -200° on the approach, the press and the pull-out.
-    min_position: !degrees -230.0
+    # Raised from -230° to -215° (2026-11-05): a 2F-85 bottom-shelf unshelve
+    # ended its pull-out at about -228°, with the upper arm swung back toward
+    # the UR stand and the planner reporting forearm_link vs
+    # robotiq_85_right_finger_link self-collision, so no move could start
+    # from there. Bottom-shelf picks that need beyond -215° now fail to plan.
+    min_position: !degrees -215.0
   elbow_joint:
     has_acceleration_limits: true
     has_effort_limits: true

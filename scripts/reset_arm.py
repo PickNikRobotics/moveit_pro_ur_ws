@@ -27,12 +27,20 @@ from rclpy.qos import DurabilityPolicy, QoSProfile
 from std_msgs.msg import Bool
 from std_srvs.srv import Trigger
 from ur_dashboard_msgs.msg import RobotMode, SafetyMode
+from ur_dashboard_msgs.srv import GetRobotMode, GetSafetyMode
 
 RECOVER_SERVICE = "/recover_from_protective_stop"
 ROBOT_MODE_TOPIC = "/io_and_status_controller/robot_mode"
 SAFETY_MODE_TOPIC = "/io_and_status_controller/safety_mode"
 PROGRAM_TOPIC = "/io_and_status_controller/robot_program_running"
 FAULT_TOPIC = "/protective_stop_manager_node/robot_fault_status"
+# Fallback for robot and safety mode. The io_and_status_controller topics publish only on a
+# change, so after a controller restart (every recovery restarts them) a mode that did not
+# change never arrives, and the script used to stop with "no robot state". The dashboard
+# server answers on request.
+ROBOT_MODE_SERVICE = "/dashboard_client/get_robot_mode"
+SAFETY_MODE_SERVICE = "/dashboard_client/get_safety_mode"
+DASHBOARD_TIMEOUT_S = 5.0
 # The service retries the unlock and waits on several driver services, so it can take a while.
 RECOVER_TIMEOUT_S = 90.0
 
@@ -65,6 +73,26 @@ class ArmState(Node):
         self.create_subscription(Bool, PROGRAM_TOPIC, lambda m: setattr(self, "program_running", m.data), latched)
         self.create_subscription(FaultStatus, FAULT_TOPIC, lambda m: setattr(self, "fault", m.status), 10)
         self.recover = self.create_client(Trigger, RECOVER_SERVICE)
+        self.get_robot_mode = self.create_client(GetRobotMode, ROBOT_MODE_SERVICE)
+        self.get_safety_mode = self.create_client(GetSafetyMode, SAFETY_MODE_SERVICE)
+        # Where each mode last came from ("topic" or "dashboard"), for the report.
+        self.mode_source = {}
+
+    def query_dashboard(self, overwrite=False):
+        """Fill robot and safety mode from the dashboard server: only the missing ones, or
+        both when overwrite is set (after a recovery the latched topic values are stale)."""
+        for client, attr in ((self.get_robot_mode, "robot_mode"), (self.get_safety_mode, "safety_mode")):
+            if getattr(self, attr) is not None and not overwrite:
+                self.mode_source.setdefault(attr, "topic")
+                continue
+            if not client.wait_for_service(timeout_sec=DASHBOARD_TIMEOUT_S):
+                continue
+            future = client.call_async(client.srv_type.Request())
+            self.spin_for(DASHBOARD_TIMEOUT_S, future.done)
+            result = future.result() if future.done() else None
+            if result is not None and result.success:
+                setattr(self, attr, getattr(result, attr).mode)
+                self.mode_source[attr] = "dashboard"
 
     def spin_for(self, seconds, until=lambda: False):
         end = time.monotonic() + seconds
@@ -80,8 +108,12 @@ class ArmState(Node):
             return "no message" if value is None else table.get(value, str(value))
 
         program = "no message" if self.program_running is None else ("running" if self.program_running else "stopped")
+        def via(attr):
+            return " (dashboard)" if self.mode_source.get(attr) == "dashboard" else ""
+
         return (
-            f"robot mode {name(ROBOT_MODES, self.robot_mode)}, safety {name(SAFETY_MODES, self.safety_mode)}, "
+            f"robot mode {name(ROBOT_MODES, self.robot_mode)}{via('robot_mode')}, "
+            f"safety {name(SAFETY_MODES, self.safety_mode)}{via('safety_mode')}, "
             f"control program {program}, Pro fault status {name(FAULTS, self.fault)}"
         )
 
@@ -105,9 +137,10 @@ def main():
     node = ArmState()
     try:
         node.wait_for_state(3.0)
+        node.query_dashboard()
         print(f"before: {node.describe()}")
         if node.robot_mode is None:
-            print(f"no robot state on {ROBOT_MODE_TOPIC}; is the UR driver running?")
+            print(f"no robot state on {ROBOT_MODE_TOPIC} or from {ROBOT_MODE_SERVICE}; is the UR driver running?")
             return 1
         if args.status:
             return 0 if node.healthy() else 1
@@ -137,7 +170,14 @@ def main():
         print(f"recovery {'succeeded' if result.success else 'FAILED'}{': ' + result.message if result.message else ''}")
 
         # The program and the fault status take a moment to catch up with the re-sent program.
-        node.spin_for(10.0, node.healthy)
+        # The modes are re-read from the dashboard: the latched topic values predate the
+        # controller restart the recovery just did.
+        end = time.monotonic() + 15.0
+        while time.monotonic() < end:
+            node.query_dashboard(overwrite=True)
+            node.spin_for(1.0, node.healthy)
+            if node.healthy():
+                break
         print(f"after:  {node.describe()}")
         return 0 if result.success and node.healthy() else 1
     finally:
