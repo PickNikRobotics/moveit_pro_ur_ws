@@ -2,7 +2,7 @@
 <root BTCPP_format="4" main_tree_to_execute="Test Wrist Camera Calibration">
   <BehaviorTree
     ID="Test Wrist Camera Calibration"
-    _description="Shows how close the arm gets to a point picked from the wrist camera, for comparing wrist camera mounts. Per test: teleop to a viewpoint, snapshot the wrist camera, click a point (it is turned into a pose exactly as a Gemini pick point is), and the arm moves the cup to hover just off that point along the surface normal. Look at where the cup ended up against the feature you clicked, then resume to go back to the viewpoint. Repeats until stopped. Nothing is saved. See design_docs/wrist_camera_touch_off_check.md."
+    _description="Shows how close the arm gets to a point picked from the wrist camera, for comparing wrist camera mounts. Per test: teleop to a viewpoint, snapshot the wrist camera, click a point (it is turned into a pose exactly as a Gemini pick point is), and the arm moves the cup to hover just off that point along the surface normal, planning around the wrist cloud (octomap) except a small box around the clicked point. Look at where the cup ended up against the feature you clicked, then resume to go back to the viewpoint. Repeats until stopped. Nothing is saved. See design_docs/wrist_camera_touch_off_check.md."
     _favorite="false"
   >
     <Decorator
@@ -95,6 +95,47 @@
           index="0"
           vector_in="{estimated_poses}"
         />
+        <!--The wrist cloud goes into the octomap so the moves to the hover pose
+            and back plan around the products; without it the planner saw only
+            the calibrated shelf, and the arm hit products on the way and faulted.
+            PlanApproachTrajectory checks against the octomap. Two parts of the
+            cloud are left out of the octomap copy only: the robot's own gripper,
+            which the camera sees within 0.3 m (as in Unshelve Products), and a
+            box around the clicked point, oriented on its surface normal, so the
+            feature itself does not block the hover. Products inside that box are
+            not protected. The ClearSnapshot above clears the previous test's
+            octomap. Done here, still in the cloud's frame, before the pose is
+            turned and moved to world.-->
+        <Action
+          ID="CreatePoseStamped"
+          name="NearCameraBox"
+          reference_frame="wrist_mounted_camera_color_optical_frame"
+          position_xyz="0;0;0.15"
+          orientation_xyzw="0;0;0;1"
+          pose_stamped="{near_camera_box_pose}"
+        />
+        <Action
+          ID="RemovePointsInBox"
+          name="DropRobotFromOctomapCloud"
+          point_cloud="{point_cloud}"
+          remove_box_centroid_pose="{near_camera_box_pose}"
+          remove_box_size="1.0;1.0;0.3"
+          point_cloud_culled="{octomap_cloud_no_robot}"
+        />
+        <Action
+          ID="RemovePointsInBox"
+          name="KeepClickedFeatureFree"
+          point_cloud="{octomap_cloud_no_robot}"
+          remove_box_centroid_pose="{estimated_pose}"
+          remove_box_size="{feature_clearance_box}"
+          point_cloud_culled="{octomap_cloud}"
+        />
+        <Action
+          ID="UpdatePlanningSceneService"
+          name="AddWristCloudToScene"
+          point_cloud="{octomap_cloud}"
+          point_cloud_service="/point_cloud_service"
+        />
         <!--As in the unshelve collection: the surface normal points out of the
             surface and the cup approaches along grasp_link +Z, so turn it half
             a turn about Y, then back off along the approach axis.-->
@@ -110,11 +151,22 @@
           marker_size="0.100000"
           marker_lifetime="0.000000"
         />
+        <!--grasp_link stops tip_reach + hover_gap in front of the point, so the end
+            effector's tip, not grasp_link, ends hover_gap off the surface. The
+            closed 2F-85's finger tips reach about 3 cm past grasp_link: the old fixed
+            2 cm offset drove them about 1 cm into the feature, which the planner
+            cannot see because the feature is cut out of the octomap, and the UR
+            stopped with C153 (collision).-->
+        <Action
+          ID="Script"
+          name="HoverDistance"
+          code="hover_back := 0.0 - (tip_reach * 1.0 + hover_gap * 1.0); hover_back_s := hover_back .. ''; hover_xyz := '0;0;' .. hover_back_s"
+        />
         <Action
           ID="TransformPose"
           name="HoverOffPoint"
           input_pose="{estimated_pose}"
-          translation_xyz="{hover_offset}"
+          translation_xyz="{hover_xyz}"
           quaternion_xyzw="0;0;0;1"
           output_pose="{hover_pose}"
           visualize_pose="false"
@@ -206,7 +258,7 @@
         <Action
           ID="BreakpointSubscriber"
           name="InspectTheMiss"
-          message="The cup should now be centred on the point you clicked, backed off along the surface normal by hover_offset. A sideways miss is the wrist camera's error across the view; a gap larger or smaller than the hover offset is its error in depth. Resume to go back to the viewpoint."
+          message="The tip should now be centred on the point you clicked, hover_gap off the surface along its normal. A sideways miss is the wrist camera's error across the view; a gap larger or smaller than hover_gap is its error in depth. Resume to go back to the viewpoint."
         />
         <Action
           ID="PlanApproachTrajectory"
@@ -235,11 +287,24 @@
   </BehaviorTree>
   <TreeNodesModel>
     <SubTree ID="Test Wrist Camera Calibration">
-      <input_port name="hover_offset" default="0;0;-0.02" type="std::string">
-        Where grasp_link stops relative to the clicked point, in the cup's
-        frame (+Z points into the surface), as x;y;z in metres. The default
-        stops it 2 cm in front of the surface, so a depth error of up to that
-        much shows as a gap instead of the cup pressing into the feature.
+      <input_port name="tip_reach" default="0.03" type="double">
+        How far the end effector's tip reaches past grasp_link along the
+        approach, in metres: about 0.03 for the closed 2F-85 finger tips, 0.015
+        with the fingers open, 0 for the EPick cup.
+      </input_port>
+      <input_port name="hover_gap" default="0.02" type="double">
+        Gap left between the tip and the clicked surface, in metres, so a depth
+        error up to that much shows as a gap instead of the tip pressing into
+        the feature.
+      </input_port>
+      <input_port name="feature_clearance_box" default="0.16;0.16;0.1" type="std::string">
+        Size of the box around the clicked point left out of the octomap, as
+        x;y;z in metres, z along the surface normal (half in front of the
+        surface, half behind). It must hold the end effector's tip at the hover
+        pose: the open 2F-85's finger tips spread about 15 cm and sit just off
+        the surface, and the octomap has 1 cm voxels, so a narrower box makes
+        the hover over a flat face unplannable. Anything else inside it is not
+        collision-checked.
       </input_port>
       <input_port name="velocity_scale" default="0.05" type="double">
         Velocity and acceleration scale for the moves to the hover pose and

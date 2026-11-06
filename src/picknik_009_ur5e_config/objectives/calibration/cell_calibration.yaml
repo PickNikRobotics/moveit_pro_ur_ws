@@ -97,14 +97,14 @@ wrist_camera_solve_difference:
 wrist_camera_mount:
   header:
     stamp:
-      sec: 1793666814
-      nanosec: 654321215
+      sec: 1793999579
+      nanosec: 0
     frame_id: d415_mount_link
   pose:
     position:
-      x: -0.0027347785427536131
-      y: 0.0008475496005192686
-      z: -0.003768153066557936
+      x: 0.007386147762606897
+      y: 0.005013707454348938
+      z: -0.008852932749526785
     orientation:
       x: -0.012270726934157311
       y: 0.012003797081088166
@@ -142,3 +142,19 @@ wrist_camera_mount_candidate_hand_tuned:
       y: 0.0
       z: 0.0
       w: 1.0
+wrist_camera_mount_candidate_touch_off_2f85:
+  header:
+    stamp:
+      sec: 1793999579
+      nanosec: 0
+    frame_id: d415_mount_link
+  pose:
+    position:
+      x: 0.007386147762606897
+      y: 0.005013707454348938
+      z: -0.008852932749526785
+    orientation:
+      x: -0.012270726934157311
+      y: 0.012003797081088166
+      z: -0.0074514315606654703
+      w: 0.99982489181048106
