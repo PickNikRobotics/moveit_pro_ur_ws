@@ -108,7 +108,9 @@
     if="$(var launch_wrist_camera)"
   >
     <arg name="camera_name" value="wrist_mounted_camera" />
-    <arg name="serial_no" value="'135322066258'" />
+    <!-- 217222066860 replaced 135322066258 on 2026-11-06, after that camera's USB link
+         kept failing (design_docs/wrist_camera_recovery.md). -->
+    <arg name="serial_no" value="'217222066860'" />
     <arg name="device_type" value="D415" />
     <!-- No hardware reset on open: see the scene camera block. -->
     <arg name="initial_reset" value="false" />

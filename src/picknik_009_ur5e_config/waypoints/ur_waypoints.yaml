@@ -1,7 +1,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -39,7 +38,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -77,7 +75,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -115,7 +112,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -153,7 +149,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -191,7 +186,6 @@
 - description: Help restore a stuck robot
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -230,7 +224,6 @@
     in a separate thread takes a snapshot.
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -268,7 +261,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -306,7 +298,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -344,7 +335,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -382,7 +372,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -420,7 +409,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -458,7 +446,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -496,7 +483,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -534,7 +520,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -572,7 +557,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -610,7 +594,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -648,7 +631,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -686,7 +668,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -724,7 +705,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -762,7 +742,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -800,7 +779,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -848,6 +826,7 @@
         nanosec: 0
         sec: 0
     name:
+    - robotiq_85_left_knuckle_joint
     - shoulder_pan_joint
     - shoulder_lift_joint
     - elbow_joint
@@ -855,12 +834,13 @@
     - wrist_2_joint
     - wrist_3_joint
     position:
-    - -0.4718087355243128
-    - -3.0363174877562464
-    - 2.129026714955465
-    - -0.28782446802172856
-    - -0.9364350477801722
-    - -2.1816638151751917
+    - 0
+    - -0.002102677022115529
+    - -2.548904081384176
+    - 2.014132324849264
+    - -0.90667279184375
+    - -0.7575400511371058
+    - -1.6557214895831507
     velocity: []
   multi_dof_joint_state:
     header:
@@ -876,7 +856,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -914,7 +893,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -952,7 +930,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -990,7 +967,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
@@ -1028,7 +1004,6 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - gripper
   - manipulator
   joint_state:
     effort: []
