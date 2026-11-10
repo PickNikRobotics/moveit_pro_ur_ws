@@ -17,9 +17,10 @@ hardware:
       # The Robotiq USB-RS485 bridge on the Agent PC, as for the EPick. Not the UR tool port.
       - robotiq_2f85_com_port: "/dev/ttyUSB0"
       # Grip force, as a fraction of the 2F-85's 235 N maximum (the driver's default is 0.5).
-      # Raised for unshelving: a mustard bottle slipped out at 0.5. Lower it for products that
-      # crush or squirt. Read at stack start.
-      - robotiq_2f85_force_multiplier: "0.8"
+      # Raised for unshelving: a mustard bottle slipped out at 0.5. 0.8 held everything but
+      # squeezed harder than wanted, so it is 20% lower; still above the 0.5 that let the
+      # mustard slip. Lower it for products that crush or squirt. Read at stack start.
+      - robotiq_2f85_force_multiplier: "0.64"
 
 objectives:
   objective_library_paths:
