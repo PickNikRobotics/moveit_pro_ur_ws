@@ -1,7 +1,7 @@
 [submodule "src/shelf_stocking"]
 	path = src/shelf_stocking
 	url = https://github.com/PickNikRoboticsServices/shelf_stocking_ws.git
-	branch = shelf-stocking-objectives
+	branch = ces-unshelving
 [submodule "src/external_dependencies/Universal_Robots_ROS2_Description"]
 	path = src/external_dependencies/Universal_Robots_ROS2_Description
 	url = https://github.com/PickNikRobotics/Universal_Robots_ROS2_Description.git
