@@ -38,6 +38,46 @@
 - description: ''
   favorite: false
   joint_group_names:
+  - gripper
+  - manipulator
+  joint_state:
+    effort: []
+    header:
+      frame_id: ''
+      stamp:
+        nanosec: 0
+        sec: 0
+    name:
+    - robotiq_85_left_knuckle_joint
+    - shoulder_pan_joint
+    - shoulder_lift_joint
+    - elbow_joint
+    - wrist_1_joint
+    - wrist_2_joint
+    - wrist_3_joint
+    position:
+    - 0
+    - -1.7916143576251429
+    - -1.9398189983763636
+    - 1.4562180677997034
+    - -1.6727973423399867
+    - -1.4728205839740198
+    - -0.14849740663637334
+    velocity: []
+  multi_dof_joint_state:
+    header:
+      frame_id: ''
+      stamp:
+        nanosec: 0
+        sec: 0
+    joint_names: []
+    transforms: []
+    twist: []
+    wrench: []
+  name: Bag Snapshot
+- description: ''
+  favorite: false
+  joint_group_names:
   - manipulator
   joint_state:
     effort: []
