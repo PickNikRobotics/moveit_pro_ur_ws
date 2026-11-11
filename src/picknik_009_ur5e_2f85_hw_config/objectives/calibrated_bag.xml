@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Calibrated Bag">
+  <!--
+    The paper bag the 2F-85 unshelve drops products into, standing on the table in place of
+    the tote. Its size and place are fixed here, in one place, for Load Calibrated Scene
+    (which adds its walls) and Gentle Bag (which lowers the product into it). It stands
+    centred under grasp_link at the unShelve End waypoint, the carry's drop pose: that
+    position comes from forward kinematics of unShelve End on 2026-11-10, so re-derive it if
+    that waypoint is re-recorded. Its long side runs along world X, the tote's long side.
+  -->
+  <BehaviorTree
+    ID="Calibrated Bag"
+    _description="The drop bag's pose and size (2F-85 cell): centred under unShelve End, standing on the table, 23 cm along world X, 21 cm along Y, 36 cm tall. Outputs only; Load Calibrated Scene adds its walls."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <Action
+        ID="Script"
+        name="BagSize"
+        code="bag_length := 0.23; bag_width := 0.21; bag_height := 0.36; bag_floor_z := 0.0; bag_center_x := 0.0236; bag_center_y := -0.6159; bag_center_z := bag_floor_z + bag_height / 2.0; bcx_s := bag_center_x .. ''; bcy_s := bag_center_y .. ''; bcz_s := bag_center_z .. ''; bag_xyz := bcx_s .. ';' .. bcy_s .. ';' .. bcz_s"
+      />
+      <Action
+        ID="CreatePoseStamped"
+        name="BagCentre"
+        reference_frame="world"
+        position_xyz="{bag_xyz}"
+        orientation_xyzw="0;0;0;1"
+        pose_stamped="{bag_pose}"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Calibrated Bag">
+      <MetadataFields>
+        <Metadata runnable="false" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+      <output_port name="bag_pose" default="{bag_pose}">
+        Centre of the bag's box, in world: half its height above its floor, axes along its
+        long side (X), its short side (Y) and up (Z).
+      </output_port>
+      <output_port name="bag_length" default="{bag_length}">Inside length along the bag's X, in metres.</output_port>
+      <output_port name="bag_width" default="{bag_width}">Inside width along the bag's Y, in metres.</output_port>
+      <output_port name="bag_height" default="{bag_height}">Height of the rim above the floor, in metres.</output_port>
+      <output_port name="bag_floor_z" default="{bag_floor_z}">World z of the bag's floor (the table top).</output_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>
