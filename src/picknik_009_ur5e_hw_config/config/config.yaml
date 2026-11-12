@@ -53,10 +53,6 @@ hardware:
       #     path: "config/moveit/joint_limits.yaml"
 
 objectives:
-  # Merged with the loaders inherited from picknik_009_ur5e_config (core, epick, custom); dicts deep-merge base -> leaf.
-  behavior_loader_plugins:
-    graspscout_behaviors:
-      - "graspscout_behaviors::GraspScoutBehaviorsLoader"
   objective_library_paths:
     # The x<N>_ prefix is load-bearing: Pro 10 picks the winning file by the ALPHABETICAL order of these ids (see design_docs/objective_library_precedence.md). Keep x1 base < x2 sim < x3 hw.
     x3_hw_objectives:

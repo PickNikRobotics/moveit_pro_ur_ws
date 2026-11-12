@@ -6,7 +6,8 @@ The loop publishes a pick record on /unshelve/pick_record (std_msgs/String, "key
   event=planned    the pick is planned and the arm is still at the view the detector saw. This
                    node takes its own wrist-camera frame then (colour, depth aligned to colour,
                    intrinsics, the camera pose from TF) and writes a sample with the product,
-                   the detector's (Gemini's) point and the planned grasp, projected into the image.
+                   the detector's point (Gemini or GraspScout, from the record's detector=;
+                   gemini when absent) and the planned grasp, projected into the image.
   event=saved      the pick's Trainer episode was kept: the sample is marked saved, with the
                    Trainer recording id that links it to the episode.
   event=discarded  the pick failed: the sample is kept, marked discarded (a negative example).
@@ -150,6 +151,7 @@ class Recorder(Node):
         fingers_cam = (R_wc.T @ R_wg[:, 0]).tolist()    # grasp_link +X (the finger axis), camera frame
         grasp_px = [fx * g_cam[0] / g_cam[2] + cx, fy * g_cam[1] / g_cam[2] + cy] if g_cam[2] > 1e-6 else None
         u, v = float(rec["u"]), float(rec["v"])
+        detector = rec.get("detector", "gemini")  # records from before the detector field are Gemini picks
         product = rec.get("product", "unknown")
         dataset = rec.get("dataset", "unknown")
         stamp = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -165,7 +167,7 @@ class Recorder(Node):
             "gripper": GRIPPER,
             "product": product,
             "grasp_mode": rec.get("mode", ""),
-            "detector_point": {"x": u, "y": v, "u_px": u * W, "v_px": v * H, "source": "gemini"},
+            "detector_point": {"x": u, "y": v, "u_px": u * W, "v_px": v * H, "source": detector},
             "grasp_world": {"position": g_world.tolist(),
                             "orientation_xyzw": [float(rec["qx"]), float(rec["qy"]), float(rec["qz"]), float(rec["qw"])]},
             "grasp_camera": {"position": g_cam.tolist(), "approach": approach_cam, "finger_axis": fingers_cam},
@@ -184,7 +186,7 @@ class Recorder(Node):
         self.current = (sample_dir, record)
         gp = "outside the image" if grasp_px is None else f"({grasp_px[0]:.0f}, {grasp_px[1]:.0f}) px"
         self.get_logger().info(f"sample {os.path.basename(sample_dir)}: {product} ({record['grasp_mode']}), "
-                               f"Gemini point ({u * W:.0f}, {v * H:.0f}) px, grasp {gp}")
+                               f"{detector} point ({u * W:.0f}, {v * H:.0f}) px, grasp {gp}")
 
     def _update(self, **fields):
         sample_dir, record = self.current

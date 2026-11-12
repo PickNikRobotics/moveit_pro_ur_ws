@@ -3,7 +3,7 @@
   <BehaviorTree
     ID="Deactivate Vacuum"
     _description="Deactivate the EPick vacuum gripper."
-    _favorite="true"
+    _favorite="false"
   >
     <Control ID="Sequence" name="root">
       <Action
