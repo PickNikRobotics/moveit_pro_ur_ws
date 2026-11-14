@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root
+  BTCPP_format="4"
+  main_tree_to_execute="Compute Wrist Orbbec Mount From Solve"
+>
+  <BehaviorTree
+    ID="Compute Wrist Orbbec Mount From Solve"
+    _description="Converts the native eye-in-hand result (Orbbec optical frame in grasp_link) into the wrist_orbbec_link pose in d415_mount_link for the 2F driver launch. It uses the live root-to-optical transform and robot kinematic chain."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <Action
+        ID="GetLatestTransform"
+        target_frame_id="{orbbec_root_frame}"
+        source_frame_id="{orbbec_optical_frame}"
+        transform="{optical_in_orbbec_root_transform}"
+      />
+      <Action
+        ID="ConvertTransformStampedToPoseStamped"
+        transform_stamped="{optical_in_orbbec_root_transform}"
+        pose_stamped="{optical_in_orbbec_root}"
+      />
+      <!--G_T_R = G_T_O * inverse(R_T_O), where G_T_O is the solver output. -->
+      <Action
+        ID="ComputeCameraPoseFromTag"
+        tag_pose_world="{wrist_orbbec_solve}"
+        tag_pose_camera="{optical_in_orbbec_root}"
+        camera_pose_world="{orbbec_root_in_grasp}"
+      />
+      <!--Transform the solved root pose from grasp_link into d415_mount_link. -->
+      <Action
+        ID="TransformPoseFrame"
+        input_pose="{orbbec_root_in_grasp}"
+        target_frame_id="d415_mount_link"
+        output_pose="{orbbec_root_in_mount}"
+      />
+      <Action
+        ID="LogMessage"
+        log_level="info"
+        message="Computed wrist_orbbec_link pose in d415_mount_link from the eye-in-hand optical-frame solve and live Orbbec root-to-optical TF."
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Compute Wrist Orbbec Mount From Solve">
+      <MetadataFields>
+        <Metadata runnable="false" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+      <input_port
+        name="wrist_orbbec_solve"
+        default="{wrist_orbbec_solve}"
+        type="geometry_msgs::msg::PoseStamped"
+      >
+        Solved Orbbec optical frame pose in grasp_link.
+      </input_port>
+      <input_port
+        name="orbbec_root_frame"
+        default="wrist_orbbec_link"
+        type="std::string"
+      >
+        Root link published by the Orbbec driver.
+      </input_port>
+      <input_port
+        name="orbbec_optical_frame"
+        default="wrist_orbbec_color_optical_frame"
+        type="std::string"
+      >
+        Optical frame named in the Orbbec image and CameraInfo headers.
+      </input_port>
+      <output_port
+        name="mount_origin"
+        default="{orbbec_root_in_mount}"
+        type="geometry_msgs::msg::PoseStamped"
+      >
+        wrist_orbbec_link pose in d415_mount_link.
+      </output_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>

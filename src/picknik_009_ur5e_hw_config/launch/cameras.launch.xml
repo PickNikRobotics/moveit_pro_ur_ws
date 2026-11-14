@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <launch>
   <!--
-    Serials are pinned per camera so the two D415s cannot swap roles between boots
-    (the RealSense driver enumerates in bus order, which is not stable). See
+    The default launch pins both D415 roles so cameras cannot swap between boots
+    (the RealSense driver enumerates in bus order, which is not stable). The 2F
+    wrapper passes an empty scene serial while only one D415 is connected. See
     design_docs/camera_naming.md for the naming contract these feed.
 
     A serial that is not on the bus is NOT a launch failure: the driver logs
@@ -14,11 +15,31 @@
   -->
 
   <arg
+    name="scene_camera_serial"
+    default="141722063195"
+    description="RealSense SDK serial to assign to scene_camera. Set empty to select an available device when only one D415 is connected."
+  />
+  <arg
     name="launch_wrist_camera"
     default="true"
     description="Whether to launch the wrist-mounted D415. Set false on a host
                  where that camera is not attached: a missing serial does not fail
                  the launch, it only adds a node that retries forever."
+  />
+  <arg
+    name="launch_wrist_orbbec"
+    default="true"
+    description="Whether to launch the wrist-mounted Orbbec Gemini 305. Needs the
+                 host Orbbec udev rule (design_docs/orbbec_wrist_camera.md); without
+                 it the node runs but logs the device as not found."
+  />
+  <arg
+    name="wrist_orbbec_dual_color"
+    default="true"
+    description="Run the Orbbec in its Dual Color Streams preset: the two color
+                 lenses on their own left_color / right_color topics, with no depth
+                 or point cloud. False gives the Default preset: one color image with
+                 both lenses side by side, plus depth and the point cloud."
   />
   <arg
     name="launch_shelf_cam"
@@ -64,7 +85,7 @@
     file="$(find-pkg-share picknik_009_ur5e_hw_config)/launch/pro_rs_launch.py"
   >
     <arg name="camera_name" value="scene_camera" />
-    <arg name="serial_no" value="'141722063195'" />
+    <arg name="serial_no" value="'$(var scene_camera_serial)'" />
     <arg name="device_type" value="D415" />
     <!-- No hardware reset on open. A reset makes the camera re-enumerate with new
          /dev/video* and /dev/bus/usb numbers, and the drivers container's /dev is a
@@ -124,12 +145,11 @@
   </include>
 
   <!--
-    Wrist cloud on the COLOR pixel grid, for GraspScout's seal check. The
-    driver's depth/color/points is organized on the depth grid, so a color pixel
-    does not index it; the GraspScout objectives therefore never pass it and
-    read this topic instead, falling back to image-only (no seal check) when it
-    is missing. Built from the driver's aligned_depth_to_color stream, which
-    needs align_depth.enable above. See design_docs/camera_naming.md.
+    Wrist cloud on the COLOR pixel grid. The driver's depth/color/points is
+    organized on the depth grid, so a color pixel does not index it. Added for
+    GraspScout's seal check; GraspScout was removed and nothing reads this topic
+    now. Built from the driver's aligned_depth_to_color stream, which needs
+    align_depth.enable above. See design_docs/camera_naming.md.
   -->
   <node
     pkg="depth_image_proc"
@@ -148,6 +168,110 @@
     />
     <remap from="points" to="/camera/wrist_mounted_camera/aligned_points" />
   </node>
+
+  <!--
+    Optional wrist Orbbec Gemini 305. The 2F-only driver wrapper disables the
+    wrist D415 and publishes a temporary mount transform for the Orbbec root. The
+    upstream launch uses camera_name as both node name and namespace, so the
+    /camera prefix is pushed here to keep the /camera/<name>/... layout. See
+    design_docs/orbbec_wrist_camera.md.
+  -->
+  <group if="$(var launch_wrist_orbbec)">
+    <!-- Per-mode settings. In Dual Color Streams the combined color stream and
+         depth are unsupported, and in Default the separate lenses are. -->
+    <let
+      name="orbbec_preset"
+      value="Dual Color Streams"
+      if="$(var wrist_orbbec_dual_color)"
+    />
+    <let
+      name="orbbec_preset"
+      value="Default"
+      unless="$(var wrist_orbbec_dual_color)"
+    />
+    <let
+      name="orbbec_combined"
+      value="false"
+      if="$(var wrist_orbbec_dual_color)"
+    />
+    <let
+      name="orbbec_combined"
+      value="true"
+      unless="$(var wrist_orbbec_dual_color)"
+    />
+    <let
+      name="orbbec_watch_topic"
+      value="/camera/wrist_orbbec/left_color/camera_info"
+      if="$(var wrist_orbbec_dual_color)"
+    />
+    <let
+      name="orbbec_watch_topic"
+      value="/camera/wrist_orbbec/color/camera_info"
+      unless="$(var wrist_orbbec_dual_color)"
+    />
+    <push_ros_namespace namespace="camera" />
+    <group>
+      <set_remap
+        from="/camera/wrist_orbbec/color/camera_info"
+        to="/camera/wrist_orbbec/color/camera_info_raw"
+      />
+      <include
+        file="$(find-pkg-share orbbec_camera)/launch/gemini305.launch.py"
+      >
+        <arg name="camera_name" value="wrist_orbbec" />
+        <arg name="serial_number" value="CV2F861000X6" />
+        <!-- Load-bearing. Include args and declared defaults leak into later
+             siblings, and the upstream launch reads every arg it declares from the
+             launch context, so it inherits the D415 blocks' device_type=D415. With
+             that, the node crashes (exit code 11) right after "ob_camera_node_ is
+             nullptr". The other three would otherwise be the RealSense values, so
+             they are pinned to those to keep this block independent of the ones
+             above it. -->
+        <arg name="device_type" value="camera" />
+        <arg name="color_qos" value="SENSOR_DATA" />
+        <arg name="depth_qos" value="SENSOR_DATA" />
+        <arg name="log_level" value="info" />
+        <arg name="device_preset" value="$(var orbbec_preset)" />
+        <arg name="enable_color" value="$(var orbbec_combined)" />
+        <arg name="enable_depth" value="$(var orbbec_combined)" />
+        <arg name="enable_point_cloud" value="$(var orbbec_combined)" />
+        <arg name="depth_registration" value="$(var orbbec_combined)" />
+        <arg name="align_target_stream" value="COLOR" />
+        <arg name="enable_colored_point_cloud" value="$(var orbbec_combined)" />
+      </include>
+    </group>
+    <node
+      pkg="picknik_009_ur5e_hw_config"
+      exec="orbbec_camera_info_model_relay.py"
+      name="wrist_orbbec_camera_info_model_relay"
+    >
+      <param
+        name="input_topic"
+        value="/camera/wrist_orbbec/color/camera_info_raw"
+      />
+      <param
+        name="output_topic"
+        value="/camera/wrist_orbbec/color/camera_info"
+      />
+    </node>
+    <!-- About one start in two or three the camera opens and then sends no
+         frames, with no error. This reboots it through the driver when that
+         happens. See design_docs/orbbec_wrist_camera.md. -->
+    <node
+      pkg="picknik_009_ur5e_hw_config"
+      exec="orbbec_stream_watchdog.py"
+      name="wrist_orbbec_stream_watchdog"
+    >
+      <param name="camera_info_topic" value="$(var orbbec_watch_topic)" />
+      <param
+        name="reboot_service"
+        value="/camera/wrist_orbbec/reboot_device"
+      />
+      <param name="stall_timeout_s" value="10.0" />
+      <param name="recovery_grace_s" value="30.0" />
+      <param name="max_recovery_grace_s" value="300.0" />
+    </node>
+  </group>
 
   <!--
     Shelf camera, a ZED 2i. pro_zed_launch.py maps its topics onto the

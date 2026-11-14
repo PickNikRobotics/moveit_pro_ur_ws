@@ -1,0 +1,13 @@
+# The 2F-85 hardware config for a policy rollout session: everything is inherited from
+# picknik_009_ur5e_2f85_hw_config except the joint limits, whose arm accelerations are raised
+# (generated at build time, see CMakeLists.txt). ExecutePolicy rejects a window whose blend into
+# the next chunk or whose at-rest fallback stop exceeds these limits, and the workspace cap is too
+# low for that. Run rollouts with `moveit_pro run -c picknik_009_ur5e_2f85_policy_config`, and go
+# back to picknik_009_ur5e_2f85_hw_config for collection: every planned move here may accelerate
+# harder at the same acceleration scale. See design_docs/policy_session_config.md.
+based_on_package: "picknik_009_ur5e_2f85_hw_config"
+
+moveit_params:
+  joint_limits:
+    package: "picknik_009_ur5e_2f85_policy_config"
+    path: "config/moveit/joint_limits.yaml"

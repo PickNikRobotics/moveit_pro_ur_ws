@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<package format="3">
+  <name>picknik_009_ur5e_2f85_policy_config</name>
+  <version>0.1.0</version>
+
+  <description>
+    UR5e 009 with the Robotiq 2F-85, for policy rollouts through ExecutePolicy: the
+    2F-85 hardware config with the arm joints' acceleration limits raised, generated at
+    build time from picknik_009_ur5e_config's joint_limits.yaml.
+  </description>
+
+  <maintainer email="support@picknik.ai">MoveIt Pro User</maintainer>
+
+  <license>Proprietary</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- Build: the generated joint_limits.yaml is made from this package's installed file. -->
+  <build_depend>picknik_009_ur5e_config</build_depend>
+  <exec_depend>picknik_009_ur5e_2f85_hw_config</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_cmake_lint_cmake</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

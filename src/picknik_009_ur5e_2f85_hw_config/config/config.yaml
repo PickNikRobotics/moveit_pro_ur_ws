@@ -6,6 +6,12 @@ based_on_package: "picknik_009_ur5e_hw_config"
 
 # [Required]
 hardware:
+  # 2F-specific driver graph: keep the shared UR/shelf services, but select the
+  # Orbbec as wrist RGB-D and the single attached D415 as scene_camera. The
+  # Orbbec mount currently reuses the old D415 body pose until camera calibration.
+  additional_driver_launch_file:
+    package: "picknik_009_ur5e_2f85_hw_config"
+    path: "launch/robot_drivers_to_persist.launch.py"
   robot_description:
     srdf:
       package: "picknik_009_ur5e_2f85_hw_config"

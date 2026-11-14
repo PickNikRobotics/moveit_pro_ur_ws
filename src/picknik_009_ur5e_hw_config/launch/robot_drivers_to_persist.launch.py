@@ -33,6 +33,7 @@ import yaml
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, LogInfo
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
@@ -45,8 +46,8 @@ CALIBRATED_CAMERAS = [
 ]
 
 
-def calibrated_camera_transforms():
-    """One static transform publisher per calibrated fixed camera, read once at stack start."""
+def calibrated_camera_transforms(launch_shelf_cam):
+    """Publish fixed-camera transforms at stack start, optionally omitting shelf_cam."""
     path = os.path.join(
         get_package_share_directory("picknik_009_ur5e_config"),
         "objectives",
@@ -60,8 +61,14 @@ def calibrated_camera_transforms():
     actions = []
     for section, child in CALIBRATED_CAMERAS:
         entry = calibration.get(section)
+        condition = IfCondition(launch_shelf_cam) if section == "shelf_cam_camera_link" else None
         if not entry:
-            actions.append(LogInfo(msg=f"No '{section}' section in {path}: {child} is not published at start."))
+            actions.append(
+                LogInfo(
+                    msg=f"No '{section}' section in {path}: {child} is not published at start.",
+                    condition=condition,
+                )
+            )
             continue
         p = entry["pose"]["position"]
         q = entry["pose"]["orientation"]
@@ -70,6 +77,7 @@ def calibrated_camera_transforms():
                 package="tf2_ros",
                 executable="static_transform_publisher",
                 name=f"{child}_calibration_tf",
+                condition=condition,
                 arguments=[
                     "--x", str(p["x"]), "--y", str(p["y"]), "--z", str(p["z"]),
                     "--qx", str(q["x"]), "--qy", str(q["y"]), "--qz", str(q["z"]), "--qw", str(q["w"]),
@@ -107,7 +115,11 @@ def generate_launch_description():
     # The calibration config package sets this; normal runs keep the default.
     cameras_launch = IncludeLaunchDescription(
         cameras_launch_path,
-        launch_arguments={"calibration_mode": LaunchConfiguration("calibration_mode")}.items(),
+        condition=IfCondition(LaunchConfiguration("launch_cameras")),
+        launch_arguments={
+            "calibration_mode": LaunchConfiguration("calibration_mode"),
+            "launch_shelf_cam": LaunchConfiguration("launch_shelf_cam"),
+        }.items(),
     )
 
     # The Trainer Training Config records this relay's topic: the policy joint states with
@@ -140,10 +152,20 @@ def generate_launch_description():
                 default_value="false",
                 description="Run the cameras at the calibration-only resolutions.",
             ),
+            DeclareLaunchArgument(
+                "launch_cameras",
+                default_value="true",
+                description="Launch the camera drivers with this hardware config.",
+            ),
+            DeclareLaunchArgument(
+                "launch_shelf_cam",
+                default_value="true",
+                description="Launch the shelf camera driver and publish its calibrated transform.",
+            ),
             base_robot_drivers_to_persist_launch,
             cameras_launch,
             policy_state_seal_relay,
             shopping_list_server,
         ]
-        + calibrated_camera_transforms()
+        + calibrated_camera_transforms(LaunchConfiguration("launch_shelf_cam"))
     )

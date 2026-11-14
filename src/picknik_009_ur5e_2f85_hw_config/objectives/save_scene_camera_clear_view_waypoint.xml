@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root
+  BTCPP_format="4"
+  main_tree_to_execute="Save Scene Camera Clear View Waypoint"
+>
+  <BehaviorTree
+    ID="Save Scene Camera Clear View Waypoint"
+    _description="Operator-assisted capture of the fixed scene camera's clear-view waypoint. Jog the arm away from the shelf board until the D415 has an unobstructed view, then continue to save the arm's current joint state under the name consumed by Calibrate Scene Camera From Shelf Board."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <SubTree
+        ID="Request Teleoperation"
+        enable_user_interaction="true"
+        user_interaction_prompt="Select Joint Jog in the teleoperation mode selector, then jog the arm to a safe pose that leaves the shelf ChArUco board unobstructed in the scene D415. Click Continue to stop teleoperation and save this clear-view waypoint."
+        controller_action_server="/joint_trajectory_admittance_controller/follow_joint_trajectory"
+        joint_trajectory_controller_name="joint_trajectory_admittance_controller"
+        default_planning_group="manipulator"
+        default_ik_frame="grasp_link"
+        link_padding="0.01"
+        execution_pipeline="jtac"
+        velocity_scale_factor="0.2"
+        max_ik_solutions="8"
+        max_mtc_solutions="1"
+        initial_teleop_mode="1"
+        require_user_approval="false"
+      />
+      <Action
+        ID="EditWaypoint"
+        waypoint_name="scene_camera_shelf_clear"
+        waypoint_operation="save"
+        joint_group_names="manipulator"
+      />
+      <Action
+        ID="LogMessage"
+        log_level="info"
+        message="Saved scene_camera_shelf_clear. Verify the arm does not obstruct the scene D415's view of the board before running calibration."
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Save Scene Camera Clear View Waypoint">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

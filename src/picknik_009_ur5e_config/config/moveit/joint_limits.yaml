@@ -30,8 +30,9 @@
 # 2026-11-02: back to 1.0. At 2.5 every move planned at full or near-full acceleration
 # scaling was up to 2.5x harsher than the speeds the shelf-stocking objectives were tuned
 # at: the arm fell 5 deg behind on an empty free-space move and pstopped (C157) carrying a
-# product. A policy rollout needs the cap raised again for that session.
-# See design_docs/policy_rollout.md.
+# product. A policy rollout needs the cap raised again for that session: for the 2F-85 that is
+# picknik_009_ur5e_2f85_policy_config, which generates its limits from this file at build time
+# (design_docs/policy_session_config.md). See design_docs/policy_rollout.md.
 # NOTE: Arm-joint max_velocity is set to the UR5e datasheet ceiling (180 deg/s).
 joint_limits:
   shoulder_pan_joint:

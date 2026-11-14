@@ -2,7 +2,7 @@
 
 ## What it does, at a glance
 
-A cross-shaped 80/20 camera rig (a vertical post with a crossbar bolted to its far side, off-center along Y) stands on the table on the world −X side of the bin (the operator's right). It is modeled as world-frame collision boxes, one per bar, added by [`Load Calibrated Scene`](../src/picknik_009_ur5e_config/objectives/load_calibrated_scene.xml) next to the table and the camera mount plate. The object ids start with `vla_cam_rig_`. The rig is still being modeled, so more pieces will be added.
+The EPick workcell's cross-shaped 80/20 camera rig (a vertical post with a crossbar bolted to its far side, off-center along Y) stands on the table on the world −X side of the bin (the operator's right). It is modeled as world-frame collision boxes, one per bar and clamp, added by [`Load Calibrated Scene`](../src/picknik_009_ur5e_config/objectives/load_calibrated_scene.xml) next to the table and camera mount plate. The 2F-85 has no shelf camera; its scene override omits these objects and removes their IDs during cleanup if an older scene left them behind.
 
 ## Why this shape
 

@@ -1,0 +1,18 @@
+# Policy Session Config
+
+[`picknik_009_ur5e_2f85_policy_config`](../src/picknik_009_ur5e_2f85_policy_config/config/config.yaml) is the 2F-85 hardware config for running trained policies through `ExecutePolicy`. It inherits everything from `picknik_009_ur5e_2f85_hw_config` and overrides one thing, the joint limits: the six arm joints get a higher `max_acceleration`. The limits file is generated at build time from [`picknik_009_ur5e_config/config/moveit/joint_limits.yaml`](../src/picknik_009_ur5e_config/config/moveit/joint_limits.yaml) by the package's [`CMakeLists.txt`](../src/picknik_009_ur5e_2f85_policy_config/CMakeLists.txt). The value is its `POLICY_MAX_ACCELERATION` cache variable. Start a rollout session with `moveit_pro run -c picknik_009_ur5e_2f85_policy_config`, and go back to `picknik_009_ur5e_2f85_hw_config` for collection and everything else.
+
+## Why this shape
+
+**`ExecutePolicy` needs a higher cap than the rest of the cell can live with.** It fits each committed policy window to a spline pinned to rest at its end, and it rejects the window if that fallback stop, or the blend from the current motion into a new chunk, exceeds the joint limits. It reports only the first sample over the limit, so the error always reads just above whatever cap is set. On this cell every new checkpoint has failed it at the workspace cap, at the first points of a window where a new chunk takes over (see the submodule's [`policy_rollout.md`](../src/shelf_stocking/design_docs/policy_rollout.md)). Raising the cap for good was tried and reverted: every move planned against it at full or near-full acceleration scaling became harsher than the speeds the shelf-stocking Objectives were tuned at. The arm fell behind its trajectories and protective-stopped carrying products. The base file's header records both changes.
+
+**A separate config, not an edit and a revert.** A rollout used to mean raising the cap in the YAML, restarting, and remembering to put it back. A config package makes the session a choice at `moveit_pro run` and cannot leak into a collection run.
+
+**Generated, not copied.** The base file's position limits are retuned as the cell changes (the shoulder lift twice in November alone). A copy would keep the old ones silently. The build replaces only the arm joints' `max_acceleration` values, the entries before the gripper's, and stops if it does not find exactly six. The gripper keeps the base value.
+
+## Notes and gotchas
+
+- **Planned moves in this config accelerate harder at the same scale.** An Objective meant for this config has to scale its planned moves down to keep their absolute acceleration. `Run CES Unshelve Bag Policy` does this for its move to the start waypoint and its fallback move over the bag. Other Objectives listed under this config, such as the collection or the shelf-stocking application, are not scaled. Do not run them here.
+- **A raised cap only moves the reported value if the policy is rough enough.** If a window still fails here, the error will again read just above the cap. Then a longer `dt` is the lever, or smoothing chunk boundaries in the `GetActionChunk` adapter, not a higher cap.
+- **A change to the base `joint_limits.yaml` reaches this config only after a rebuild.** CMake re-runs the generation when the base file changes, but only on a build of this package.
+- **It is a new package**, so it needs a `moveit_pro build` before `moveit_pro run -c` can find it.

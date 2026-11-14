@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Apply Wrist Camera Calibration">
+  <BehaviorTree ID="Apply Wrist Camera Calibration">
+    <Control ID="Sequence" name="TopLevelSequence">
+      <Action
+        ID="LogMessage"
+        log_level="error"
+        message="Apply Wrist Camera Calibration writes the EPick D415 mount and is disabled for the 2F-85 Orbbec setup. Use Apply Wrist Orbbec Calibration."
+      />
+      <Action ID="AlwaysFailure" />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Apply Wrist Camera Calibration">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

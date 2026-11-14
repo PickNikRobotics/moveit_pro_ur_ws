@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root
+  BTCPP_format="4"
+  main_tree_to_execute="Calibrate Wrist Orbbec On Shelf Board"
+>
+  <BehaviorTree
+    ID="Calibrate Wrist Orbbec On Shelf Board"
+    _description="Uses MoveIt Pro 10.2 eye-in-hand calibration to solve the Orbbec optical frame relative to grasp_link while viewing the fixed shelf ChArUco board. Uses saved, hand-selected waypoints with multi-axis arm rotation; the waypoint generator is unsuitable when the camera axis is not aligned with grasp_link +Z. Saves candidate results only. Verify image/CameraInfo frames and the point-cloud topic before running."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <SubTree
+        ID="Calibrate Eye In Hand Camera"
+        waypoint_prefix="{waypoint_prefix}"
+        image_topic="/camera/wrist_orbbec/color/image_raw"
+        camera_info_topic="/camera/wrist_orbbec/color/camera_info"
+        camera_name="wrist_orbbec"
+        point_cloud_topic="/camera/wrist_orbbec/depth_registered/points"
+        joint_group_name="manipulator"
+        end_effector_frame="grasp_link"
+        base_frame="world"
+        board="{board}"
+        settle_seconds="{settle_seconds}"
+        calibrated_camera_pose="{wrist_orbbec_solve}"
+        calibrated_board_pose="{shelf_board_candidate}"
+        used_sample_count="{used_sample_count}"
+        rotation_residual="{rotation_residual}"
+        translation_residual="{translation_residual}"
+      />
+      <!--Save solver outputs before mount conversion can fail due to a missing TF. Never replace wall_board here. -->
+      <Action
+        ID="SavePoseStampedToYaml"
+        yaml_filename="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="wrist_orbbec_solve_shelf_board"
+        overwrite="false"
+        message="{wrist_orbbec_solve}"
+      />
+      <Action
+        ID="SavePoseStampedToYaml"
+        yaml_filename="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="shelf_board_candidate"
+        overwrite="false"
+        message="{shelf_board_candidate}"
+      />
+      <SubTree
+        ID="Compute Wrist Orbbec Mount From Solve"
+        wrist_orbbec_solve="{wrist_orbbec_solve}"
+        mount_origin="{wrist_orbbec_mount_candidate}"
+      />
+      <Action
+        ID="SavePoseStampedToYaml"
+        yaml_filename="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="wrist_orbbec_mount_candidate_shelf_board"
+        overwrite="false"
+        message="{wrist_orbbec_mount_candidate}"
+      />
+      <!--Measure against the existing shelf calibration without applying this new estimate automatically. -->
+      <Action
+        ID="LoadPoseStampedFromYamlNamespace"
+        file_path="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="wall_board"
+        output="{shelf_board_reference}"
+      />
+      <Action
+        ID="CalculatePoseOffset"
+        source_pose="{shelf_board_reference}"
+        destination_pose="{shelf_board_candidate}"
+        source_to_destination_pose="{shelf_board_difference}"
+      />
+      <Action
+        ID="SavePoseStampedToYaml"
+        yaml_filename="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="shelf_board_difference"
+        overwrite="false"
+        message="{shelf_board_difference}"
+      />
+      <Action
+        ID="LogMessage"
+        log_level="info"
+        message="Orbbec calibration candidates saved. Review used views, residuals, shelf_board_candidate and its difference from wall_board before applying anything."
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Calibrate Wrist Orbbec On Shelf Board">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+      <input_port name="waypoint_prefix" default="Orbecc Wall" type="std::string">
+        Prefix of manually saved, safe arm waypoints that view the shelf board; vary arm orientation about at least two axes as well as board position.
+      </input_port>
+      <input_port name="board" default="[{squares_x: 7, squares_y: 5, square_length: 0.035, marker_length: 0.026, dictionary: DICT_4X4_50}]" type="moveit_studio_msgs::msg::CharucoBoard">
+        The existing shelf-mounted board. Keep this definition matched to the physical print.
+      </input_port>
+      <input_port name="settle_seconds" default="1.0" type="double">
+        Wait after each planned waypoint before recording its image.
+      </input_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>

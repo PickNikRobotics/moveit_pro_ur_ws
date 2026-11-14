@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Calibrate Scene Camera From Tote Board">
+  <BehaviorTree ID="Calibrate Scene Camera From Tote Board">
+    <Control ID="Sequence" name="TopLevelSequence">
+      <Action
+        ID="LogMessage"
+        log_level="error"
+        message="The inherited tote-board scene calibration depends on the D415 wrist camera. For the 2F-85, use Calibrate Scene Camera From Shelf Board with the shelf-mounted board."
+      />
+      <Action ID="AlwaysFailure" />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Calibrate Scene Camera From Tote Board">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

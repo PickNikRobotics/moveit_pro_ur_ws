@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root
+  BTCPP_format="4"
+  main_tree_to_execute="Apply Wrist Orbbec Calibration"
+>
+  <BehaviorTree
+    ID="Apply Wrist Orbbec Calibration"
+    _description="Copies a reviewed wrist_orbbec_link mount candidate to the wrist_orbbec_mount section read by the 2F driver launch. Restart the stack afterward to publish the new transform."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <Action
+        ID="LoadPoseStampedFromYamlNamespace"
+        file_path="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="{candidate_section}"
+        output="{mount_pose}"
+      />
+      <Action
+        ID="SavePoseStampedToYaml"
+        yaml_filename="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="wrist_orbbec_mount"
+        overwrite="false"
+        message="{mount_pose}"
+      />
+      <Action
+        ID="LogMessage"
+        log_level="info"
+        message="Applied wrist_orbbec_mount. Restart the stack before using the calibrated wrist camera."
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Apply Wrist Orbbec Calibration">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+      <input_port name="candidate_section" default="wrist_orbbec_mount_candidate_shelf_board" type="std::string">
+        Reviewed cell_calibration.yaml section containing wrist_orbbec_link in d415_mount_link.
+      </input_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>

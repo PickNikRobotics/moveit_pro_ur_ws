@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Calibrate Cameras">
+  <BehaviorTree
+    ID="Calibrate Cameras"
+    _description="2F-85 calibration entry point. It checks the replacement scene D415 and wrist Orbbec color and depth feeds, then runs the Orbbec eye-in-hand solve. Before starting, save at least five safe wrist waypoints named with the `Orbecc Wall` prefix and rotational diversity about multiple axes. This Objective writes the wrist solve, mount, and shelf-board candidates only. Inspect residuals and the board-pose difference from wall_board before applying any candidate. Run Calibrate Scene Camera From Shelf Board separately after reviewing and applying the shelf-board candidate and saving scene_camera_shelf_clear. Verify camera topics, frame IDs, and the Orbbec cloud before use. See design_docs/orbbec_shelf_board_calibration.md."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <SubTree ID="Check Camera Feeds" />
+      <SubTree
+        ID="Calibrate Wrist Orbbec On Shelf Board"
+        waypoint_prefix="Orbecc Wall"
+        board="[{squares_x: 7, squares_y: 5, square_length: 0.035, marker_length: 0.026, dictionary: DICT_4X4_50}]"
+        settle_seconds="1.0"
+      />
+      <Action
+        ID="LogMessage"
+        log_level="info"
+        message="Wrist calibration candidates are ready. Review used views, residuals and the board-pose difference before applying. Apply the reviewed shelf-board candidate before running Calibrate Scene Camera From Shelf Board; save scene_camera_shelf_clear first."
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Calibrate Cameras">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

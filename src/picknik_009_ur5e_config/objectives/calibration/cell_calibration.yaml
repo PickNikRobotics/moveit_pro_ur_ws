@@ -110,6 +110,23 @@ wrist_camera_mount:
       y: 0.012003797081088166
       z: -0.0074514315606654703
       w: 0.99982489181048106
+wrist_orbbec_mount:
+  temporary: true
+  header:
+    stamp:
+      sec: 1793999579
+      nanosec: 0
+    frame_id: d415_mount_link
+  pose:
+    position:
+      x: 0.007956403000916575
+      y: 0.025285583724887227
+      z: 0.002145969079072607
+    orientation:
+      x: -0.012270726934157311
+      y: 0.012003797081088166
+      z: -0.0074514315606654703
+      w: 0.99982489181048106
 wrist_camera_mount_candidate_wall_board:
   header:
     stamp:
@@ -158,3 +175,35 @@ wrist_camera_mount_candidate_touch_off_2f85:
       y: 0.012003797081088166
       z: -0.0074514315606654703
       w: 0.99982489181048106
+calibrated_bin_top_left_corner:
+  header:
+    stamp:
+      sec: 1794612457
+      nanosec: 217753893
+    frame_id: world
+  pose:
+    position:
+      x: 0.27090818199672773
+      y: -0.51613216404258133
+      z: 0.28358889393148612
+    orientation:
+      x: -0.010074807011039407
+      y: 0.99930635580236615
+      z: 0.031342660762570619
+      w: 0.017405261647203504
+calibrated_bin_front_left_corner:
+  header:
+    stamp:
+      sec: 1794612540
+      nanosec: 446937597
+    frame_id: world
+  pose:
+    position:
+      x: 0.27092085463450116
+      y: -0.51612005490555768
+      z: 0.28359674223761755
+    orientation:
+      x: -0.010093828634769708
+      y: 0.99930561260904072
+      z: 0.031352705005725193
+      w: 0.017418815125770225

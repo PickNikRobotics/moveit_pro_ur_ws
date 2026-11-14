@@ -2,14 +2,14 @@
 <root BTCPP_format="4" main_tree_to_execute="Load Calibrated Scene">
   <!--
     2F-85 copy of picknik_009_ur5e_config's Load Calibrated Scene: this file's library
-    (x4_2f85_objectives) sorts after the base one, so it wins on this config only. The one
-    change: the tote is replaced by the paper drop bag (Calibrated Bag), added as four thin
-    walls so the product can be lowered inside. The tote pose is still worked out, because
-    bin_calibrated_pose is an output callers pass on. Keep the rest in step with the base file.
+    (x4_2f85_objectives) sorts after the base one, so it wins on this config only. The tote
+    is replaced by a four-wall bin whose pose comes from Calibrate Bin. Calibrated Bag
+    shares that pose and the bin's interior dimensions with the existing 2F-85 drop logic.
+    Keep the workcell and the remaining shared scene in step with the base file.
   -->
   <BehaviorTree
     ID="Load Calibrated Scene"
-    _description="2F-85 version: the drop bag (Calibrated Bag) stands in place of the tote. Builds the calibrated scene from objectives/calibration/cell_calibration.yaml and board_offsets.yaml: works out the shelving and the tote from the two board poses and the offsets, places them and the fixed workcell parts in the planning scene, and publishes the scene camera and shelf_cam transforms. An offset edit counts at the next run. See design_docs/board_based_calibration.md."
+    _description="2F-85 version: loads the bin measured by Calibrate Bin, plus the calibrated shelving and fixed workcell parts. The bin pose comes from the calibrated_bin section of cell_calibration.yaml; Calibrated Bag exposes the same pose and interior dimensions to the existing 2F-85 drop logic. Publishes the scene-camera transform. Calibrate the bin before using this scene. See design_docs/calibrate_bin.md and design_docs/board_based_calibration.md."
     _favorite="false"
   >
     <Control ID="Sequence" name="TopLevelSequence" _collapsed="false">
@@ -36,13 +36,26 @@
         <Action ID="RemoveCollisionObject" object_id="calibrated_bag_wall_ny" />
       </Decorator>
       <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="camera_mount_plate" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
         <Action ID="RemoveURDFFromScene" urdf_name="calibrated_camera" />
       </Decorator>
       <Decorator ID="ForceSuccess" _collapsed="false">
         <Action ID="RemoveURDFFromScene" urdf_name="calibrated_workcell" />
       </Decorator>
       <Decorator ID="ForceSuccess" _collapsed="false">
-        <Action ID="RemoveURDFFromScene" urdf_name="calibrated_shelf_cam" />
+        <Action ID="RemoveCollisionObject" object_id="camera_pole_mount_plate" />
+      </Decorator>
+      <!--Clear the obsolete shelf-camera support from any scene loaded before this override. -->
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="vla_cam_rig_post" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="vla_cam_rig_crossbar" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="vla_cam_rig_clamp" />
       </Decorator>
       <!--=== WORK OUT THE SHELVING FROM THE WALL BOARD AND THE OFFSETS ===-->
       <Action
@@ -158,119 +171,55 @@
         package_name="picknik_009_ur5e_config"
         urdf_file_path="description/workcell.urdf"
       />
-      <!--=== PLACE CAMERA MOUNT PLATE (sits on top of workcell crossbar at z=0.66 from workcell base) ===-->
-      <!--7" x 1.5" x 0.25" plate (0.1778 x 0.0381 x 0.00635 m) for the scene
-          camera mounting bracket. Crossbar top sits at z = 0.66 m above the
-          workcell base (= world z = 0.66, since the workcell base = table top
-          = world z = 0). Plate center.z = 0.66 + half_thickness = 0.663175.
-          Default placement is the workcell footprint center in X and Y; nudge
-          the position_xyz below if the crossbar isn't where this assumes.
-          The +90 deg yaw on the pose below rotates the box's local X (the 7"
-          dimension) onto world Y, so the long edge runs front-to-back in world.-->
+      <!--=== PLACE THE 2F-85 STAND-CORNER 80/20 POLE ===-->
+      <!--Touch-off placement from the actual fingertip frames, not grasp_link.
+          The first fingertip-based estimate still overlapped the physical tips;
+          after checking against the real 3.5 cm finger reach, shift the pole
+          3.5 cm away from the robot (-world Y). The 2F-85 points approximately
+          along world -Y here. Vertically, the stand mesh's lowest point is the
+          floor reference. Fixed 2F-85 hardware assumption only. -->
       <Action
         ID="CreatePoseStamped"
         reference_frame="world"
-        position_xyz="0;-0.9;0.663175"
-        orientation_xyzw="0;0;0.7071068;0.7071068"
-        pose_stamped="{camera_mount_plate_pose}"
-      />
-      <Action
-        ID="AddCollisionBox"
-        object_id="camera_mount_plate"
-        dimensions="0.1778;0.0381;0.00635"
-        pose="{camera_mount_plate_pose}"
-        overwrite="true"
-      />
-      <!--=== PLACE VLA CAMERA RIG (80/20 cross on the table, world -X of the bin) ===-->
-      <!--Two 4x4 cm 80/20 bars forming a cross, plus a camera clamp, placed
-          by touch-off rather than AprilTag calibration. Every number below
-          is derived from one reading: with the suction cup touching the
-          post's bin-side (+X) face at the cross, approaching along world -X,
-          grasp_link read world (-0.365, -0.383, 0.552).
-          Vertical post: on the bin side. Centerline x = -0.365 - 0.02 (half a
-          bar width behind the touched face), y = -0.383. 25.7" (0.6528 m)
-          tall from the table top (world z=0).
-          Crossbar: 24" (0.6096 m) long along world Y at the cross height,
-          bolted to the post's OUTSIDE (-X) face, so its centerline is one
-          bar width further out: x = -0.385 - 0.04. It protrudes 9.75"
-          (0.2477 m) toward the shelf (+Y) from the post centerline, so its
-          +Y end is y = -0.383 + 0.2477 = -0.1353 and its center is 0.3048 m
-          back from that.
-          Re-touch-off and update these numbers if the rig is moved.-->
-      <Action
-        ID="CreatePoseStamped"
-        reference_frame="world"
-        position_xyz="-0.385;-0.383;0.3264"
+        position_xyz="-0.269;-0.3545;-0.1125"
         orientation_xyzw="0;0;0;1"
-        pose_stamped="{vla_cam_rig_post_pose}"
+        pose_stamped="{robot_stand_corner_pole_pose}"
       />
       <Action
         ID="AddCollisionBox"
-        object_id="vla_cam_rig_post"
-        dimensions="0.04;0.04;0.6528"
-        pose="{vla_cam_rig_post_pose}"
+        object_id="robot_stand_corner_pole"
+        dimensions="0.04;0.04;1.385"
+        pose="{robot_stand_corner_pole_pose}"
         overwrite="true"
       />
+      <!--=== ADD THE CAMERA MOUNT PLATE ON THE POLE, PROJECTING +X ===-->
+      <!--The plate is screwed to the pole's +Y/front face and projects along
+          world +X. Its 7-inch dimension runs along X; align its -X edge with
+          the pole's -X edge so the plate extends outward in +X. The fingertip
+          touch-off set its height; its thin dimension lies along world Y. -->
       <Action
         ID="CreatePoseStamped"
         reference_frame="world"
-        position_xyz="-0.425;-0.4401;0.552"
-        orientation_xyzw="0;0;0;1"
-        pose_stamped="{vla_cam_rig_crossbar_pose}"
+        position_xyz="-0.338;-0.331325;0.0783"
+        orientation_xyzw="0;0;-0.7071068;0.7071068"
+        pose_stamped="{camera_pole_mount_plate_pose}"
       />
       <Action
         ID="AddCollisionBox"
-        object_id="vla_cam_rig_crossbar"
-        dimensions="0.04;0.6096;0.04"
-        pose="{vla_cam_rig_crossbar_pose}"
+        object_id="camera_pole_mount_plate"
+        dimensions="0.00635;0.1778;0.04445"
+        pose="{camera_pole_mount_plate_pose}"
         overwrite="true"
       />
-      <!--Camera clamp: a rough bounding box, not a model of the real part.
-          6" (0.1524 m) wide along world X (parallel to the shelves), 2"
-          (0.0508 m) deep along Y, 9" (0.2286 m) tall. Its shelf-side (+Y)
-          face is flush with the crossbar's +Y end (y = -0.1353), so its
-          center is half a depth back from that. In X/Z it is aligned to the
-          crossbar's top-left corner (operator's left = world +X): clamp top
-          = bar top (0.552 + 0.02), clamp +X face = bar +X face
-          (-0.425 + 0.02), so the box hangs down and extends toward -X.-->
-      <Action
-        ID="CreatePoseStamped"
-        reference_frame="world"
-        position_xyz="-0.4812;-0.1607;0.4577"
-        orientation_xyzw="0;0;0;1"
-        pose_stamped="{vla_cam_rig_clamp_pose}"
-      />
-      <Action
-        ID="AddCollisionBox"
-        object_id="vla_cam_rig_clamp"
-        dimensions="0.1524;0.0508;0.2286"
-        pose="{vla_cam_rig_clamp_pose}"
-        overwrite="true"
-      />
-      <!--=== LOAD CALIBRATED BIN (walls-only URDF so robot can reach inside) ===-->
-      <!--The tote pose is the bin_tote.urdf origin, worked out from the tote board and the offsets.-->
-      <Action
-        ID="LoadPoseStampedFromYamlNamespace"
-        file_path="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
-        namespace="tote_board"
-        output="{tote_board_pose}"
-      />
-      <SubTree
-        ID="Place Tote From Tote Board"
-        _collapsed="true"
-        tote_board_pose="{tote_board_pose}"
-        bin_calibrated_pose="{bin_calibrated_pose}"
-      />
-      <!--=== THE DROP BAG, IN PLACE OF THE TOTE (2F-85) ===-->
-      <!--Four thin walls around the bag's inside, no floor (the table is under it) and no
-          lid, so the product and fingers can go down inside while the arm and the carried
-          product cannot clip the rim. The offsets are in the bag's own frame (labelled
-          world, which TransformPoseWithPose needs) and placed by its pose.-->
-      <Control ID="Sequence" name="AddBag">
+      <!--=== ADD THE CALIBRATED BIN (2F-85) ===-->
+      <!--Calibrated Bag reads the top-left corner captured by Calibrate Bin and derives
+          the world-aligned bin centre and interior dimensions, shared with the existing
+          2F-85 drop logic. The tabletop is the bin floor; the bin has an open top and thin
+          walls. See design_docs/calibrate_bin.md. -->
+      <Control ID="Sequence" name="AddBin">
         <SubTree
           ID="Calibrated Bag"
-          _collapsed="true"
-          bag_pose="{bag_pose}"
+          bag_pose="{bin_calibrated_pose}"
           bag_length="{bag_length}"
           bag_width="{bag_width}"
           bag_height="{bag_height}"
@@ -279,7 +228,7 @@
         <Action
           ID="Script"
           name="BagWallGeometry"
-          code="t := 0.005; ox := bag_length / 2.0 + t / 2.0; oy := bag_width / 2.0 + t / 2.0; long_wall := bag_length + 2.0 * t; nox := 0.0 - ox; noy := 0.0 - oy; ox_s := ox .. ''; nox_s := nox .. ''; oy_s := oy .. ''; noy_s := noy .. ''; t_s := t .. ''; lw_s := long_wall .. ''; w_s := bag_width .. ''; h_s := bag_height .. ''; wall_px_xyz := ox_s .. ';0;0'; wall_nx_xyz := nox_s .. ';0;0'; wall_py_xyz := '0;' .. oy_s .. ';0'; wall_ny_xyz := '0;' .. noy_s .. ';0'; wall_x_dims := t_s .. ';' .. w_s .. ';' .. h_s; wall_y_dims := lw_s .. ';' .. t_s .. ';' .. h_s"
+          code="t := 0.00635; ox := bag_length / 2.0 + t / 2.0; oy := bag_width / 2.0 + t / 2.0; long_wall := bag_length + 2.0 * t; nox := 0.0 - ox; noy := 0.0 - oy; ox_s := ox .. ''; nox_s := nox .. ''; oy_s := oy .. ''; noy_s := noy .. ''; t_s := t .. ''; lw_s := long_wall .. ''; w_s := bag_width .. ''; h_s := bag_height .. ''; wall_px_xyz := ox_s .. ';0;0'; wall_nx_xyz := nox_s .. ';0;0'; wall_py_xyz := '0;' .. oy_s .. ';0'; wall_ny_xyz := '0;' .. noy_s .. ';0'; wall_x_dims := t_s .. ';' .. w_s .. ';' .. h_s; wall_y_dims := lw_s .. ';' .. t_s .. ';' .. h_s"
         />
         <Action
           ID="CreatePoseStamped"
@@ -293,7 +242,7 @@
           ID="TransformPoseWithPose"
           name="BagWallPose_px"
           input_pose="{bag_wall_offset}"
-          transform_pose="{bag_pose}"
+          transform_pose="{bin_calibrated_pose}"
           output_pose="{bag_wall_pose}"
         />
         <Action
@@ -316,7 +265,7 @@
           ID="TransformPoseWithPose"
           name="BagWallPose_nx"
           input_pose="{bag_wall_offset}"
-          transform_pose="{bag_pose}"
+          transform_pose="{bin_calibrated_pose}"
           output_pose="{bag_wall_pose}"
         />
         <Action
@@ -339,7 +288,7 @@
           ID="TransformPoseWithPose"
           name="BagWallPose_py"
           input_pose="{bag_wall_offset}"
-          transform_pose="{bag_pose}"
+          transform_pose="{bin_calibrated_pose}"
           output_pose="{bag_wall_pose}"
         />
         <Action
@@ -362,7 +311,7 @@
           ID="TransformPoseWithPose"
           name="BagWallPose_ny"
           input_pose="{bag_wall_offset}"
-          transform_pose="{bag_pose}"
+          transform_pose="{bin_calibrated_pose}"
           output_pose="{bag_wall_pose}"
         />
         <Action
@@ -376,13 +325,13 @@
         <Action
           ID="VisualizePose"
           marker_lifetime="0.000000"
-          marker_name="drop_bag_center"
+          marker_name="calibrated_bin_center"
           marker_size="0.100000"
-          pose="{bag_pose}"
-          marker_text="Drop Bag"
+          pose="{bin_calibrated_pose}"
+          marker_text="Calibrated Bin"
         />
       </Control>
-      <!--=== LOAD CALIBRATED SCENE CAMERA (from Calibrate Scene Camera From Tote Board) ===-->
+      <!--=== LOAD CALIBRATED SCENE CAMERA (from Calibrate Scene Camera From Shelf Board) ===-->
       <Action
         ID="LoadPoseStampedFromYamlNamespace"
         file_path="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
@@ -401,31 +350,6 @@
         pose="{scene_camera_link_pose}"
         child_frame_id="scene_camera_link"
       />
-      <!--=== LOAD CALIBRATED SHELF CAM (ZED 2i, from Calibrate Shelf Cam From Wall Board) ===-->
-      <!--Optional: skipped while the shelf_cam pose file is missing, before stage c has run.-->
-      <Decorator ID="ForceSuccess" _collapsed="false">
-        <Control ID="Sequence">
-          <Action
-            ID="LoadPoseStampedFromYamlNamespace"
-            file_path="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
-            namespace="shelf_cam_camera_link"
-            output="{shelf_cam_link_pose}"
-          />
-          <Action
-            ID="PublishStaticTransform"
-            pose="{shelf_cam_link_pose}"
-            child_frame_id="shelf_cam_camera_link"
-          />
-          <!--Collision body at the same pose, like the scene camera; skipped with the transform.-->
-          <Action
-            ID="AddURDF"
-            urdf_name="calibrated_shelf_cam"
-            urdf_pose="{shelf_cam_link_pose}"
-            package_name="picknik_009_ur5e_config"
-            urdf_file_path="description/shelf_cam.urdf"
-          />
-        </Control>
-      </Decorator>
     </Control>
   </BehaviorTree>
   <TreeNodesModel>
@@ -443,12 +367,10 @@
         offsets. Map this at the call site.
       </output_port>
       <output_port name="bin_calibrated_pose">
-        Calibrated bin reference pose (world frame), the bin_tote.urdf origin,
-        worked out from the tote board and the offsets. Exposed so the parent
-        can
-        derive the bin top z (bin_top_z_world =
-        bin_calibrated_pose.position.z + 0.0925, the bin wall
-        half-height per bin_tote.urdf).
+        Calibrated bin reference pose in world, centred between the outer walls
+        and halfway up from the table. The parent passes this through to the
+        2F-85 drop logic, which reads matching interior dimensions from
+        Calibrated Bag.
       </output_port>
     </SubTree>
   </TreeNodesModel>

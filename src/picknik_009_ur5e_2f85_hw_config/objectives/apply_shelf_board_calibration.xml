@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root
+  BTCPP_format="4"
+  main_tree_to_execute="Apply Shelf Board Calibration"
+>
+  <BehaviorTree
+    ID="Apply Shelf Board Calibration"
+    _description="Promotes a reviewed shelf-board candidate to the shared wall_board section used to place the shelving. Apply only when the board has the existing physical location and marked origin assumed by board_offsets.yaml. This also changes the scene pose inherited by the EPick config."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <Action
+        ID="LoadPoseStampedFromYamlNamespace"
+        file_path="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="{candidate_section}"
+        output="{shelf_board_pose}"
+      />
+      <Action
+        ID="SavePoseStampedToYaml"
+        yaml_filename="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="wall_board"
+        overwrite="false"
+        message="{shelf_board_pose}"
+      />
+      <Action
+        ID="LogMessage"
+        log_level="info"
+        message="Applied wall_board. Its pose now drives shelf placement in the 2F-85 and inherited EPick scene. Restart and verify the shelves before planning."
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Apply Shelf Board Calibration">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+      <input_port name="candidate_section" default="shelf_board_candidate" type="std::string">
+        Reviewed cell_calibration.yaml section containing the fixed shelf board pose in world.
+      </input_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>

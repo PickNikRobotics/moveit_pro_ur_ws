@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root
+  BTCPP_format="4"
+  main_tree_to_execute="Calibrate Scene Camera From Shelf Board"
+>
+  <BehaviorTree
+    ID="Calibrate Scene Camera From Shelf Board"
+    _description="Calibrates the fixed scene D415 from the shelf-mounted ChArUco board. Loads the shelf-board pose estimated by Calibrate Wrist Orbbec On Shelf Board, moves the arm to a saved clear-view waypoint, then averages scene-camera detections with Calibrate Fixed Camera From Known Board. Saves only a candidate scene_camera_link pose. The 2F robot model must already be running with a provisional scene_camera_link-to-optical-frame transform so the helper can resolve the camera's internal TF. Keep the board fully visible in every sample because the helper may reuse the previous detection after a missed frame."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <Action
+        ID="LoadPoseStampedFromYamlNamespace"
+        file_path="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="shelf_board_candidate"
+        output="{shelf_board_pose}"
+      />
+      <SubTree
+        ID="Load Calibrated Scene"
+        top_shelf_pose="{top_shelf_pose}"
+        bottom_shelf_pose="{bottom_shelf_pose}"
+        bin_calibrated_pose="{bin_calibrated_pose}"
+      />
+      <SubTree
+        ID="Move to Named Waypoint"
+        waypoint_name="scene_camera_shelf_clear"
+        joint_group_name="manipulator"
+      />
+      <SubTree
+        ID="Calibrate Fixed Camera From Known Board"
+        image_topic="/camera/scene_camera/color/image_raw"
+        camera_info_topic="/camera/scene_camera/color/camera_info"
+        board="{board}"
+        board_pose_world="{shelf_board_pose}"
+        camera_root_frame="scene_camera_link"
+        camera_optical_frame="scene_camera_color_optical_frame"
+        sample_count="{sample_count}"
+        camera_root_pose_world="{scene_camera_candidate}"
+      />
+      <Action
+        ID="SavePoseStampedToYaml"
+        yaml_filename="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
+        namespace="scene_camera_link_candidate_shelf_board"
+        overwrite="false"
+        message="{scene_camera_candidate}"
+      />
+      <Action
+        ID="LogMessage"
+        log_level="info"
+        message="Scene-camera candidate saved. Compare the camera model and live overlay against the shelf and board before applying it."
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Calibrate Scene Camera From Shelf Board">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+      <input_port name="board" default="[{squares_x: 7, squares_y: 5, square_length: 0.035, marker_length: 0.026, dictionary: DICT_4X4_50}]" type="moveit_studio_msgs::msg::CharucoBoard">
+        The shelf-mounted board whose pose was solved by the wrist-camera stage.
+      </input_port>
+      <input_port name="sample_count" default="10" type="int">
+        Number of scene-camera images whose board poses are averaged.
+      </input_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>
