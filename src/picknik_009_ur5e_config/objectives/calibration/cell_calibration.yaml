@@ -33,19 +33,19 @@ tote_board:
 scene_camera_link:
   header:
     stamp:
-      sec: 1792095451
-      nanosec: 856972401
+      sec: 1794850296
+      nanosec: 47226772
     frame_id: world
   pose:
     position:
-      x: -0.020996337246526716
-      y: -0.7868566513230408
-      z: 0.6463476554132722
+      x: -0.47165753554747136
+      y: -0.26939452062000813
+      z: 0.20372072393706431
     orientation:
-      x: -0.4061524575221902
-      y: 0.384162663261593
-      z: 0.573670899294031
-      w: 0.5986325489877945
+      x: -0.062126859663154357
+      y: 0.098878976898989723
+      z: 0.54492100431609847
+      w: 0.83031578347694812
 shelf_cam_camera_link:
   header:
     stamp:
@@ -111,22 +111,21 @@ wrist_camera_mount:
       z: -0.0074514315606654703
       w: 0.99982489181048106
 wrist_orbbec_mount:
-  temporary: true
   header:
     stamp:
-      sec: 1793999579
-      nanosec: 0
+      sec: 1794847444
+      nanosec: 270313076
     frame_id: d415_mount_link
   pose:
     position:
-      x: 0.007956403000916575
-      y: 0.025285583724887227
-      z: 0.002145969079072607
+      x: 0.015549964994488241
+      y: 0.0095000031031206265
+      z: 0.016440297990991996
     orientation:
-      x: -0.012270726934157311
-      y: 0.012003797081088166
-      z: -0.0074514315606654703
-      w: 0.99982489181048106
+      x: -0.006210537507190219
+      y: 0.084469323008233829
+      z: 0.0043041695661206565
+      w: 0.99639742915101337
 wrist_camera_mount_candidate_wall_board:
   header:
     stamp:
@@ -207,3 +206,83 @@ calibrated_bin_front_left_corner:
       y: 0.99930561260904072
       z: 0.031352705005725193
       w: 0.017418815125770225
+wrist_orbbec_solve_shelf_board:
+  header:
+    stamp:
+      sec: 0
+      nanosec: 0
+    frame_id: grasp_link
+  pose:
+    position:
+      x: 0.0095000031031206855
+      y: 0.081724822373680867
+      z: -0.11771674025611052
+    orientation:
+      x: 0.0068752597030695547
+      y: -0.13665321143692194
+      z: 0.99058625636279973
+      w: 0.0041832180345695354
+shelf_board_candidate:
+  header:
+    stamp:
+      sec: 0
+      nanosec: 0
+    frame_id: world
+  pose:
+    position:
+      x: -0.18269344395488563
+      y: 0.91886285436534842
+      z: 0.35873709558772099
+    orientation:
+      x: -0.70290757916917679
+      y: -0.013208083687747944
+      z: -0.0051218146829721464
+      w: 0.71114010482195278
+wrist_orbbec_mount_candidate_shelf_board:
+  header:
+    stamp:
+      sec: 1794847444
+      nanosec: 270313076
+    frame_id: d415_mount_link
+  pose:
+    position:
+      x: 0.015549964994488241
+      y: 0.0095000031031206265
+      z: 0.016440297990991996
+    orientation:
+      x: -0.0062105375071902207
+      y: 0.084469323008233843
+      z: 0.0043041695661206573
+      w: 0.99639742915101359
+shelf_board_difference:
+  header:
+    stamp:
+      sec: 0
+      nanosec: 0
+    frame_id: world
+  pose:
+    position:
+      x: -0.017876782777130118
+      y: 0.048319167850672362
+      z: -0.00094957652109672885
+    orientation:
+      x: 0.0080221045604896204
+      y: 0.0055403619161819538
+      z: -0.01083752438232684
+      w: 0.9998937435015387
+scene_camera_link_candidate_shelf_board:
+  header:
+    stamp:
+      sec: 1794850296
+      nanosec: 47226772
+    frame_id: world
+  pose:
+    position:
+      x: -0.47165753554747136
+      y: -0.26939452062000813
+      z: 0.20372072393706431
+    orientation:
+      x: -0.062126859663154371
+      y: 0.098878976898989751
+      z: 0.54492100431609858
+      w: 0.83031578347694834

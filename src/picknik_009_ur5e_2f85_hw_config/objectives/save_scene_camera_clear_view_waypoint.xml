@@ -12,7 +12,7 @@
       <SubTree
         ID="Request Teleoperation"
         enable_user_interaction="true"
-        user_interaction_prompt="Select Joint Jog in the teleoperation mode selector, then jog the arm to a safe pose that leaves the shelf ChArUco board unobstructed in the scene D415. Click Continue to stop teleoperation and save this clear-view waypoint."
+        user_interaction_prompt="When teleoperation appears, select Joint Jog in the teleoperation mode selector, then jog the arm to a safe pose that leaves the shelf ChArUco board unobstructed in the scene D415. Click Continue to stop teleoperation and save this clear-view waypoint."
         controller_action_server="/joint_trajectory_admittance_controller/follow_joint_trajectory"
         joint_trajectory_controller_name="joint_trajectory_admittance_controller"
         default_planning_group="manipulator"
@@ -22,7 +22,7 @@
         velocity_scale_factor="0.2"
         max_ik_solutions="8"
         max_mtc_solutions="1"
-        initial_teleop_mode="1"
+        initial_teleop_mode="3"
         require_user_approval="false"
       />
       <Action

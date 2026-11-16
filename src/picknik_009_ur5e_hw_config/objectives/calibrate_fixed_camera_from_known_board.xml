@@ -15,7 +15,52 @@
         message_out="{camera_info}"
       />
       <Action ID="ResetPoseStampedVector" vector="{board_poses_in_camera}" />
-      <!--A frame with no board pose keeps the previous pose, so the first image must see the board.-->
+      <!--DetectCharucoBoard succeeds without writing board_pose when a frame gives
+          no pose (too few corners, or both planar solutions fit about equally), and
+          PushBackVector then fails on the unset key. So the first sample is retried
+          on new frames until one gives a pose: Inverter / Repeat / Inverter is the
+          Pro 10 form of the deprecated RetryUntilSuccessful.-->
+      <Control ID="Fallback" name="SeedFirstBoardPose">
+        <Decorator ID="Inverter">
+          <Decorator
+            ID="RepeatUnlessFailureEachTick"
+            num_cycles="{max_seed_attempts}"
+          >
+            <Decorator ID="Inverter">
+              <Control ID="Sequence">
+                <Action
+                  ID="GetImage"
+                  topic_name="{image_topic}"
+                  message_out="{image}"
+                />
+                <Action
+                  ID="DetectCharucoBoard"
+                  image="{image}"
+                  camera_info="{camera_info}"
+                  board="{board}"
+                  detections="{detections}"
+                  board_pose="{board_pose_in_camera}"
+                />
+                <Action
+                  ID="PushBackVector"
+                  input_vector="{board_poses_in_camera}"
+                  element="{board_pose_in_camera}"
+                  output_vector="{board_poses_in_camera}"
+                />
+              </Control>
+            </Decorator>
+          </Decorator>
+        </Decorator>
+        <Control ID="Sequence">
+          <Action
+            ID="LogMessage"
+            log_level="error"
+            message="No camera frame gave a ChArUco board pose. The board is too small in this camera's image (too few corners found), or seen too square-on for the two planar pose solutions to be told apart. Move the camera or board closer, tilt the board relative to the camera, or run the cameras at the calibration resolution. See design_docs/board_based_calibration.md."
+          />
+          <Action ID="AlwaysFailure" />
+        </Control>
+      </Control>
+      <!--After the first pose, a frame with no board pose repeats the previous one.-->
       <Decorator ID="RepeatUnlessFailureEachTick" num_cycles="{sample_count}">
         <Control ID="Sequence">
           <Action
@@ -130,7 +175,11 @@
         The frame_id of the camera's color image.
       </input_port>
       <input_port name="sample_count" default="10" type="int">
-        Number of images whose board poses are averaged.
+        Number of images whose board poses are averaged, after the first one
+        that gives a pose.
+      </input_port>
+      <input_port name="max_seed_attempts" default="30" type="int">
+        Frames to try for the first board pose before failing.
       </input_port>
       <output_port
         name="camera_root_pose_world"

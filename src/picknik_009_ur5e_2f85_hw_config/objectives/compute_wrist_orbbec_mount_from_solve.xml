@@ -32,7 +32,7 @@
         ID="TransformPoseFrame"
         input_pose="{orbbec_root_in_grasp}"
         target_frame_id="d415_mount_link"
-        output_pose="{orbbec_root_in_mount}"
+        output_pose="{mount_origin}"
       />
       <Action
         ID="LogMessage"
@@ -70,7 +70,6 @@
       </input_port>
       <output_port
         name="mount_origin"
-        default="{orbbec_root_in_mount}"
         type="geometry_msgs::msg::PoseStamped"
       >
         wrist_orbbec_link pose in d415_mount_link.
