@@ -65,6 +65,17 @@ bottom_rack_from_wall_corner:
   # between the cup-centre touches at the left (-0.6456) and right (0.5440) front corners.
   xyz: "0.6786;-0.3865;-1.2788"
 
+middle_rack_from_wall_corner:
+  # Geometry, measurable. Middle rack reference point (chunky_shelf_only.urdf origin), the
+  # rack added between the top and bottom ones, from the wall's front-face top-left corner,
+  # world-aligned wall frame.
+  # 2026-11-16: 2F-85 fingertip touch on the front face of the lip (front-most fingertip
+  # collision-mesh point y 0.5325, contact z 0.176..0.196 in world). y: front face at the
+  # touch, the mesh's front face being 25.4 mm in front of its origin. z: top surface set
+  # with the fingertip centred on the 31.8 mm lip (+-6 mm). x: not measured by a front-face
+  # touch; the mean of the top and bottom racks. A touch on the top surface would pin z.
+  xyz: "0.6677;-0.3959;-0.8719"
+
 shelf_base_from_wall_corner:
   # Geometry, measurable. Shelf base box centre from the wall's front-face top-left
   # corner, world-aligned wall frame. Default: current calibration.

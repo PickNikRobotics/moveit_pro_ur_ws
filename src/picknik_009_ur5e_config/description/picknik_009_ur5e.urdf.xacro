@@ -70,6 +70,11 @@
        arm stays real; "false" uses robotiq_driver. See
        design_docs/end_effector_variants.md. -->
   <xacro:arg name="gripper_use_fake_hardware" default="true" />
+  <!-- Wrist camera on d415_mount_link: "d415" (the RealSense model, the default)
+       or "orbbec_gemini_305" (a collision box only; the drivers launch owns the
+       Orbbec's frames). See design_docs/orbbec_wrist_camera.md. -->
+  <xacro:arg name="wrist_camera" default="d415" />
+  <xacro:property name="wrist_camera" value="$(arg wrist_camera)" />
   <!-- robotiq_2f85 only: serial device robotiq_driver opens. Defaults to the
        FTDI USB-RS485 bridge the EPick used (see epick_usb_port below), not the
        arm's tool port (tool_device_name). -->
@@ -162,6 +167,7 @@
     child_camera="d415_mount_link"
     rotation="0"
   />
+  <xacro:if value="${wrist_camera == 'd415'}">
   <!-- Camera mount origin from cell_calibration.yaml; Apply Wrist Camera Calibration writes it. -->
   <xacro:property
     name="wrist_mount"
@@ -184,6 +190,52 @@
       rpy="${atan2(2*(wm_w*wm_x + wm_y*wm_z), 1 - 2*(wm_x*wm_x + wm_y*wm_y))} ${asin(max(-1.0, min(1.0, 2*(wm_w*wm_y - wm_z*wm_x))))} ${atan2(2*(wm_w*wm_z + wm_x*wm_y), 1 - 2*(wm_y*wm_y + wm_z*wm_z))}"
     />
   </xacro:realsense_d415>
+  </xacro:if>
+
+  <xacro:if value="${wrist_camera == 'orbbec_gemini_305'}">
+    <!-- No Gemini 305 model is available, so the body is a measured box. It
+         hangs off its own link at the calibrated wrist_orbbec_mount, the same
+         section the 2F drivers launch publishes as d415_mount_link ->
+         wrist_orbbec_link; a URDF wrist_orbbec_link would give that frame two
+         parents. Camera-link axes: x out of the lens, y left, z up. The box
+         assumes the frame sits on the front face, centred on it. -->
+    <xacro:property
+      name="orbbec_mount"
+      value="${xacro.load_yaml('$(find picknik_009_ur5e_config)/objectives/calibration/cell_calibration.yaml')['wrist_orbbec_mount']['pose']}"
+    />
+    <xacro:property name="om_p" value="${orbbec_mount['position']}" />
+    <xacro:property name="om_q" value="${orbbec_mount['orientation']}" />
+    <xacro:property name="om_x" value="${om_q['x']}" />
+    <xacro:property name="om_y" value="${om_q['y']}" />
+    <xacro:property name="om_z" value="${om_q['z']}" />
+    <xacro:property name="om_w" value="${om_q['w']}" />
+    <xacro:property name="orbbec_depth" value="0.023" />
+    <xacro:property name="orbbec_width" value="0.042" />
+    <xacro:property name="orbbec_height" value="0.046" />
+    <link name="wrist_orbbec_body_link">
+      <visual>
+        <origin xyz="${-orbbec_depth/2} 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${orbbec_depth} ${orbbec_width} ${orbbec_height}" />
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="${-orbbec_depth/2} 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${orbbec_depth} ${orbbec_width} ${orbbec_height}" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="wrist_orbbec_body_joint" type="fixed">
+      <parent link="d415_mount_link" />
+      <child link="wrist_orbbec_body_link" />
+      <!-- Quaternion to fixed-axis roll, pitch, yaw; the pitch argument is clamped for asin. -->
+      <origin
+        xyz="${om_p['x']} ${om_p['y']} ${om_p['z']}"
+        rpy="${atan2(2*(om_w*om_x + om_y*om_z), 1 - 2*(om_x*om_x + om_y*om_y))} ${asin(max(-1.0, min(1.0, 2*(om_w*om_y - om_z*om_x))))} ${atan2(2*(om_w*om_z + om_x*om_y), 1 - 2*(om_y*om_y + om_z*om_z))}"
+      />
+    </joint>
+  </xacro:if>
 
   <!-- Gripper adapter (UR to Robotiq) -->
   <xacro:include

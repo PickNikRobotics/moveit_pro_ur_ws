@@ -193,19 +193,19 @@ calibrated_bin_top_left_corner:
 calibrated_bin_front_left_corner:
   header:
     stamp:
-      sec: 1794612540
-      nanosec: 446937597
+      sec: 1794850622
+      nanosec: 169423725
     frame_id: world
   pose:
     position:
-      x: 0.27092085463450116
-      y: -0.51612005490555768
-      z: 0.28359674223761755
+      x: 0.30550639028887183
+      y: -0.42385422723424632
+      z: 0.31616299364343881
     orientation:
-      x: -0.010093828634769708
-      y: 0.99930561260904072
-      z: 0.031352705005725193
-      w: 0.017418815125770225
+      x: 0.99878644660553595
+      y: 0.041770255442150982
+      z: 0.013625376002799292
+      w: -0.022253740498321052
 wrist_orbbec_solve_shelf_board:
   header:
     stamp:

@@ -2,16 +2,34 @@
 <root BTCPP_format="4" main_tree_to_execute="Calibrated Bag">
   <!--
     Compatibility interface for the existing 2F-85 drop subtrees. The physical bin pose
-    comes from Calibrate Bin and is passed into Load Calibrated Scene; this subtree owns only
-    the fixed inside dimensions and exposes the runtime pose input together with the shared
+    comes from Calibrate Bin and is passed into Load Calibrated Scene; this subtree owns the
+    fixed bin and paper bag dimensions and exposes the drop container through the shared
     bag_* ports that Gentle Bag already consumes. The tabletop is the bin floor.
+    bag_side picks the container: the whole bin, or one of the two paper bags standing in
+    it. The bin_* and paper_bag_* outputs always describe the bin and the bags themselves,
+    for Load Calibrated Scene to build them from.
   -->
   <BehaviorTree
     ID="Calibrated Bag"
-    _description="Compatibility adapter for 2F-85 drop subtrees: receives the calibrated bin pose and provides the shared interior dimensions used by Gentle Bag. Load Calibrated Scene adds the open bin walls."
+    _description="Compatibility adapter for 2F-85 drop subtrees: receives the calibrated bin pose and provides the drop container's pose and interior dimensions used by Gentle Bag, either the whole bin or the left or right paper bag (bag_side). Load Calibrated Scene adds the open bin walls and the paper bags."
     _favorite="false"
   >
     <Control ID="Sequence" name="TopLevelSequence">
+      <Decorator
+        ID="Precondition"
+        name="IfUnknownBagSide"
+        if="bag_side != 'bin' &amp;&amp; bag_side != 'left' &amp;&amp; bag_side != 'right'"
+        else="SUCCESS"
+      >
+        <Control ID="Sequence">
+          <Action
+            ID="LogMessage"
+            log_level="error"
+            message="Calibrated Bag: bag_side must be bin, left or right."
+          />
+          <Action ID="AlwaysFailure" />
+        </Control>
+      </Decorator>
       <Action
         ID="LoadPoseStampedFromYamlNamespace"
         name="LoadCalibratedBinFrontLeftCorner"
@@ -22,14 +40,6 @@
       <!--The saved pose is the fingertip origin. Convert it to the actual touched outer
           contact point before removing orientation; the fingertips' collision mesh extends
           beyond TF. Close Gripper seats the contact pad against the bin's outside faces. -->
-      <Action
-        ID="CreatePoseStamped"
-        name="TouchedFrontLeftCornerOffset"
-        reference_frame="world"
-        position_xyz="-0.025259;-0.0008;0.047015"
-        orientation_xyzw="0;0;0;1"
-        pose_stamped="{bin_front_left_corner_fingertip_local}"
-      />
       <Action
         ID="TransformPose"
         name="FingertipToFrontLeftCorner"
@@ -51,15 +61,61 @@
         input_pose="{bin_front_left_corner_world_aligned}"
         translation_xyz="-0.2286;-0.1651;-0.1397"
         quaternion_xyzw="0;0;0;1"
-        output_pose="{bag_pose}"
+        output_pose="{bin_pose}"
       />
-      <Action ID="UnpackPoseStampedMessage" pose_stamped="{bag_pose}" pose="{bin_pose_msg}" header="{bin_pose_header}" />
+      <Action ID="UnpackPoseStampedMessage" pose_stamped="{bin_pose}" pose="{bin_pose_msg}" header="{bin_pose_header}" />
       <Action ID="UnpackPoseMessage" pose="{bin_pose_msg}" position="{bin_position}" orientation="{bin_orientation}" />
       <Action ID="UnpackPointMessage" point="{bin_position}" x="{bin_center_x}" y="{bin_center_y}" z="{bin_center_z}" />
+      <!--The paper bags stand one against each X wall, spanning the bin's depth. Left and
+          right are as seen from the robot, as for the touched front-left corner: left is
+          world +X.-->
       <Action
         ID="Script"
-        name="BinInsideDimensions"
-        code="bag_length := 0.4445; bag_width := 0.3175; bag_height := 0.2794; bag_floor_z := bin_center_z - bag_height / 2.0"
+        name="BinAndPaperBagDimensions"
+        code="bin_length := 0.4445; bin_width := 0.3175; bin_height := 0.2794; bin_floor_z := bin_center_z - bin_height / 2.0; paper_bag_width := 0.17; paper_bag_height := 0.365; paper_wall := 0.002; paper_bag_cx := bin_length / 2.0 - paper_bag_width / 2.0"
+      />
+      <Decorator ID="Precondition" name="IfWholeBin" if="bag_side == 'bin'" else="SUCCESS">
+        <Action
+          ID="Script"
+          name="ContainerIsTheBin"
+          code="bag_length := bin_length; bag_width := bin_width; bag_height := bin_height; bag_floor_z := bin_floor_z; container_dx := 0.0; container_dz := 0.0"
+        />
+      </Decorator>
+      <Decorator ID="Precondition" name="IfLeftBag" if="bag_side == 'left'" else="SUCCESS">
+        <Action
+          ID="Script"
+          name="ContainerIsTheLeftBag"
+          code="bag_length := paper_bag_width - 2.0 * paper_wall; bag_width := bin_width - 2.0 * paper_wall; bag_height := paper_bag_height; bag_floor_z := bin_floor_z; container_dx := paper_bag_cx; container_dz := paper_bag_height / 2.0 - bin_height / 2.0"
+        />
+      </Decorator>
+      <Decorator ID="Precondition" name="IfRightBag" if="bag_side == 'right'" else="SUCCESS">
+        <Action
+          ID="Script"
+          name="ContainerIsTheRightBag"
+          code="bag_length := paper_bag_width - 2.0 * paper_wall; bag_width := bin_width - 2.0 * paper_wall; bag_height := paper_bag_height; bag_floor_z := bin_floor_z; container_dx := 0.0 - paper_bag_cx; container_dz := paper_bag_height / 2.0 - bin_height / 2.0"
+        />
+      </Decorator>
+      <!--Same convention as the bin: the container pose is world-aligned, centred on its
+          interior, halfway up its walls.-->
+      <Action
+        ID="Script"
+        name="ContainerOffset"
+        code="cdx_s := container_dx .. ''; cdz_s := container_dz .. ''; container_offset_xyz := cdx_s .. ';0;' .. cdz_s"
+      />
+      <Action
+        ID="CreatePoseStamped"
+        name="ContainerOffsetInBin"
+        reference_frame="world"
+        position_xyz="{container_offset_xyz}"
+        orientation_xyzw="0;0;0;1"
+        pose_stamped="{container_offset}"
+      />
+      <Action
+        ID="TransformPoseWithPose"
+        name="ContainerPose"
+        input_pose="{container_offset}"
+        transform_pose="{bin_pose}"
+        output_pose="{bag_pose}"
       />
     </Control>
   </BehaviorTree>
@@ -69,14 +125,29 @@
         <Metadata runnable="false" />
         <Metadata subcategory="3. Calibration Routine" />
       </MetadataFields>
+      <input_port name="bag_side" default="bin" type="std::string">
+        The drop container: bin (the whole bin), left or right (one paper bag, as seen from
+        the robot; left is world +X).
+      </input_port>
       <output_port name="bag_pose" default="{bag_pose}">
-        Bin centre in world. Calibrated from the touched outer front-left rim corner; bin axes
-        are fixed to world X/Y/Z.
+        Drop container centre in world: world-aligned, centred on its interior, halfway up
+        its walls. Follows the touched outer front-left rim corner of the bin.
       </output_port>
-      <output_port name="bag_length" default="{bag_length}">Interior width along world X, in metres.</output_port>
-      <output_port name="bag_width" default="{bag_width}">Interior depth along world Y, in metres.</output_port>
-      <output_port name="bag_height" default="{bag_height}">Wall height above the table, in metres.</output_port>
-      <output_port name="bag_floor_z" default="{bag_floor_z}">World z of the bin floor (the tabletop).</output_port>
+      <output_port name="bag_length" default="{bag_length}">Container interior width along world X, in metres.</output_port>
+      <output_port name="bag_width" default="{bag_width}">Container interior depth along world Y, in metres.</output_port>
+      <output_port name="bag_height" default="{bag_height}">Container wall height above the table, in metres.</output_port>
+      <output_port name="bag_floor_z" default="{bag_floor_z}">World z of the container floor (the tabletop).</output_port>
+      <output_port name="bin_pose" default="{bin_pose}">
+        Bin centre in world, centred between the bin walls, halfway up them. Bin axes are
+        fixed to world X/Y/Z.
+      </output_port>
+      <output_port name="bin_length" default="{bin_length}">Bin interior width along world X, in metres.</output_port>
+      <output_port name="bin_width" default="{bin_width}">Bin interior depth along world Y, in metres.</output_port>
+      <output_port name="bin_height" default="{bin_height}">Bin wall height above the table, in metres.</output_port>
+      <output_port name="paper_bag_width" default="{paper_bag_width}">Outer width of each paper bag along world X, in metres.</output_port>
+      <output_port name="paper_bag_height" default="{paper_bag_height}">Paper bag height above the bin floor, in metres.</output_port>
+      <output_port name="paper_wall" default="{paper_wall}">Modelled paper wall thickness, in metres.</output_port>
+      <output_port name="paper_bag_cx" default="{paper_bag_cx}">Distance along world X from the bin centre to each paper bag's centre, in metres.</output_port>
     </SubTree>
   </TreeNodesModel>
 </root>

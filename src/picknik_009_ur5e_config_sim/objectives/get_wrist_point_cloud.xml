@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root BTCPP_format="4" main_tree_to_execute="Get Wrist Point Cloud">
-  <!-- ////////// -->
-  <BehaviorTree ID="Get Wrist Point Cloud" _description="" _favorite="false">
+  <BehaviorTree
+    ID="Get Wrist Point Cloud"
+    _description="Captures one sim wrist camera point cloud and shows it in the MoveIt Pro 3D Visualizer, replacing the previous snapshot."
+    _favorite="false"
+  >
     <Control ID="Sequence" name="TopLevelSequence">
       <Action
         ID="GetPointCloud"
@@ -9,6 +12,16 @@
         message_out="{point_cloud}"
         publisher_timeout_sec="5.000000"
         topic_name="/wrist_mounted_camera/points"
+      />
+      <Action ID="ClearSnapshot" name="ClearPreviousCloud" />
+      <!--use_latest_transform is off so the cloud is placed with the camera
+          transform at its own stamp, not wherever the arm is now.-->
+      <Action
+        ID="SendPointCloudToUI"
+        name="ShowWristCloud"
+        point_cloud="{point_cloud}"
+        pcd_topic="/pcd_pointcloud_captures"
+        use_latest_transform="false"
       />
     </Control>
   </BehaviorTree>

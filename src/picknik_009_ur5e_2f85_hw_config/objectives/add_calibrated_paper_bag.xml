@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Add Calibrated Paper Bag">
+  <!--
+    One open-top paper bag standing on the bin floor: four thin walls, no floor (the
+    table is the floor) and no top, so products can still be lowered into it. The walls
+    are placed in the calibrated bin's frame, which is world-aligned and centred between
+    the bin walls halfway up them, so the bag moves with every Calibrate Bin run.
+    The bag spans the bin's full depth along Y. Its X walls run that whole depth, and its
+    Y walls run the bag's width, so they overlap at the corners.
+  -->
+  <BehaviorTree
+    ID="Add Calibrated Paper Bag"
+    _description="Adds one open-top paper bag inside the calibrated 2F-85 bin as four thin collision walls, positioned relative to the calibrated bin pose. Called by Load Calibrated Scene once per bag."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <Action
+        ID="Script"
+        name="PaperBagWallGeometry"
+        code="pt := paper_wall; hx := paper_bag_width / 2.0 - pt / 2.0; hy := bin_width / 2.0 - pt / 2.0; cz := paper_bag_height / 2.0 - bin_height / 2.0; xp := bag_center_x + hx; xn := bag_center_x - hx; nhy := 0.0 - hy; xp_s := xp .. ''; xn_s := xn .. ''; cx_s := bag_center_x .. ''; hy_s := hy .. ''; nhy_s := nhy .. ''; cz_s := cz .. ''; pt_s := pt .. ''; bw_s := bin_width .. ''; pw_s := paper_bag_width .. ''; ph_s := paper_bag_height .. ''; wall_px_xyz := xp_s .. ';0;' .. cz_s; wall_nx_xyz := xn_s .. ';0;' .. cz_s; wall_py_xyz := cx_s .. ';' .. hy_s .. ';' .. cz_s; wall_ny_xyz := cx_s .. ';' .. nhy_s .. ';' .. cz_s; wall_x_dims := pt_s .. ';' .. bw_s .. ';' .. ph_s; wall_y_dims := pw_s .. ';' .. pt_s .. ';' .. ph_s; id_px := bag_id .. '_wall_px'; id_nx := bag_id .. '_wall_nx'; id_py := bag_id .. '_wall_py'; id_ny := bag_id .. '_wall_ny'"
+      />
+      <Action
+        ID="CreatePoseStamped"
+        name="PaperBagWallOffset_px"
+        reference_frame="world"
+        position_xyz="{wall_px_xyz}"
+        orientation_xyzw="0;0;0;1"
+        pose_stamped="{wall_offset}"
+      />
+      <Action
+        ID="TransformPoseWithPose"
+        name="PaperBagWallPose_px"
+        input_pose="{wall_offset}"
+        transform_pose="{bin_pose}"
+        output_pose="{wall_pose}"
+      />
+      <Action
+        ID="AddCollisionBox"
+        name="AddPaperBagWall_px"
+        object_id="{id_px}"
+        dimensions="{wall_x_dims}"
+        pose="{wall_pose}"
+        overwrite="true"
+      />
+      <Action
+        ID="CreatePoseStamped"
+        name="PaperBagWallOffset_nx"
+        reference_frame="world"
+        position_xyz="{wall_nx_xyz}"
+        orientation_xyzw="0;0;0;1"
+        pose_stamped="{wall_offset}"
+      />
+      <Action
+        ID="TransformPoseWithPose"
+        name="PaperBagWallPose_nx"
+        input_pose="{wall_offset}"
+        transform_pose="{bin_pose}"
+        output_pose="{wall_pose}"
+      />
+      <Action
+        ID="AddCollisionBox"
+        name="AddPaperBagWall_nx"
+        object_id="{id_nx}"
+        dimensions="{wall_x_dims}"
+        pose="{wall_pose}"
+        overwrite="true"
+      />
+      <Action
+        ID="CreatePoseStamped"
+        name="PaperBagWallOffset_py"
+        reference_frame="world"
+        position_xyz="{wall_py_xyz}"
+        orientation_xyzw="0;0;0;1"
+        pose_stamped="{wall_offset}"
+      />
+      <Action
+        ID="TransformPoseWithPose"
+        name="PaperBagWallPose_py"
+        input_pose="{wall_offset}"
+        transform_pose="{bin_pose}"
+        output_pose="{wall_pose}"
+      />
+      <Action
+        ID="AddCollisionBox"
+        name="AddPaperBagWall_py"
+        object_id="{id_py}"
+        dimensions="{wall_y_dims}"
+        pose="{wall_pose}"
+        overwrite="true"
+      />
+      <Action
+        ID="CreatePoseStamped"
+        name="PaperBagWallOffset_ny"
+        reference_frame="world"
+        position_xyz="{wall_ny_xyz}"
+        orientation_xyzw="0;0;0;1"
+        pose_stamped="{wall_offset}"
+      />
+      <Action
+        ID="TransformPoseWithPose"
+        name="PaperBagWallPose_ny"
+        input_pose="{wall_offset}"
+        transform_pose="{bin_pose}"
+        output_pose="{wall_pose}"
+      />
+      <Action
+        ID="AddCollisionBox"
+        name="AddPaperBagWall_ny"
+        object_id="{id_ny}"
+        dimensions="{wall_y_dims}"
+        pose="{wall_pose}"
+        overwrite="true"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Add Calibrated Paper Bag">
+      <MetadataFields>
+        <Metadata runnable="false" />
+        <Metadata subcategory="3. Calibration Routine" />
+      </MetadataFields>
+      <input_port name="bin_pose" default="{bin_calibrated_pose}" type="geometry_msgs::msg::PoseStamped">
+        Calibrated bin pose (Calibrated Bag's bin_pose): world-aligned, centred between the bin
+        walls, halfway up them.
+      </input_port>
+      <input_port name="bag_center_x" default="0.0" type="double">
+        The bag's centre along world X, measured from the bin centre.
+      </input_port>
+      <input_port name="bin_width" default="{bag_width}" type="double">
+        The bin's interior depth along world Y; the bag spans all of it.
+      </input_port>
+      <input_port name="bin_height" default="{bag_height}" type="double">
+        The bin's wall height, used to stand the bag on the bin floor.
+      </input_port>
+      <input_port name="paper_bag_width" default="{paper_bag_width}" type="double">
+        The bag's outer width along world X.
+      </input_port>
+      <input_port name="paper_bag_height" default="{paper_bag_height}" type="double">
+        The bag's height above the bin floor.
+      </input_port>
+      <input_port name="paper_wall" default="{paper_wall}" type="double">
+        Modelled paper wall thickness. The walls sit inside the bag's outer size.
+      </input_port>
+      <input_port name="bag_id" default="paper_bag" type="std::string">
+        Prefix for the four wall object IDs (bag_id_wall_px and so on).
+      </input_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>

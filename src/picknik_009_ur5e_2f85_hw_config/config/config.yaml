@@ -21,12 +21,17 @@ hardware:
       # Real robotiq_driver. Set "true" to run the fingers on mock hardware with the real arm.
       - gripper_use_fake_hardware: "false"
       # The Robotiq USB-RS485 bridge on the Agent PC, as for the EPick. Not the UR tool port.
-      - robotiq_2f85_com_port: "/dev/ttyUSB0"
+      # By serial number, so it survives the bridge renumbering to ttyUSB1; needs the
+      # /dev/serial mount in the workspace docker-compose.yaml. Change it if the bridge is swapped.
+      - robotiq_2f85_com_port: "/dev/serial/by-id/usb-FTDI_USB_TO_RS-485_DA61OIR8-if00-port0"
       # Grip force, as a fraction of the 2F-85's 235 N maximum (the driver's default is 0.5).
       # Raised for unshelving: a mustard bottle slipped out at 0.5. 0.8 held everything but
       # squeezed harder than wanted, so it is 20% lower; still above the 0.5 that let the
       # mustard slip. Lower it for products that crush or squirt. Read at stack start.
       - robotiq_2f85_force_multiplier: "0.64"
+      # The wrist D415 was replaced by an Orbbec Gemini 305: a collision box at the
+      # calibrated wrist_orbbec_mount instead of the RealSense model.
+      - wrist_camera: "orbbec_gemini_305"
 
 objectives:
   objective_library_paths:

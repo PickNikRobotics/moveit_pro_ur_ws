@@ -52,8 +52,24 @@ the color image before relying on pixel-to-3D projection.
 - **The Orbbec is a 2F-only camera variant.** The established `wrist_mounted_camera`
   contract remains intact for sim and EPick HW. The 2F leaf points its existing
   wrist subtree IDs at the Orbbec topics and attaches the driver's
-  `wrist_orbbec_link` below the adapter mount. The old D415 robot-description links
-  remain for SRDF and collision compatibility, but no wrist D415 driver is launched.
+  `wrist_orbbec_link` below the adapter mount. Its `wrist_camera` xacro arg
+  (`orbbec_gemini_305`) drops the RealSense model from the robot description and
+  puts a measured collision box on `wrist_orbbec_body_link` instead, because no
+  Gemini 305 model is available. The adapter plate and `d415_mount_link` stay, since
+  the gripper and the Orbbec mount hang off them.
+- **The camera body is its own link, at the same calibrated pose.** The drivers
+  launch publishes `d415_mount_link` → `wrist_orbbec_link` as a static transform, so
+  a URDF link of that name would give the frame two parents. The box link reads the
+  same `wrist_orbbec_mount` section at xacro time, so the two agree after a restart,
+  and both move when a new calibration is applied. The box assumes the frame sits on
+  the camera's front face, centred on it (x out of the lens, y left, z up): if the
+  box sits off the real body in the MoveIt Pro 3D Visualizer while the cloud lines
+  up, the frame is off-centre on the body, not the calibration wrong. The 2F SRDF's
+  disabled self-collision pairs moved from `wrist_mounted_camera_link` to the box
+  link. They were generated for the D415's wider, shorter body, so re-check them if
+  the box grows. Removing the D415 frames also leaves the hw-config objectives that
+  name them (`Test Wrist Camera Calibration`, the D415 mount conversion) unusable
+  under the 2F config. They were already unusable there, because they read D415 topics.
 - **The Orbbec mount remains separate from the D415 mount.** `wrist_orbbec_mount`
   is consumed by the 2F driver launch; `wrist_camera_mount` remains owned by the
   D415 xacro and EPick calibration Objectives. Applying a reviewed Orbbec candidate

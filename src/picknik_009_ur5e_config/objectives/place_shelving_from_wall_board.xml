@@ -55,6 +55,17 @@
         ID="ReadYamlValue"
         package_name="picknik_009_ur5e_config"
         relative_file_path="objectives/calibration/board_offsets.yaml"
+        key1="middle_rack_from_wall_corner"
+        key2="xyz"
+        key3=""
+        key4=""
+        key5=""
+        value="{middle_rack_offset}"
+      />
+      <Action
+        ID="ReadYamlValue"
+        package_name="picknik_009_ur5e_config"
+        relative_file_path="objectives/calibration/board_offsets.yaml"
         key1="shelf_base_from_wall_corner"
         key2="xyz"
         key3=""
@@ -110,6 +121,13 @@
       <Action
         ID="TransformPose"
         input_pose="{wall_corner_pose}"
+        translation_xyz="{middle_rack_offset}"
+        quaternion_xyzw="0;0;1;0"
+        output_pose="{middle_shelf_pose}"
+      />
+      <Action
+        ID="TransformPose"
+        input_pose="{wall_corner_pose}"
         translation_xyz="{shelf_base_offset}"
         quaternion_xyzw="0;0;0;1"
         output_pose="{shelf_base_pose}"
@@ -144,6 +162,14 @@
         type="geometry_msgs::msg::PoseStamped"
       >
         Bottom rack reference point in world.
+      </output_port>
+      <output_port
+        name="middle_shelf_pose"
+        default="{middle_shelf_pose}"
+        type="geometry_msgs::msg::PoseStamped"
+      >
+        Middle rack reference point in world (the rack added between the top and
+        bottom ones; middle_rack_from_wall_corner).
       </output_port>
       <output_port
         name="shelf_base_pose"

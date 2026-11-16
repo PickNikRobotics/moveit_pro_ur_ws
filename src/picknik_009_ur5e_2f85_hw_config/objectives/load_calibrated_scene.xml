@@ -5,11 +5,13 @@
     (x4_2f85_objectives) sorts after the base one, so it wins on this config only. The tote
     is replaced by a four-wall bin whose pose comes from Calibrate Bin. Calibrated Bag
     shares that pose and the bin's interior dimensions with the existing 2F-85 drop logic.
-    Keep the workcell and the remaining shared scene in step with the base file.
+    Two open-top paper bags stand inside the bin, placed from the same calibrated pose.
+    The 80/20 workcell is gone from this cell, so it is not added (only removed, to clear
+    a scene loaded earlier). Keep the remaining shared scene in step with the base file.
   -->
   <BehaviorTree
     ID="Load Calibrated Scene"
-    _description="2F-85 version: loads the bin measured by Calibrate Bin, plus the calibrated shelving and fixed workcell parts. The bin pose comes from the calibrated_bin section of cell_calibration.yaml; Calibrated Bag exposes the same pose and interior dimensions to the existing 2F-85 drop logic. Publishes the scene-camera transform. Calibrate the bin before using this scene. See design_docs/calibrate_bin.md and design_docs/board_based_calibration.md."
+    _description="2F-85 version: loads the bin measured by Calibrate Bin with its two paper bags (bag_side blocks off the one not in use), plus the calibrated shelving, the table and the fixed 2F-85 cell parts. The bin pose comes from the calibrated_bin section of cell_calibration.yaml; Calibrated Bag exposes the same pose and interior dimensions to the existing 2F-85 drop logic. Publishes the scene-camera transform. Calibrate the bin before using this scene. See design_docs/calibrate_bin.md and design_docs/board_based_calibration.md."
     _favorite="false"
   >
     <Control ID="Sequence" name="TopLevelSequence" _collapsed="false">
@@ -19,6 +21,27 @@
       </Decorator>
       <Decorator ID="ForceSuccess" _collapsed="false">
         <Action ID="RemoveURDFFromScene" urdf_name="calibrated_bottom_shelf" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveURDFFromScene" urdf_name="calibrated_middle_shelf" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="top_shelf_inflation_front" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="top_shelf_inflation_bottom" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="middle_shelf_inflation_front" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="middle_shelf_inflation_bottom" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="bottom_shelf_inflation_front" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="bottom_shelf_inflation_bottom" />
       </Decorator>
       <Decorator ID="ForceSuccess" _collapsed="false">
         <Action ID="RemoveURDFFromScene" urdf_name="calibrated_bin" />
@@ -34,6 +57,36 @@
       </Decorator>
       <Decorator ID="ForceSuccess" _collapsed="false">
         <Action ID="RemoveCollisionObject" object_id="calibrated_bag_wall_ny" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="paper_bag_px_wall_px" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="paper_bag_px_wall_nx" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="paper_bag_px_wall_py" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="paper_bag_px_wall_ny" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="paper_bag_nx_wall_px" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="paper_bag_nx_wall_nx" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="paper_bag_nx_wall_py" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="paper_bag_nx_wall_ny" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="paper_bag_px_blocked" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="paper_bag_nx_blocked" />
       </Decorator>
       <Decorator ID="ForceSuccess" _collapsed="false">
         <Action ID="RemoveCollisionObject" object_id="camera_mount_plate" />
@@ -71,6 +124,7 @@
         shelf_back_pose="{shelf_back_pose}"
         top_shelf_pose="{top_shelf_pose}"
         bottom_shelf_pose="{bottom_shelf_pose}"
+        middle_shelf_pose="{middle_shelf_pose}"
         shelf_base_pose="{shelf_base_pose}"
       />
       <!--=== PLACE TOP SHELF ===-->
@@ -104,6 +158,128 @@
         marker_size="0.100000"
         pose="{bottom_shelf_pose}"
         marker_text="Bottom Shelf"
+      />
+      <!--=== PLACE MIDDLE SHELF (added 2026-11-16, between the top and bottom) ===-->
+      <Action
+        ID="AddURDF"
+        urdf_name="calibrated_middle_shelf"
+        urdf_pose="{middle_shelf_pose}"
+        package_name="picknik_009_ur5e_config"
+        urdf_file_path="description/chunky_shelf_only.urdf"
+      />
+      <Action
+        ID="VisualizePose"
+        marker_lifetime="0.000000"
+        marker_name="middle_shelf_center"
+        marker_size="0.100000"
+        pose="{middle_shelf_pose}"
+        marker_text="Middle Shelf"
+      />
+      <!--=== INFLATE EVERY RACK 1 CM ON THE FRONT AND UNDERNEATH ===-->
+      <!--The arm kept clipping the middle rack. chunky_shelf_only is a wedge in its own
+          frame: top surface at z 0 back to the wall (y -0.4254), a 31.8 mm front lip whose
+          face is at y +0.0254 (towards the robot), and an underside sloping from the lip's
+          bottom (y 0.0254, z -0.0318) down to z -0.1083 at the wall. Two 1 cm slabs per rack,
+          placed in the rack's frame so they follow calibration: one on the lip's face, down
+          to 1 cm below it, and one under the sloped underside (9.63 degrees about x). Nothing
+          is added above the top surface, so products and approaches over the board are
+          unchanged. The slab sizes and offsets come from the mesh; change both if the mesh
+          or the 1 cm changes.-->
+      <Action
+        ID="TransformPose"
+        name="TopShelfFrontInflationPose"
+        input_pose="{top_shelf_pose}"
+        translation_xyz="0;0.0304;-0.0209"
+        quaternion_xyzw="0;0;0;1"
+        output_pose="{shelf_inflation_pose}"
+      />
+      <Action
+        ID="AddCollisionBox"
+        name="AddTopShelfFrontInflation"
+        object_id="top_shelf_inflation_front"
+        dimensions="1.2192;0.01;0.0418"
+        pose="{shelf_inflation_pose}"
+        overwrite="true"
+      />
+      <Action
+        ID="TransformPose"
+        name="TopShelfBottomInflationPose"
+        input_pose="{top_shelf_pose}"
+        translation_xyz="0;-0.19916;-0.07498"
+        quaternion_xyzw="0.08395;0;0;0.99647"
+        output_pose="{shelf_inflation_pose}"
+      />
+      <Action
+        ID="AddCollisionBox"
+        name="AddTopShelfBottomInflation"
+        object_id="top_shelf_inflation_bottom"
+        dimensions="1.2192;0.4572;0.01"
+        pose="{shelf_inflation_pose}"
+        overwrite="true"
+      />
+      <Action
+        ID="TransformPose"
+        name="MiddleShelfFrontInflationPose"
+        input_pose="{middle_shelf_pose}"
+        translation_xyz="0;0.0304;-0.0209"
+        quaternion_xyzw="0;0;0;1"
+        output_pose="{shelf_inflation_pose}"
+      />
+      <Action
+        ID="AddCollisionBox"
+        name="AddMiddleShelfFrontInflation"
+        object_id="middle_shelf_inflation_front"
+        dimensions="1.2192;0.01;0.0418"
+        pose="{shelf_inflation_pose}"
+        overwrite="true"
+      />
+      <Action
+        ID="TransformPose"
+        name="MiddleShelfBottomInflationPose"
+        input_pose="{middle_shelf_pose}"
+        translation_xyz="0;-0.19916;-0.07498"
+        quaternion_xyzw="0.08395;0;0;0.99647"
+        output_pose="{shelf_inflation_pose}"
+      />
+      <Action
+        ID="AddCollisionBox"
+        name="AddMiddleShelfBottomInflation"
+        object_id="middle_shelf_inflation_bottom"
+        dimensions="1.2192;0.4572;0.01"
+        pose="{shelf_inflation_pose}"
+        overwrite="true"
+      />
+      <Action
+        ID="TransformPose"
+        name="BottomShelfFrontInflationPose"
+        input_pose="{bottom_shelf_pose}"
+        translation_xyz="0;0.0304;-0.0209"
+        quaternion_xyzw="0;0;0;1"
+        output_pose="{shelf_inflation_pose}"
+      />
+      <Action
+        ID="AddCollisionBox"
+        name="AddBottomShelfFrontInflation"
+        object_id="bottom_shelf_inflation_front"
+        dimensions="1.2192;0.01;0.0418"
+        pose="{shelf_inflation_pose}"
+        overwrite="true"
+      />
+      <Action
+        ID="TransformPose"
+        name="BottomShelfBottomInflationPose"
+        input_pose="{bottom_shelf_pose}"
+        translation_xyz="0;-0.19916;-0.07498"
+        quaternion_xyzw="0.08395;0;0;0.99647"
+        output_pose="{shelf_inflation_pose}"
+      />
+      <Action
+        ID="AddCollisionBox"
+        name="AddBottomShelfBottomInflation"
+        object_id="bottom_shelf_inflation_bottom"
+        dimensions="1.2192;0.4572;0.01"
+        pose="{shelf_inflation_pose}"
+        overwrite="true"
       />
       <!--=== PLACE SHELF BACK BOX ===-->
       <!--1.27m wide, 0.08m deep, 72" (1.8288m) tall-->
@@ -147,29 +323,6 @@
         dimensions="1.24;0.63;0.76"
         pose="{table_calibrated_pose}"
         overwrite="true"
-      />
-      <!--=== PLACE WORKCELL TOP (mounted on table, origin at front-right-bottom corner) ===-->
-      <!--Workcell occupies the middle of the 1.24m table:
-          ~16 cm gap on the operator's left (world +X), ~17 cm on the right (world -X).
-          Front face flush with the table's robot-side (+Y) edge.
-          Origin sits on the table top.
-          The mesh's local axes are rotated 90 deg from the table axes
-          (mesh +X-face = workcell right, mesh -Y-face = workcell front), so we
-          apply a +90 deg yaw (CCW about world Z) on top of the corner-offset
-          translation. Quaternion below = (0, 0, sin(45), cos(45)).-->
-      <Action
-        ID="TransformPose"
-        input_pose="{table_calibrated_pose}"
-        output_pose="{workcell_top_pose}"
-        translation_xyz="0.46;0.315;0.38"
-        quaternion_xyzw="0;0;0.7071068;0.7071068"
-      />
-      <Action
-        ID="AddURDF"
-        urdf_name="calibrated_workcell"
-        urdf_pose="{workcell_top_pose}"
-        package_name="picknik_009_ur5e_config"
-        urdf_file_path="description/workcell.urdf"
       />
       <!--=== PLACE THE 2F-85 STAND-CORNER 80/20 POLE ===-->
       <!--Touch-off placement from the actual fingertip frames, not grasp_link.
@@ -219,16 +372,25 @@
       <Control ID="Sequence" name="AddBin">
         <SubTree
           ID="Calibrated Bag"
-          bag_pose="{bin_calibrated_pose}"
-          bag_length="{bag_length}"
-          bag_width="{bag_width}"
-          bag_height="{bag_height}"
-          bag_floor_z="{bag_floor_z}"
+          bag_side="{bag_side}"
+          bag_pose="{drop_container_pose}"
+          bag_length="{drop_container_length}"
+          bag_width="{drop_container_width}"
+          bag_height="{drop_container_height}"
+          bag_floor_z="{drop_container_floor_z}"
+          bin_pose="{bin_calibrated_pose}"
+          bin_length="{bin_length}"
+          bin_width="{bin_width}"
+          bin_height="{bin_height}"
+          paper_bag_width="{paper_bag_width}"
+          paper_bag_height="{paper_bag_height}"
+          paper_wall="{paper_wall}"
+          paper_bag_cx="{paper_bag_cx}"
         />
         <Action
           ID="Script"
           name="BagWallGeometry"
-          code="t := 0.00635; ox := bag_length / 2.0 + t / 2.0; oy := bag_width / 2.0 + t / 2.0; long_wall := bag_length + 2.0 * t; nox := 0.0 - ox; noy := 0.0 - oy; ox_s := ox .. ''; nox_s := nox .. ''; oy_s := oy .. ''; noy_s := noy .. ''; t_s := t .. ''; lw_s := long_wall .. ''; w_s := bag_width .. ''; h_s := bag_height .. ''; wall_px_xyz := ox_s .. ';0;0'; wall_nx_xyz := nox_s .. ';0;0'; wall_py_xyz := '0;' .. oy_s .. ';0'; wall_ny_xyz := '0;' .. noy_s .. ';0'; wall_x_dims := t_s .. ';' .. w_s .. ';' .. h_s; wall_y_dims := lw_s .. ';' .. t_s .. ';' .. h_s"
+          code="t := 0.00635; ox := bin_length / 2.0 + t / 2.0; oy := bin_width / 2.0 + t / 2.0; long_wall := bin_length + 2.0 * t; nox := 0.0 - ox; noy := 0.0 - oy; ox_s := ox .. ''; nox_s := nox .. ''; oy_s := oy .. ''; noy_s := noy .. ''; t_s := t .. ''; lw_s := long_wall .. ''; w_s := bin_width .. ''; h_s := bin_height .. ''; wall_px_xyz := ox_s .. ';0;0'; wall_nx_xyz := nox_s .. ';0;0'; wall_py_xyz := '0;' .. oy_s .. ';0'; wall_ny_xyz := '0;' .. noy_s .. ';0'; wall_x_dims := t_s .. ';' .. w_s .. ';' .. h_s; wall_y_dims := lw_s .. ';' .. t_s .. ';' .. h_s"
         />
         <Action
           ID="CreatePoseStamped"
@@ -322,6 +484,99 @@
           pose="{bag_wall_pose}"
           overwrite="true"
         />
+        <!--Two paper bags, one against each X wall of the bin, spanning its full depth,
+            with the rest of the bin between them. Open-topped, so products can still be
+            lowered into them. See design_docs/calibrate_bin.md.-->
+        <Action
+          ID="Script"
+          name="RightPaperBagOffset"
+          code="paper_bag_ncx := 0.0 - paper_bag_cx"
+        />
+        <SubTree
+          ID="Add Calibrated Paper Bag"
+          name="AddPaperBag_px"
+          bin_pose="{bin_calibrated_pose}"
+          bag_center_x="{paper_bag_cx}"
+          bin_width="{bin_width}"
+          bin_height="{bin_height}"
+          paper_bag_width="{paper_bag_width}"
+          paper_bag_height="{paper_bag_height}"
+          paper_wall="{paper_wall}"
+          bag_id="paper_bag_px"
+        />
+        <SubTree
+          ID="Add Calibrated Paper Bag"
+          name="AddPaperBag_nx"
+          bin_pose="{bin_calibrated_pose}"
+          bag_center_x="{paper_bag_ncx}"
+          bin_width="{bin_width}"
+          bin_height="{bin_height}"
+          paper_bag_width="{paper_bag_width}"
+          paper_bag_height="{paper_bag_height}"
+          paper_wall="{paper_wall}"
+          bag_id="paper_bag_nx"
+        />
+        <!--bag_side left or right: fill the other bag with a solid box so nothing is
+            planned into it. bin leaves both open.-->
+        <Action
+          ID="Script"
+          name="UnusedPaperBagGeometry"
+          code="ub_cz := paper_bag_height / 2.0 - bin_height / 2.0; ub_cz_s := ub_cz .. ''; ub_px_s := paper_bag_cx .. ''; ub_nx_s := paper_bag_ncx .. ''; blocked_px_xyz := ub_px_s .. ';0;' .. ub_cz_s; blocked_nx_xyz := ub_nx_s .. ';0;' .. ub_cz_s; ub_w_s := paper_bag_width .. ''; ub_d_s := bin_width .. ''; ub_h_s := paper_bag_height .. ''; blocked_dims := ub_w_s .. ';' .. ub_d_s .. ';' .. ub_h_s"
+        />
+        <Decorator ID="Precondition" name="IfLeftBagBlockRight" if="bag_side == 'left'" else="SUCCESS">
+          <Control ID="Sequence" name="BlockRightPaperBag">
+            <Action
+              ID="CreatePoseStamped"
+              name="BlockedRightBagOffset"
+              reference_frame="world"
+              position_xyz="{blocked_nx_xyz}"
+              orientation_xyzw="0;0;0;1"
+              pose_stamped="{blocked_bag_offset}"
+            />
+            <Action
+              ID="TransformPoseWithPose"
+              name="BlockedRightBagPose"
+              input_pose="{blocked_bag_offset}"
+              transform_pose="{bin_calibrated_pose}"
+              output_pose="{blocked_bag_pose}"
+            />
+            <Action
+              ID="AddCollisionBox"
+              name="AddBlockedRightBag"
+              object_id="paper_bag_nx_blocked"
+              dimensions="{blocked_dims}"
+              pose="{blocked_bag_pose}"
+              overwrite="true"
+            />
+          </Control>
+        </Decorator>
+        <Decorator ID="Precondition" name="IfRightBagBlockLeft" if="bag_side == 'right'" else="SUCCESS">
+          <Control ID="Sequence" name="BlockLeftPaperBag">
+            <Action
+              ID="CreatePoseStamped"
+              name="BlockedLeftBagOffset"
+              reference_frame="world"
+              position_xyz="{blocked_px_xyz}"
+              orientation_xyzw="0;0;0;1"
+              pose_stamped="{blocked_bag_offset}"
+            />
+            <Action
+              ID="TransformPoseWithPose"
+              name="BlockedLeftBagPose"
+              input_pose="{blocked_bag_offset}"
+              transform_pose="{bin_calibrated_pose}"
+              output_pose="{blocked_bag_pose}"
+            />
+            <Action
+              ID="AddCollisionBox"
+              name="AddBlockedLeftBag"
+              object_id="paper_bag_px_blocked"
+              dimensions="{blocked_dims}"
+              pose="{blocked_bag_pose}"
+              overwrite="true"
+            />
+          </Control>
+        </Decorator>
         <Action
           ID="VisualizePose"
           marker_lifetime="0.000000"
@@ -366,6 +621,10 @@
         Bottom-shelf reference pose, worked out from the wall board and the
         offsets. Map this at the call site.
       </output_port>
+      <input_port name="bag_side" default="bin" type="std::string">
+        Which paper bag the drops go into: left or right (as seen from the robot; left is
+        world +X) fills the other bag with a solid box; bin leaves both open.
+      </input_port>
       <output_port name="bin_calibrated_pose">
         Calibrated bin reference pose in world, centred between the outer walls
         and halfway up from the table. The parent passes this through to the

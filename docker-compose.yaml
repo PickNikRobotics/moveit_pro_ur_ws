@@ -16,3 +16,9 @@ services:
       # Takes effect when the stack is started again through the moveit_pro CLI (the
       # container is recreated); `docker restart` keeps the old mounts.
       - /dev/bus/usb:/dev/bus/usb
+      # udev's stable serial names (/dev/serial/by-id/...). The privileged container
+      # gets the host's device nodes but not udev's symlinks, so without this the
+      # 2F-85's robotiq_2f85_com_port has to name a ttyUSBn that renumbers when the
+      # RS-485 bridge is replugged under a running stack. Read-only: udev owns it.
+      # See design_docs/end_effector_variants.md.
+      - /dev/serial:/dev/serial:ro

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root BTCPP_format="4" main_tree_to_execute="Get Wrist Point Cloud">
-  <BehaviorTree ID="Get Wrist Point Cloud" _description="Reads the color-registered Orbbec Gemini 305 point cloud for the 2F-85 hardware config." _favorite="false">
+  <BehaviorTree
+    ID="Get Wrist Point Cloud"
+    _description="Captures one color-registered Orbbec Gemini 305 cloud for the 2F-85 hardware config and shows it in the MoveIt Pro 3D Visualizer, replacing the previous snapshot. The cloud is placed with the wrist_orbbec transform at its own stamp, so it reflects the wrist_orbbec_mount the stack published at startup; restart after Apply Wrist Orbbec Calibration."
+    _favorite="false"
+  >
     <Control ID="Sequence" name="TopLevelSequence">
       <Action
         ID="GetPointCloud"
@@ -8,6 +12,16 @@
         message_out="{point_cloud}"
         publisher_timeout_sec="5.000000"
         topic_name="/camera/wrist_orbbec/depth_registered/points"
+      />
+      <Action ID="ClearSnapshot" name="ClearPreviousCloud" />
+      <!--use_latest_transform is off so the cloud is placed with the camera
+          transform at its own stamp, not wherever the arm is now.-->
+      <Action
+        ID="SendPointCloudToUI"
+        name="ShowWristCloud"
+        point_cloud="{point_cloud}"
+        pcd_topic="/pcd_pointcloud_captures"
+        use_latest_transform="false"
       />
     </Control>
   </BehaviorTree>

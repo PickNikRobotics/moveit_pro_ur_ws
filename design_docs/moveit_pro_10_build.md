@@ -14,9 +14,11 @@ Because the CLI is the build system now, most of what used to be workspace-side 
 
 ## Why this shape
 
-### The workspace no longer ships a `docker-compose.yaml`
+### The workspace's `docker-compose.yaml` overrides only what it needs
 
-It used to. Every `docker compose` command the CLI issues layers the workspace's `docker-compose.yaml` *on top of* `/opt/moveit_pro/docker-compose.yaml`, so a workspace could override any service's environment, mounts, or devices without forking the installed file. The template that shipped with Pro 9 pre-declared each service with an empty body as a place to hang those overrides.
+The Pro 9 template was deleted. [`docker-compose.yaml`](../docker-compose.yaml) was later re-added with only `drivers` mount overrides.
+
+The workspace used to ship the Pro 9 template. Every `docker compose` command the CLI issues layers the workspace's `docker-compose.yaml` *on top of* `/opt/moveit_pro/docker-compose.yaml`, so a workspace could override any service's environment, mounts, or devices without forking the installed file. The template that shipped with Pro 9 pre-declared each service with an empty body as a place to hang those overrides.
 
 Pro 10 renamed the service set. The Pro 9 names (`agent_bridge`, `web_ui`) are simply not defined in the installed compose file any more, so merging the old template no longer *overrides* those services — it **declares new ones**, with empty bodies. Docker Compose rejects a service that has neither an image nor a build context, and it rejects the whole project when it does, so every CLI invocation failed at parse time, before any build work started:
 
@@ -25,6 +27,8 @@ service "web_ui" has neither an image nor a build context specified: invalid com
 ```
 
 The file was deleted rather than rewritten with the Pro 10 service names. Nothing in it was ever overriding anything — all four bodies were empty — so a rewritten file would have been an empty placeholder carrying the same drift hazard forward into the next rename. MoveIt Pro's own workspace checker agrees: it flags a stale workspace compose file and offers to delete it. **If this workspace ever does need a compose override, re-add the file with only the service being overridden**, checked against the service names in the installed compose file at that time — not against a copied template.
+
+The re-added file mounts two host directories into `drivers`. The live `/dev/bus/usb` lets the ZED recover from its own resets (see [`zed_shelf_cam.md`](zed_shelf_cam.md)). `/dev/serial` provides the stable path for the 2F-85's serial port; [`end_effector_variants.md`](end_effector_variants.md) explains why that is needed. Compose appends list values such as `volumes` on top of the installed file's lists, so restate nothing from the installed file. Check every service it names against `/opt/moveit_pro/docker-compose.yaml` after each Pro upgrade. A compose-only change takes effect on the next `moveit_pro run`, with no rebuild.
 
 ### Distinct workspace directory names are load-bearing
 
