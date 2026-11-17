@@ -103,7 +103,6 @@ def generate_launch_description():
                 launch_arguments={
                     "calibration_mode": calibration_mode,
                     "launch_cameras": "false",
-                    "launch_shelf_cam": "false",
                 }.items(),
             ),
             IncludeLaunchDescription(
@@ -113,7 +112,6 @@ def generate_launch_description():
                     "launch_wrist_camera": "false",
                     "launch_wrist_orbbec": "true",
                     "wrist_orbbec_dual_color": "false",
-                    "launch_shelf_cam": "false",
                 }.items(),
             ),
         ]

@@ -5,14 +5,11 @@
 services:
   drivers:
     volumes:
-      # The host's live USB device directory, in place of the start-time /dev snapshot.
-      # When the ZED SDK resets the shelf_cam, the camera's sensor MCU (the f881 HID
-      # interface) re-enumerates under a new device number; without this the container
-      # never gets that node, the SDK's recovery fails ("MCU Permissions denied",
-      # "Recovery failed: unable to communicate with the camera"), and only a drivers
-      # restart brings the camera back. The installed file already makes drivers
-      # privileged and allows c 189:* (usb_device), so the missing node is the only
-      # obstacle. Ported from shelf_stocking_ws; see its design_docs/zed_shelf_cam.md.
+      # The host's live USB device directory, in place of the start-time /dev snapshot,
+      # so a USB device that re-enumerates under a running stack gets its new node.
+      # The installed file already makes drivers privileged and allows c 189:*
+      # (usb_device), so the missing node is the only obstacle. Relied on by the wrist
+      # camera recovery (design_docs/wrist_camera_recovery.md).
       # Takes effect when the stack is started again through the moveit_pro CLI (the
       # container is recreated); `docker restart` keeps the old mounts.
       - /dev/bus/usb:/dev/bus/usb

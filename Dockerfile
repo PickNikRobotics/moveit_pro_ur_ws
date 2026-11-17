@@ -59,40 +59,6 @@ RUN usermod -aG dialout,video ${USERNAME}
 RUN groupadd realtime && \
     usermod -a -G realtime ${USERNAME}
 
-# ZED SDK for the shelf_cam ZED 2i (design_docs/zed_shelf_cam.md). The SDK line must
-# match the zed-ros2-wrapper submodule, and its CUDA major the base image's CUDA runtime.
-# The base image ships the CUDA runtime only; the SDK's CMake config needs nvcc and the
-# cudart dev files. The installer reads the CUDA version from version.txt, which the
-# base image does not have. skip_python is load-bearing: the installer's Python step
-# pip-installs pyzed and a newer numpy over the base image's, readable by root only, which
-# breaks every rosidl Python build. /usr/local/zed is handed to the user so the SDK can
-# write the camera's factory calibration file to settings/ on first open.
-ARG ZED_SDK_URL=https://download.stereolabs.com/zedsdk/5.4.1/cu13/ubuntu24
-ARG ZED_CUDA_PACKAGE_VERSION=13-2
-# hadolint ignore=DL3008
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && \
-    apt-get install -q -y --no-install-recommends \
-      cuda-nvcc-${ZED_CUDA_PACKAGE_VERSION} \
-      cuda-cudart-dev-${ZED_CUDA_PACKAGE_VERSION} \
-      libopenblas-dev \
-      libpng-dev \
-      libgomp1 \
-      libusb-1.0-0-dev \
-      lsb-release \
-      udev \
-      wget \
-      zstd && \
-    echo "CUDA Version $(dpkg-query -W -f='${Version}' cuda-cudart-${ZED_CUDA_PACKAGE_VERSION} | cut -d- -f1)" \
-      > /usr/local/cuda/version.txt && \
-    wget -q -O /tmp/ZED_SDK_installer.run "${ZED_SDK_URL}" && \
-    chmod +x /tmp/ZED_SDK_installer.run && \
-    /tmp/ZED_SDK_installer.run -- silent skip_tools skip_cuda skip_python && \
-    rm -f /tmp/ZED_SDK_installer.run && \
-    rm -rf /usr/local/zed/resources/* && \
-    chown -R ${USER_UID}:${USER_GID} /usr/local/zed
-
 # Install additional dependencies
 # You can also add any necessary apt-get install, pip install, etc. commands at this point.
 # NOTE: The /opt/overlay_ws folder contains MoveIt Pro binary packages and the source file.

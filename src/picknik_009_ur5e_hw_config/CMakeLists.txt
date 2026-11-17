@@ -14,7 +14,6 @@ install(
 
 install(
   PROGRAMS
-    scripts/rgb_image_relay.py
     scripts/orbbec_stream_watchdog.py
     scripts/orbbec_camera_info_model_relay.py
   DESTINATION

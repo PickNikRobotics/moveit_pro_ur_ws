@@ -103,7 +103,7 @@ the color image before relying on pixel-to-3D projection.
   about a minute instead of a few seconds, and the watchdog logs the reboot. As a
   manual alternative, re-enumerating the camera through its sysfs `authorized` file
   also works, but needs root. Check `product` / `serial` in that directory first,
-  because the ZED sits on the same bus. The likely cause is the kernel `uvcvideo`
+  because other cameras can sit on the same bus. The likely cause is the kernel `uvcvideo`
   driver re-claiming the camera after every reset or node exit, while the SDK's
   libuvc backend has to take each interface back from it. That is a hypothesis.
   The V4L2 backend, which would avoid it, cannot find the camera inside the
@@ -170,6 +170,3 @@ the color image before relying on pixel-to-3D projection.
   registered cloud arrived unorganized (height 1), so pick its points by projecting
   them through the colour `camera_info`, not by pixel index. A glossy board seen at a
   grazing angle gives too noisy a cloud to measure a rack height to the millimetre.
-- **It shares a USB 3 root hub with the ZED** on the current Agent PC (they are
-  the only two devices on that bus). If either starts dropping frames, try moving
-  one of them to another controller.

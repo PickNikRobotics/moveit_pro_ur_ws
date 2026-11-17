@@ -2,11 +2,12 @@
 <root BTCPP_format="4" main_tree_to_execute="Check Camera Feeds">
   <BehaviorTree
     ID="Check Camera Feeds"
-    _description="Checks that the three Trainer cameras (scene, wrist, shelf_cam) are delivering frames: each must deliver a new color image within the timeout. Fails naming the dead camera, so a collection run stops before it records episodes with a missing view. A RealSense node whose device stopped delivering stays advertised, so this waits for a fresh frame, not for the topic. See design_docs/camera_watchdog.md."
+    _description="Checks that the two Trainer cameras (scene, wrist) are delivering frames: each must deliver a new color image within the timeout. Fails naming the dead camera, so a collection run stops before it records episodes with a missing view. A RealSense node whose device stopped delivering stays advertised, so this waits for a fresh frame, not for the topic. See design_docs/camera_watchdog.md."
     _favorite="false"
   >
     <Control ID="Sequence" name="TopLevelSequence">
-      <!--Topics match the Trainer Training Config (shelf_stocking_objectives' config/trainer/picknik_009_ur5e_hw_config.json).
+      <!--Topics match the scene and wrist cameras of the Trainer Training Config (shelf_stocking_objectives' config/trainer/picknik_009_ur5e_hw_config.json).
+          Its shelf_cam view has no camera since the ZED was removed.
           Each check waits for a NEW message, so a stalled camera fails even though its topic
           is still advertised.-->
       <Control ID="Fallback" name="CheckSceneCamera">
@@ -45,28 +46,10 @@
           <Action ID="AlwaysFailure" />
         </Control>
       </Control>
-      <Control ID="Fallback" name="CheckShelfCamera">
-        <Action
-          ID="GetImage"
-          name="GetShelfCameraFrame"
-          topic_name="/camera/shelf_cam/color/image_raw"
-          message_timeout_sec="{message_timeout_sec}"
-          publisher_timeout_sec="{message_timeout_sec}"
-          message_out="{camera_check_image}"
-        />
-        <Control ID="Sequence">
-          <Action
-            ID="LogMessage"
-            log_level="error"
-            message="Camera check: shelf_cam delivered no frame. Check the ZED and restart the drivers (design_docs/zed_shelf_cam.md)."
-          />
-          <Action ID="AlwaysFailure" />
-        </Control>
-      </Control>
       <Action
         ID="LogMessage"
         log_level="info"
-        message="Camera check: scene_camera, wrist_mounted_camera and shelf_cam are all delivering frames."
+        message="Camera check: scene_camera and wrist_mounted_camera are both delivering frames."
       />
     </Control>
   </BehaviorTree>

@@ -44,12 +44,6 @@
                  both lenses side by side, plus depth and the point cloud."
   />
   <arg
-    name="launch_shelf_cam"
-    default="true"
-    description="Whether to launch the shelf_cam ZED 2i. Needs the ZED SDK and
-                 zed_wrapper in the container (design_docs/zed_shelf_cam.md)."
-  />
-  <arg
     name="calibration_mode"
     default="false"
     description="Run the cameras at the calibration-only resolutions. Set by the
@@ -57,7 +51,7 @@
                  runs. See design_docs/board_based_calibration.md."
   />
 
-  <!-- Calibration mode raises the D415 color resolution and the ZED resolution. -->
+  <!-- Calibration mode raises the D415 color resolution. -->
   <!-- Color runs at 30 Hz so the Trainer's 10 fps divides it evenly (a D415 has
        no 10 Hz mode). Depth stays at 6 Hz: nothing records it, and it carries the
        point cloud. See design_docs/cracker_box_pick_drop_collection.md. -->
@@ -69,16 +63,6 @@
   <let
     name="d415_color_profile"
     value="1280x720x6"
-    if="$(var calibration_mode)"
-  />
-  <let
-    name="shelf_cam_params"
-    value="$(find-pkg-share picknik_009_ur5e_hw_config)/config/zed_shelf_cam.yaml"
-    unless="$(var calibration_mode)"
-  />
-  <let
-    name="shelf_cam_params"
-    value="$(find-pkg-share picknik_009_ur5e_hw_config)/config/zed_shelf_cam_calibration.yaml"
     if="$(var calibration_mode)"
   />
 
@@ -274,18 +258,4 @@
       <param name="max_recovery_grace_s" value="300.0" />
     </node>
   </group>
-
-  <!--
-    Shelf camera, a ZED 2i. pro_zed_launch.py maps its topics onto the
-    /camera/<name>/... layout the RealSense cameras use (design_docs/zed_shelf_cam.md).
-  -->
-  <include
-    file="$(find-pkg-share picknik_009_ur5e_hw_config)/launch/pro_zed_launch.py"
-    if="$(var launch_shelf_cam)"
-  >
-    <arg name="camera_name" value="shelf_cam" />
-    <arg name="camera_model" value="zed2i" />
-    <arg name="serial_number" value="34758561" />
-    <arg name="ros_params_override_path" value="$(var shelf_cam_params)" />
-  </include>
 </launch>

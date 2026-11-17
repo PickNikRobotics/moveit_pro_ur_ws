@@ -24,9 +24,3 @@
 [submodule "src/picknik_009_ur5e_config_sim/mjcf/assets/ycb_dataset"]
 	path = src/picknik_009_ur5e_config_sim/mjcf/assets/ycb_dataset
 	url = https://github.com/PickNikRobotics/YCB_Dataset.git
-[submodule "src/external_dependencies/zed-ros2-wrapper"]
-	path = src/external_dependencies/zed-ros2-wrapper
-	url = https://github.com/stereolabs/zed-ros2-wrapper.git
-[submodule "src/external_dependencies/zed-ros2-interfaces"]
-	path = src/external_dependencies/zed-ros2-interfaces
-	url = https://github.com/stereolabs/zed-ros2-interfaces.git

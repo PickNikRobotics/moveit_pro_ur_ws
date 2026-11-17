@@ -167,7 +167,3 @@ it reproduces on a workstation what v3.10.3 only does in CI.
 | `integration_test` at `colcon test` (`shelf_stocking_behaviors`, `pcl_nn_filter`, `get_graspable_grocery_objects_from_masks3d`) | gtest in a behavior package failing | Reproduce locally: `colcon build --packages-up-to <pkg> && colcon test --packages-select <pkg>` in a clean dev container, then `colcon test-result --verbose` |
 | `integration_test` at `colcon test` (other) | A real unit test is broken | Reproduce locally with the dev-container build/test commands |
 | `integration_test` missing license | Org secret access policy doesn't include this repo, OR PR is from a fork | Org Settings → Secrets → confirm `shelf_stocking_ws` is in scope |
-
-## ZED packages are skipped
-
-The `zed-ros2-wrapper` and `zed-ros2-interfaces` submodules need the Stereolabs ZED SDK and CUDA, which the CI image does not have. `colcon_build_args` in `ci.yaml` skips their packages. This works only because no workspace package declares a dependency on them: colcon refuses to skip a package that another package depends on. So the shelf_cam launch files reach `zed_wrapper` at run time without an `exec_depend` ([`zed_shelf_cam.md`](zed_shelf_cam.md)). Keep the skip list in step with the packages in those submodules.
