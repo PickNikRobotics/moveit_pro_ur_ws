@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <launch>
   <!--
-    The default launch pins both D415 roles so cameras cannot swap between boots
-    (the RealSense driver enumerates in bus order, which is not stable). The 2F
-    wrapper passes an empty scene serial while only one D415 is connected. See
-    design_docs/camera_naming.md for the naming contract these feed.
+    The scene camera is not pinned: an empty serial makes the driver open whichever
+    D415 it finds, so a replaced scene camera works without a launch edit. That is
+    only safe because the cell has exactly one D415 attached, the scene camera. A
+    second D415 would race the wrist node for the device, since the driver
+    enumerates in bus order, which is not stable; pin scene_camera_serial before
+    attaching one. See design_docs/camera_naming.md for the naming contract these feed.
 
     A serial that is not on the bus is NOT a launch failure: the driver logs
     "The requested device ... is NOT found. Will Try again." and retries forever,
@@ -16,8 +18,8 @@
 
   <arg
     name="scene_camera_serial"
-    default="141722063195"
-    description="RealSense SDK serial to assign to scene_camera. Set empty to select an available device when only one D415 is connected."
+    default=""
+    description="RealSense SDK serial to assign to scene_camera. Empty (the default) opens whichever D415 is attached, which is right only while the scene camera is the one D415 connected."
   />
   <arg
     name="launch_wrist_camera"

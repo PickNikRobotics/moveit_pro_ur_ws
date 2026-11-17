@@ -3,7 +3,7 @@
   <BehaviorTree
     ID="Get Wrist Point Cloud"
     _description="Captures one color-registered Orbbec Gemini 305 cloud for the 2F-85 hardware config and shows it in the MoveIt Pro 3D Visualizer, replacing the previous snapshot. The cloud is placed with the wrist_orbbec transform at its own stamp, so it reflects the wrist_orbbec_mount the stack published at startup; restart after Apply Wrist Orbbec Calibration."
-    _favorite="false"
+    _favorite="true"
   >
     <Control ID="Sequence" name="TopLevelSequence">
       <Action

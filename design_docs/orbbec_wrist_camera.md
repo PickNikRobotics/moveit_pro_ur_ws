@@ -75,10 +75,9 @@ the color image before relying on pixel-to-3D projection.
   D415 xacro and EPick calibration Objectives. Applying a reviewed Orbbec candidate
   writes a plain pose section, after which launch accepts the missing temporary
   marker as calibrated and still checks that the parent is `d415_mount_link`.
-- **The scene D415 selection is currently unpinned in the 2F wrapper.** That is
-  unambiguous while exactly one D415 is connected. If another RealSense device is
-  attached, pin the scene camera with its SDK serial (not the USB serial printed
-  by `lsusb`).
+- **The scene D415 is unpinned.** The 2F wrapper inherits the empty scene serial
+  from `cameras.launch.xml`, which is unambiguous because the scene camera is the
+  only D415 attached (see [`camera_naming.md`](camera_naming.md)).
 - **Default RGB-D for the 2F config, dual color remains opt-in for other runs.**
   The Orbbec include uses launch arguments rather than the driver's shipped
   `gemini305_dual_color.yaml`, because that YAML wins during parameter merging and

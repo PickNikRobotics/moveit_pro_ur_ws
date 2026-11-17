@@ -114,10 +114,6 @@ def generate_launch_description():
                     "launch_wrist_orbbec": "true",
                     "wrist_orbbec_dual_color": "false",
                     "launch_shelf_cam": "false",
-                    # The replacement scene D415 retains the scene_camera role. Empty
-                    # serial selects it while it is the only attached D415; pin its SDK
-                    # serial if more D415 devices are connected.
-                    "scene_camera_serial": "",
                 }.items(),
             ),
         ]
