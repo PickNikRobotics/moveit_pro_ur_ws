@@ -74,7 +74,11 @@ middle_rack_from_wall_corner:
   # touch, the mesh's front face being 25.4 mm in front of its origin. z: top surface set
   # with the fingertip centred on the 31.8 mm lip (+-6 mm). x: not measured by a front-face
   # touch; the mean of the top and bottom racks. A touch on the top surface would pin z.
-  xyz: "0.6677;-0.3959;-0.8719"
+  # 2026-11-17: z lowered 10.0 mm (was -0.8719). The arm grazed the rack when the model said
+  # it cleared, a pudding's planned face (stood on this board) sat about 1.5 cm above the real
+  # box in the wrist image, and the wrist Orbbec cloud put the top surface 1 to 1.7 cm below
+  # the model (noisy: a glossy board seen at a grazing angle). Not a touch-off; pin it with one.
+  xyz: "0.6677;-0.3959;-0.8819"
 
 shelf_base_from_wall_corner:
   # Geometry, measurable. Shelf base box centre from the wall's front-face top-left

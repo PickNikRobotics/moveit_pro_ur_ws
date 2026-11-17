@@ -433,6 +433,46 @@
     - wrist_2_joint
     - wrist_3_joint
     position:
+    - 0
+    - 0.6999872922897339
+    - -2.688503404656881
+    - 2.185118023549215
+    - 0.7734357553669433
+    - 0.8435170650482178
+    - 2.9130189418792725
+    velocity: []
+  multi_dof_joint_state:
+    header:
+      frame_id: ''
+      stamp:
+        nanosec: 0
+        sec: 0
+    joint_names: []
+    transforms: []
+    twist: []
+    wrench: []
+  name: Middle Shelf Start
+- description: ''
+  favorite: false
+  joint_group_names:
+  - gripper
+  - manipulator
+  joint_state:
+    effort: []
+    header:
+      frame_id: ''
+      stamp:
+        nanosec: 0
+        sec: 0
+    name:
+    - robotiq_85_left_knuckle_joint
+    - shoulder_pan_joint
+    - shoulder_lift_joint
+    - elbow_joint
+    - wrist_1_joint
+    - wrist_2_joint
+    - wrist_3_joint
+    position:
     - 0.7859140969162995
     - 0.1773827075958252
     - -2.7091499767699183
@@ -1226,12 +1266,12 @@
     - wrist_2_joint
     - wrist_3_joint
     position:
-    - -1.748667065297262
-    - -1.250926212673523
-    - 0.8652814070331019
-    - -1.2041405600360413
-    - -1.569014851246969
-    - -0.13310653368105108
+    - -1.6855133215533655
+    - -1.207640365963318
+    - 0.7406700293170374
+    - -1.1225343507579346
+    - -1.5704134146319788
+    - -0.07015401521791631
     velocity: []
   multi_dof_joint_state:
     header:

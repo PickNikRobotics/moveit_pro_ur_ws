@@ -155,6 +155,21 @@ the color image before relying on pixel-to-3D projection.
   registered cloud output. Confirm on the installed driver that image, camera
   info, cloud organization, and header frame match the projection behavior expected
   by `GetPoseFromPixelCoords` and `GetMasks3DFromMasks2D`.
+- **Its depth reads short, about 1.4% at 70 cm.** On 2026-11-17 the cloud on the
+  shelf ChArUco board, from the middle-shelf view, came out about a centimetre nearer
+  than the board face given by the colour-image calibration solve, the same in
+  repeated captures. Both calibrated board poses agree on that face, so the colour
+  solve is a fair reference for depth. Everything planned from the wrist cloud
+  therefore sits that much nearer the camera than it is. The 2F-85 pre-grasp
+  re-alignment sees it: a box face planned too near looks narrower from the
+  pre-grasp, and a clean pudding mask measured 10% under its catalog width, which is
+  why `Execute Shelf Pick` gives boxes a looser width check than the node's default
+  (see the submodule's `two_finger_shelf_approach.md`). The cause is not found
+  (depth calibration, or the depth-to-colour registration). Measure it at a second
+  distance before correcting for it, to tell an offset from a scale error. The
+  registered cloud arrived unorganized (height 1), so pick its points by projecting
+  them through the colour `camera_info`, not by pixel index. A glossy board seen at a
+  grazing angle gives too noisy a cloud to measure a rack height to the millimetre.
 - **It shares a USB 3 root hub with the ZED** on the current Agent PC (they are
   the only two devices on that bus). If either starts dropping frames, try moving
   one of them to another controller.

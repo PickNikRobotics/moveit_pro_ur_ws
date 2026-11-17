@@ -6,6 +6,9 @@
     _favorite="false"
   >
     <Control ID="Sequence" name="root">
+      <!--The commanded finger position, for recording (Trainer bags do not hold the
+          gripper command; see shelf_stocking design_docs/full_bag_recorder.md).-->
+      <Action ID="PublishString" name="PublishGripperCommand" topic="/unshelve/gripper_command" message="0.0" queue_size="10" use_best_effort="false" />
       <Action
         ID="MoveGripperAction"
         gripper_command_action_name="/robotiq_gripper_controller/gripper_cmd"
