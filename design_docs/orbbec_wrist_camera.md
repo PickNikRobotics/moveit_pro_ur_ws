@@ -15,8 +15,8 @@ It has two modes, chosen by the `wrist_orbbec_dual_color` launch arg:
 - **Dual Color Streams (the default).** Each of the two color lenses on its own
   topic, `left_color/...` and `right_color/...`. The device turns depth off in this
   preset, so there is no `depth/` or point cloud.
-- **Default preset.** One `color/image_raw` with both lenses in a single frame,
-  side by side, plus `depth/image_raw` and `depth/points`.
+- **Default preset.** One `color/image_raw`, plus `depth/image_raw` and
+  `depth/points`. The launch asks for uncompressed YUYV color; see below.
 
 A small watchdog,
 [`orbbec_stream_watchdog.py`](../src/picknik_009_ur5e_hw_config/scripts/orbbec_stream_watchdog.py),
@@ -136,10 +136,18 @@ the color image before relying on pixel-to-3D projection.
   "not found" even though it retries. Restart the stack, or stop only that node's
   `component_container` with SIGINT (the drivers launch does not shut down when it
   exits) and run the `cameras.launch.xml` Orbbec block again as the workspace user.
-- **In the Default preset the two lenses do not split at the middle of the
-  frame.** The seam is at a fixed column well right of centre, and the two sides
-  show very different views. So cropping the combined image in half is not a
-  substitute for the Dual Color Streams preset.
+- **The Default preset's color must not be MJPG, the driver's default.** With
+  MJPG, every row of `color/image_raw` arrives rotated by a fixed number of
+  columns, the same in every frame, so the image looks like two different views
+  side by side with a seam. It is one view: rolling the rows back by the seam
+  column gives a clean image. This was once read as "both lenses in one frame".
+  The seam column differs by host (well right of centre on the lab Agent PC, a
+  quarter of the width on the aarch64 `qc-ubuntu-pr`), and on `qc-ubuntu-pr` the
+  depth and point-cloud topics never appeared either. YUYV fixes both, so the
+  launch sets it, at the 1280x800 that MJPG used by default (YUYV alone defaults to
+  a smaller profile). Where in the SDK or wrapper the MJPG offset comes from is not
+  known. A Gemini pick point taken on an MJPG image lands on the wrong part of the
+  scene, so treat a 2F-85 run with a seam in the wrist image as invalid.
 - **`Failed to get right_color extrinsic` in dual color mode is harmless for the
   images.** Both lenses still stream. It only means the driver publishes no
   left-to-right transform.

@@ -40,8 +40,8 @@
     default="true"
     description="Run the Orbbec in its Dual Color Streams preset: the two color
                  lenses on their own left_color / right_color topics, with no depth
-                 or point cloud. False gives the Default preset: one color image with
-                 both lenses side by side, plus depth and the point cloud."
+                 or point cloud. False gives the Default preset: one color image, plus
+                 depth and the point cloud."
   />
   <arg
     name="calibration_mode"
@@ -224,6 +224,14 @@
         <arg name="depth_registration" value="$(var orbbec_combined)" />
         <arg name="align_target_stream" value="COLOR" />
         <arg name="enable_colored_point_cloud" value="$(var orbbec_combined)" />
+        <!-- Uncompressed color, at the resolution MJPG defaulted to. With the
+             driver's default MJPG, every row of the color image arrives rotated by a
+             fixed number of columns (it looks like two views side by side), and on
+             some hosts the depth topics never appear. See
+             design_docs/orbbec_wrist_camera.md. -->
+        <arg name="color_format" value="YUYV" />
+        <arg name="color_width" value="1280" />
+        <arg name="color_height" value="800" />
       </include>
     </group>
     <node
