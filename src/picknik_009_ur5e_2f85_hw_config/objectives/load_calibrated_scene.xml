@@ -330,30 +330,36 @@
           after checking against the real 3.5 cm finger reach, shift the pole
           3.5 cm away from the robot (-world Y). The 2F-85 points approximately
           along world -Y here. Vertically, the stand mesh's lowest point is the
-          floor reference. Fixed 2F-85 hardware assumption only. -->
+          floor reference. Fixed 2F-85 hardware assumption only.
+          2026-11-17: the pole and scene camera moved to the robot's right. X is
+          the touched-off -X position mirrored about the robot base (the stand is
+          symmetric in X); not touched off again. The right-side post is shorter,
+          1.08 m from the floor: the bottom stays on the floor reference and the
+          centre is half the height above it. -->
       <Action
         ID="CreatePoseStamped"
         reference_frame="world"
-        position_xyz="-0.269;-0.3545;-0.1125"
+        position_xyz="0.269;-0.3545;-0.265"
         orientation_xyzw="0;0;0;1"
         pose_stamped="{robot_stand_corner_pole_pose}"
       />
       <Action
         ID="AddCollisionBox"
         object_id="robot_stand_corner_pole"
-        dimensions="0.04;0.04;1.385"
+        dimensions="0.04;0.04;1.08"
         pose="{robot_stand_corner_pole_pose}"
         overwrite="true"
       />
       <!--=== ADD THE CAMERA MOUNT PLATE ON THE POLE, PROJECTING +X ===-->
-      <!--The plate is screwed to the pole's +Y/front face and projects along
-          world +X. Its 7-inch dimension runs along X; align its -X edge with
-          the pole's -X edge so the plate extends outward in +X. The fingertip
-          touch-off set its height; its thin dimension lies along world Y. -->
+      <!--The plate is screwed to the pole's +Y face (toward the robot) and projects
+          outward along world +X, away from the robot. Its 7-inch dimension runs along
+          X, with its -X edge on the pole's -X edge. Its top edge is level with the top
+          of the post, so its centre is half its height below the post top; its thin
+          dimension lies along world Y. -->
       <Action
         ID="CreatePoseStamped"
         reference_frame="world"
-        position_xyz="-0.338;-0.331325;0.0783"
+        position_xyz="0.338;-0.331325;0.252775"
         orientation_xyzw="0;0;-0.7071068;0.7071068"
         pose_stamped="{camera_pole_mount_plate_pose}"
       />
