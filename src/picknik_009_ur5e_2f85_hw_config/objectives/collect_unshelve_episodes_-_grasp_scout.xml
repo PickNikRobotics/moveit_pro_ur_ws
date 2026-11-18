@@ -17,7 +17,7 @@
       name="CollectWithGraspScout"
       _collapsed="true"
       detector="graspscout"
-      bag_side="left"
+      bag_side="right"
       record_episodes="true"
       pause_before_close="false"
     />
