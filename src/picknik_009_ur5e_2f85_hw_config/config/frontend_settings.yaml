@@ -59,6 +59,7 @@
 # Must live in the *leaf* launched config package: the loader reads
 # get_config_package()/share/config/frontend_settings.yaml and does NOT follow
 # based_on_package inheritance. Copy of picknik_009_ur5e_hw_config's; keep the two in sync.
+# picknik_009_ur5e_2f85_policy_config carries a copy of this file; keep that in sync too.
 iframeViewports:
   - name: Shelf Stocking App
     url: http://127.0.0.1:8731/shelf_stocking.html
@@ -68,3 +69,8 @@ iframeViewports:
   # Live wrist force/torque (display-only tare). Served from shelf_stocking_objectives/web.
   - name: Force Torque
     url: http://127.0.0.1:8731/force_torque.html
+  # Unshelve Product Loop (Collect Unshelve Episodes): the product being picked, the
+  # split bag dataset's two prompts and the cycle time. 2F-85 only: the EPick unshelve
+  # does not run the loop, so nothing would drive it there.
+  - name: Unshelve Episodes
+    url: http://127.0.0.1:8731/unshelve_episodes.html
