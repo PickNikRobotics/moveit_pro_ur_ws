@@ -22,6 +22,9 @@ output.log
 .pnpm-store/
 # Python bytecode cache next to the host-side scripts.
 __pycache__/
+# Qualcomm AI Hub model exports for the NPU (Collect Unshelve Episodes - Grasp Scout (NPU)),
+# exported on the board and gigabytes each; never committed.
+aihub/
 # MoveIt Pro 10 reads the workspace's own .env (GOOGLE_GEMINI_API_KEY, ...); never commit a key.
 .env
 
