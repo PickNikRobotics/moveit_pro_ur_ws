@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root
+  BTCPP_format="4"
+  main_tree_to_execute="Collect Unshelve Episodes - Grasp Scout"
+>
+  <BehaviorTree
+    ID="Collect Unshelve Episodes - Grasp Scout"
+    _description="2F-85: Collect Unshelve Episodes with the GraspScout trial server pointing at the products instead of Gemini, bagging into the left paper bag and recording into Collect Unshelve Episodes v2. Needs the pinned GraspScout trial running on this PC (checked before the first run) with the collection products enrolled under their catalog names. See src/shelf_stocking/design_docs/unshelve_collection.md."
+    _favorite="true"
+  >
+    <!--The UI does not pass Objective inputs, so the detector, bag side and
+        recording are fixed here. Only the detector differs from Collect Unshelve
+        Episodes - Left Bag: everything after the points (masks, grasps, planning,
+        execution, the drop and the episode) is the same shared pipeline.-->
+    <SubTree
+      ID="Collect Unshelve Episodes"
+      name="CollectWithGraspScout"
+      _collapsed="true"
+      detector="graspscout"
+      bag_side="left"
+      record_episodes="true"
+      pause_before_close="false"
+    />
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Collect Unshelve Episodes - Grasp Scout">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="8. VLA Data Collection" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

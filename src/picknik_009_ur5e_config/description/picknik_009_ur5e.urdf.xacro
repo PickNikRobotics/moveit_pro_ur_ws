@@ -82,6 +82,10 @@
   <!-- robotiq_2f85 only: grip force as a fraction of the 2F-85's 235 N maximum, read
        once by robotiq_driver at start-up. 0.5 is the driver's default. -->
   <xacro:arg name="robotiq_2f85_force_multiplier" default="0.5" />
+  <!-- robotiq_2f85 only: finger speed as a fraction of the 2F-85's 150 mm/s maximum, for
+       opening and closing alike, read once by robotiq_driver at start-up. 1.0 is the
+       driver's default. -->
+  <xacro:arg name="robotiq_2f85_speed_multiplier" default="1.0" />
   <xacro:arg name="epick_extension_radius" default="0.005" />
   <xacro:arg name="epick_extension_length" default="0.1" />
   <xacro:arg name="epick_suction_cup_radius" default="0.012" />
@@ -340,6 +344,7 @@
       sim_gazebo="false"
       com_port="$(arg robotiq_2f85_com_port)"
       gripper_force_multiplier="$(arg robotiq_2f85_force_multiplier)"
+      gripper_speed_multiplier="$(arg robotiq_2f85_speed_multiplier)"
     >
       <origin xyz="0 0 0" rpy="0 0 0"/>
     </xacro:robotiq_gripper>
