@@ -5,22 +5,22 @@
 >
   <BehaviorTree
     ID="Collect Unshelve Episodes - Right Bag (NPU)"
-    _description="Collect Unshelve Episodes - Right Bag for a Qualcomm Dragonwing board (iq9-1): the same Gemini collection (right paper bag, the other bag blocked off), with the pick's SAM3 segmentations run on the Hexagon NPU from a Qualcomm AI Hub export at aihub/sam3/ in this workspace (exported on the board, never committed). Fails at the first segmentation on a PC without that export; run Collect Unshelve Episodes - Right Bag there. See design_docs/qualcomm_npu_segmentation.md."
+    _description="Collect Unshelve Episodes - Right Bag for a Qualcomm Dragonwing board (iq9-1): the same Gemini collection (right paper bag, the other bag blocked off) without recording or the pause before the close, with the pick's SAM3 segmentations run on the Hexagon NPU from a Qualcomm AI Hub export at aihub/sam3/ in this workspace (exported on the board, never committed). Fails at the first segmentation on a PC without that export; run Collect Unshelve Episodes - Right Bag there. See design_docs/qualcomm_npu_segmentation.md."
     _favorite="true"
   >
     <!--Collect Unshelve Episodes - Right Bag plus the SAM3 bundle: the UI does
         not pass Objective inputs, so the model is fixed here rather than on the
         shared favourite, which must keep the vendored bundle for NVIDIA PCs.
-        record_episodes and pause_before_close mirror that favourite; keep them in
-        step. An empty sam_model_package makes the manifest a path; ~ is the
+        Unlike that favourite, recording and the pause before the close are off,
+        for trying the NPU path on the board. An empty sam_model_package makes the manifest a path; ~ is the
         Runtime user's home, where the workspace is mounted as user_ws.-->
     <SubTree
       ID="Collect Unshelve Episodes"
       name="CollectIntoRightBagOnNpu"
       _collapsed="true"
       bag_side="right"
-      record_episodes="true"
-      pause_before_close="true"
+      record_episodes="false"
+      pause_before_close="false"
       sam_model_package=""
       sam_model_bundle_manifest="~/user_ws/aihub/sam3/model.yaml"
     />
