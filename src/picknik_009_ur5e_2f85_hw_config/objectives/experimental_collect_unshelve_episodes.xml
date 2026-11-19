@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root
+  BTCPP_format="4"
+  main_tree_to_execute="Experimental Collect Unshelve Episodes"
+>
+  <BehaviorTree
+    ID="Experimental Collect Unshelve Episodes"
+    _description="Collect Unshelve Episodes - Right Bag (NPU) for trying faster picks on iq9-1: the same collection into the right bag, not recording, with the pick's SAM3 on the Hexagon NPU, but the carry goes straight to the bag without stopping over both bags (bag_view_pause 0), and only the jello and pudding are re-measured at the pre-grasp (align_at_pre_grasp false; their exemplars.yaml entries keep it on), which saves a SAM3 pass on every other product, and the product is carried without the 2 cm lift-and-weigh grasp check (check_grasp_by_weight false), so a missed grasp is only noticed at the bag, and the free-space moves are faster (velocity_scale, acceleration_scale). Needs the aihub/sam3/ export, like the NPU favourite. See design_docs/qualcomm_npu_segmentation.md."
+    _favorite="true"
+  >
+    <!--A thin call, like the NPU favourite, so the collection itself cannot
+        drift; only the settings below differ. align_at_pre_grasp off skips the
+        pre-grasp re-alignment except where exemplars.yaml asks for it (the
+        jello and pudding: about 6 mm of finger clearance a side, and planned
+        from the start view alone a pudding missed by about that much). Where a
+        re-alignment fails, abort_if_not_aligned off goes in as planned instead
+        of stopping at a breakpoint and giving up. The weight check is off
+        because it failed a jello that was held (a light product can read under
+        its threshold); without it a missed grasp goes on to the bag empty. The
+        stop over both bags is only there so a recorded policy sees both bags
+        before going to the chosen one; nothing is recorded here. The free-space
+        moves (views, approach, carry) are faster than the collection's
+        defaults; the moves at the shelf and the bag keep their own scales.
+        Raise the acceleration with care: hard acceleration while carrying a
+        product has tripped the UR's C157 shoulder protective stop.-->
+    <SubTree
+      ID="Collect Unshelve Episodes"
+      name="ExperimentalCollectIntoRightBagOnNpu"
+      _collapsed="true"
+      bag_side="right"
+      record_episodes="false"
+      pause_before_close="false"
+      align_at_pre_grasp="false"
+      check_grasp_by_weight="false"
+      abort_if_not_aligned="false"
+      bag_view_pause="0.0"
+      velocity_scale="0.8"
+      acceleration_scale="0.3"
+      sam_model_package=""
+      sam_model_bundle_manifest="~/user_ws/aihub/sam3/model.yaml"
+    />
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Experimental Collect Unshelve Episodes">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="xExperimental - Kristen" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>
