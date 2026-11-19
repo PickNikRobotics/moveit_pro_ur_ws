@@ -1,0 +1,6 @@
+sam3_npu_server:
+  ros__parameters:
+    # Must match the sam_npu_service the Objectives pass to Get SAM3 Masks.
+    service_name: /sam3_npu/segment_text
+    # Upper bound on prompts in one request; GetSam3Masks sends one.
+    max_prompts: 16

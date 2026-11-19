@@ -1,7 +1,8 @@
 # Workspace overrides, layered by the moveit_pro CLI on top of /opt/moveit_pro/docker-compose.yaml
 # (moveit_pro_docker_wrapper.get_all_compose_files adds <workspace>/docker-compose.yaml when it
-# exists). Declare only services that exist in that file, and only the keys being overridden:
+# exists). For a service the installed file has, declare only the keys being overridden:
 # compose appends list values, so restating an entry the installed file already has is an error.
+# A service of its own (sam3_npu) needs a full body; it extends the installed base service.
 services:
   drivers:
     volumes:
@@ -19,3 +20,49 @@ services:
       # RS-485 bridge is replugged under a running stack. Read-only: udev owns it.
       # See design_docs/end_effector_variants.md.
       - /dev/serial:/dev/serial:ro
+
+  # Starts the SAM3 NPU sidecar first when its profile is active; required: false keeps the Runtime
+  # starting on every other machine, where the profile is off and sam3_npu does not exist.
+  runtime:
+    depends_on:
+      sam3_npu:
+        condition: service_started
+        required: false
+
+  # SAM3 on the IQ10's Hexagon NPU, as the SegmentText service GetSam3Masks calls (the Order
+  # Fulfillment Demo (IQ10) favourite). IQ10 only: started only with the sam3_npu profile active
+  # (COMPOSE_PROFILES=sam3_npu in the shell that runs moveit_pro), because the read-only binds below
+  # are that board's FastRPC files and do not exist elsewhere. On the IQ10 only root reaches the
+  # NPU (fastrpc-rm's per-session message queues are root-only), so this runs as root with the
+  # host IPC and PID namespaces and SYS_PTRACE; no --privileged or devices are needed. The model and
+  # QAI AppBuilder are host files in SAM3_NPU_DIR. See design_docs/iq10_sam3_npu_sidecar.md.
+  sam3_npu:
+    # The image, DDS environment, host networking and workspace mount of every Pro service.
+    extends:
+      file: /opt/moveit_pro/docker-compose.yaml
+      service: base
+    profiles: ["sam3_npu"]
+    user: "0"
+    ipc: host
+    pid: host
+    cap_add:
+      - SYS_PTRACE
+    # The image entrypoint's user setup fails as root (GID clash); the start script does the ROS
+    # and DDS setup itself. $$ defers USER_WS to the container's own environment.
+    entrypoint: ["/bin/bash", "-c"]
+    command: ["exec $${USER_WS}src/sam3_npu_server/scripts/start_sam3_npu.sh"]
+    # A few retries, not forever: a wedged DSP fails every start, and each failed start can leave DSP
+    # buffers allocated (seen on iq9-1). A reboot is the fix then, not more restarts.
+    restart: on-failure:3
+    environment:
+      - SAM3_NPU_DIR=${SAM3_NPU_DIR:-${HOME}/sam3_npu}
+    volumes:
+      - /usr/lib/libcdsprpc.so:/usr/lib/libcdsprpc.so:ro
+      - /lib/libkiumd.so:/lib/libkiumd.so:ro
+      # Without liblrmc.so QNN reports "No NSP cores detected".
+      - /lib/liblrmc.so:/lib/liblrmc.so:ro
+      - /usr/lib/rfsa:/usr/lib/rfsa:ro
+      # The DSP's fastrpc_shell_unsigned lives on its own partition here.
+      - /vendor/dsp:/vendor/dsp:ro
+      # sam3_merged.bin and appbuilder/, at the same path as on the host.
+      - ${SAM3_NPU_DIR:-${HOME}/sam3_npu}:${SAM3_NPU_DIR:-${HOME}/sam3_npu}:ro

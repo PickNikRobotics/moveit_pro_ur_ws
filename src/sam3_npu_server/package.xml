@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>sam3_npu_server</name>
+  <version>0.1.0</version>
+  <description>
+    SAM3 text-prompt segmentation on the IQ10's Hexagon NPU, served as the
+    shelf_stocking_msgs
+    SegmentText service from a root sidecar container for the GetSam3Masks
+    Behavior.
+  </description>
+  <maintainer email="support@picknik.ai">MoveIt Pro User</maintainer>
+  <license>BSD-3-Clause</license>
+  <license>MIT</license>
+
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>rcl_interfaces</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>shelf_stocking_msgs</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-opencv</exec_depend>
+
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

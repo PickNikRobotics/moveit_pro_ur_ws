@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Order Fulfillment Demo (IQ10)">
+  <BehaviorTree
+    ID="Order Fulfillment Demo (IQ10)"
+    _description="Order Fulfillment Demo for the IQ10 (qc-ubuntu): the same faster, unrecorded collection into the right bag, with the same settings, but the pick's SAM3 is sent to the IQ10's NPU sidecar (the SegmentText service /sam3_npu/segment_text, run by the sam3_npu compose service, which only starts with the sam3_npu profile) instead of running in the Runtime, and a front grasp that does not plan straight in is not retried leaned forward or turned; each carry plan stops after 5 solutions, and MTC introspection is off. Fails at the first segmentation when the sidecar is not up; it never falls back to the CPU. See design_docs/iq10_sam3_npu_sidecar.md."
+    _favorite="false"
+  >
+    <!--A copy of Order Fulfillment Demo (order_fulfillment_demo.xml) and its GPU twin; keep
+        the three in step. Only the SAM3 path differs: on the IQ10 only root reaches the NPU,
+        so neither the iq9-1 AI Hub export nor the Runtime's QNN provider can be used, and
+        the segmentations go to a root sidecar over a ROS service instead. The bundle ports
+        are left on the vendored bundle; they are not read while sam_npu_service is set.
+        It also skips the lean-forward and turned retries when a front grasp does not plan
+        straight in (lean_forward, turn_cylinders), which cost several seconds a candidate
+        on the IQ10's slower CPU. In the 2026-11-19 runs a lean never planned and a turned
+        approach planned the boxed-in soup once in six tries, so a product only those
+        retries reach is now skipped. Each carry plan also stops after a few solutions
+        (carry_max_solutions; the carry's MTC task otherwise plans every candidate, and
+        grasp to bag took about 6 s longer than on the NVIDIA PC), and the pick's MTC tasks
+        keep no candidates for the Task Constructor debugger (mtc_introspection), so
+        debug a failed plan on another favourite.-->
+    <SubTree
+      ID="Collect Unshelve Episodes"
+      name="ExperimentalCollectIntoRightBagOnIq10Npu"
+      _collapsed="true"
+      bag_side="right"
+      record_episodes="false"
+      pause_before_close="false"
+      align_at_pre_grasp="false"
+      check_grasp_by_weight="false"
+      approach_max_solutions="4"
+      abort_if_not_aligned="false"
+      bag_view_pause="0.0"
+      pause_on_plan_failure="false"
+      pause_if_gentle_bag_fails="false"
+      bag_descent_timing="[{mode: time_optimal, velocity_scale_factor: 0.1, acceleration_scale_factor: 0.1, trajectory_sampling_rate: 100}]"
+      bag_retreat_timing="[{mode: time_optimal, velocity_scale_factor: 0.33, acceleration_scale_factor: 0.33, trajectory_sampling_rate: 100}]"
+      velocity_scale="1.0"
+      acceleration_scale="0.4"
+      sam_model_package="shelf_stocking_objectives"
+      sam_model_bundle_manifest="models/sam3_bundle.yaml"
+      sam_npu_service="/sam3_npu/segment_text"
+      lean_forward="false"
+      turn_cylinders="false"
+      carry_max_solutions="5"
+      mtc_introspection="false"
+    />
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Order Fulfillment Demo (IQ10)">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="xExperimental - Kristen" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>
