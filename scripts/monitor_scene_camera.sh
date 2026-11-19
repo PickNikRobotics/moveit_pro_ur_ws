@@ -20,7 +20,11 @@
 # It never restarts the drivers container (that drops arm control) and never USB-resets the
 # camera itself. It survives stack restarts. See design_docs/scene_camera_recovery.md.
 #
-# Env: CONTAINER, POLL_S, STALL_S, SETTLE_S, FRAME_WAIT_S, CALIBRATION_MODE=1 (the
+# A relaunched node's output goes to /tmp/scene_camera_relaunch.log in the container; once
+# that passes LOG_MAX_BYTES (default 50 MB) the node is stopped, so a node stuck on a dropped
+# camera cannot fill the disk even after this script has exited.
+#
+# Env: CONTAINER, POLL_S, STALL_S, SETTLE_S, FRAME_WAIT_S, LOG_MAX_BYTES, CALIBRATION_MODE=1 (the
 # calibration colour profile), SCENE_CAMERA_SERIAL (default: the launch file's default),
 # WS (workspace with cameras.launch.xml; default: this script's workspace).
 set -uo pipefail
@@ -46,6 +50,8 @@ HELPER=/tmp/${CAMERA}_monitor_helper.sh
 NODE_CMD=/tmp/${CAMERA}_node_cmdline
 FRAME_WATCH=/tmp/${CAMERA}_frame_watch.py
 LOG=/tmp/${CAMERA}_relaunch.log
+# A relaunched node is stopped once its log passes this size (see run_capped in the helper).
+LOG_MAX_BYTES="${LOG_MAX_BYTES:-50000000}"
 # The same directory from both sides: the drivers container mounts the host's
 # ~/.ros/log_moveit_pro at ~/.ros/log.
 FRAME_FILE_HOST="$HOME/.ros/log_moveit_pro/${CAMERA}_last_frame"
@@ -144,10 +150,31 @@ install_helpers() {
 source ~/.moveit-pro-bashrc >/dev/null 2>&1
 export \$(tr '\0' '\n' < /proc/\$(pgrep -f ros2_control_node | head -1)/environ \\
     | grep -E '^(CYCLONEDDS_|RMW_|ROS_DOMAIN|ROS_AUTOMATIC)' | grep -v '=\$' | xargs)
+# Run a relaunched camera node with its output in $LOG, and stop it once $LOG passes
+# $LOG_MAX_BYTES bytes. A node left holding a camera that has gone off the bus logs a
+# VIDIOC_QBUF error per frame request, tens of MB/s; with nothing watching it (this monitor
+# gone) that once filled the disk. A healthy node logs a few KB, so the cap only ever stops
+# a node that is stuck; if the monitor is still running it relaunches the camera as usual.
+run_capped() {
+    "\$@" > $LOG 2>&1 &
+    local pid=\$!
+    while kill -0 \$pid 2>/dev/null; do
+        sleep 1
+        if [ "\$(stat -c %s $LOG 2>/dev/null || echo 0)" -gt $LOG_MAX_BYTES ]; then
+            pkill -TERM -P \$pid 2>/dev/null; kill -TERM \$pid 2>/dev/null
+            sleep 2
+            pkill -KILL -P \$pid 2>/dev/null; kill -KILL \$pid 2>/dev/null
+            tail -c 1000000 $LOG > $LOG.tail && mv $LOG.tail $LOG
+            echo "[monitor_scene_camera] $LOG passed $LOG_MAX_BYTES bytes; stopped the node (kept the last 1 MB)." >> $LOG
+            break
+        fi
+    done
+    wait \$pid 2>/dev/null
+}
 case "\$1" in
-    launch) shift; exec ros2 launch picknik_009_ur5e_hw_config pro_rs_launch.py \\
-        camera_name:=$CAMERA "\$@" > $LOG 2>&1 ;;
-    node) mapfile -d '' -t cmd < $NODE_CMD; exec "\${cmd[@]}" > $LOG 2>&1 ;;
+    launch) shift; run_capped ros2 launch picknik_009_ur5e_hw_config pro_rs_launch.py \\
+        camera_name:=$CAMERA "\$@" ;;
+    node) mapfile -d '' -t cmd < $NODE_CMD; run_capped "\${cmd[@]}" ;;
     watch) shift; exec python3 $FRAME_WATCH "\$@" ;;
     call) shift; exec timeout 15 ros2 service call "\$@" ;;
 esac
