@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root
+  BTCPP_format="4"
+  main_tree_to_execute="Order Fulfillment Demo (GPU)"
+>
+  <BehaviorTree
+    ID="Order Fulfillment Demo (GPU)"
+    _description="Order Fulfillment Demo for an NVIDIA GPU PC (kristen-Thelio-Mira): the same faster, unrecorded collection into the right bag, with the same settings, but the pick's SAM3 runs from the vendored bundle (shelf_stocking_objectives models/sam3_bundle.yaml), which the NVIDIA runtime image runs on the GPU, instead of from the iq9-1 Qualcomm AI Hub export. See design_docs/qualcomm_npu_segmentation.md."
+    _favorite="true"
+  >
+    <!--A copy of Order Fulfillment Demo (order_fulfillment_demo.xml); keep the two in step.
+        Only the SAM3 bundle differs: the NPU export in aihub/sam3/ exists only on iq9-1 and
+        loads only on its QNN provider, so a GPU PC uses the vendored bundle, which ONNX
+        Runtime runs on CUDA in the NVIDIA runtime image. The bundle is named here rather
+        than left to the subtree default so the choice is visible next to the NPU copy.-->
+    <SubTree
+      ID="Collect Unshelve Episodes"
+      name="ExperimentalCollectIntoRightBagOnGpu"
+      _collapsed="true"
+      bag_side="right"
+      record_episodes="false"
+      pause_before_close="false"
+      align_at_pre_grasp="false"
+      check_grasp_by_weight="false"
+      approach_max_solutions="4"
+      abort_if_not_aligned="false"
+      bag_view_pause="0.0"
+      pause_on_plan_failure="false"
+      pause_if_gentle_bag_fails="false"
+      bag_descent_timing="[{mode: time_optimal, velocity_scale_factor: 0.1, acceleration_scale_factor: 0.1, trajectory_sampling_rate: 100}]"
+      bag_retreat_timing="[{mode: time_optimal, velocity_scale_factor: 0.33, acceleration_scale_factor: 0.33, trajectory_sampling_rate: 100}]"
+      velocity_scale="1.0"
+      acceleration_scale="0.4"
+      sam_model_package="shelf_stocking_objectives"
+      sam_model_bundle_manifest="models/sam3_bundle.yaml"
+    />
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Order Fulfillment Demo (GPU)">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="xExperimental - Kristen" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>
