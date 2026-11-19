@@ -6,7 +6,7 @@
   <BehaviorTree
     ID="Collect Unshelve Episodes - Grasp Scout"
     _description="2F-85: Collect Unshelve Episodes with the GraspScout trial server pointing at the products instead of Gemini, bagging into the right paper bag and recording into Collect Unshelve Episodes v2. Needs the pinned GraspScout trial running on this PC (checked before the first run) with the collection products enrolled under their catalog names. See src/shelf_stocking/design_docs/unshelve_collection.md."
-    _favorite="true"
+    _favorite="false"
   >
     <!--The UI does not pass Objective inputs, so the detector, bag side and
         recording are fixed here. Only the detector differs from Collect Unshelve

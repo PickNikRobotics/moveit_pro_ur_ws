@@ -87,6 +87,9 @@ the color image before relying on pixel-to-3D projection.
 - **A watchdog that reboots through the driver, not a relaunch or a USB reset.**
   See the stall note below: the driver's `reboot_device` service is the only
   recovery found that works in place, as the workspace user, without root.
+  Where the USB hub keeps resetting, `scripts/monitor_scene_camera.sh` takes
+  this job over with faster timing and stops this watchdog while it runs; see
+  [`scene_camera_recovery.md`](scene_camera_recovery.md).
 - **The `/camera` prefix is pushed in the launch file.** The upstream launch uses
   `camera_name` as both the node name and the namespace, so it cannot take
   `camera/wrist_orbbec`. A `push_ros_namespace` around the include adds it.

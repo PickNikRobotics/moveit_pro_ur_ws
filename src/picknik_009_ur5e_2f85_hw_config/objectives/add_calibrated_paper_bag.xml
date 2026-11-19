@@ -17,8 +17,12 @@
       <Action
         ID="Script"
         name="PaperBagWallGeometry"
-        code="pt := paper_wall; hx := paper_bag_width / 2.0 - pt / 2.0; hy := bin_width / 2.0 - pt / 2.0; cz := paper_bag_height / 2.0 - bin_height / 2.0; xp := bag_center_x + hx; xn := bag_center_x - hx; nhy := 0.0 - hy; xp_s := xp .. ''; xn_s := xn .. ''; cx_s := bag_center_x .. ''; hy_s := hy .. ''; nhy_s := nhy .. ''; cz_s := cz .. ''; pt_s := pt .. ''; bw_s := bin_width .. ''; pw_s := paper_bag_width .. ''; ph_s := paper_bag_height .. ''; wall_px_xyz := xp_s .. ';0;' .. cz_s; wall_nx_xyz := xn_s .. ';0;' .. cz_s; wall_py_xyz := cx_s .. ';' .. hy_s .. ';' .. cz_s; wall_ny_xyz := cx_s .. ';' .. nhy_s .. ';' .. cz_s; wall_x_dims := pt_s .. ';' .. bw_s .. ';' .. ph_s; wall_y_dims := pw_s .. ';' .. pt_s .. ';' .. ph_s; id_px := bag_id .. '_wall_px'; id_nx := bag_id .. '_wall_nx'; id_py := bag_id .. '_wall_py'; id_ny := bag_id .. '_wall_ny'"
+        code="pt := paper_wall; npt := 0.02; hx := paper_bag_width / 2.0 - pt / 2.0; hy := bin_width / 2.0 - pt / 2.0; hyn := bin_width / 2.0 - npt / 2.0; cz := paper_bag_height / 2.0 - bin_height / 2.0; xp := bag_center_x + hx; xn := bag_center_x - hx; nhy := 0.0 - hy; xp_s := xp .. ''; xn_s := xn .. ''; cx_s := bag_center_x .. ''; hyn_s := hyn .. ''; nhy_s := nhy .. ''; cz_s := cz .. ''; pt_s := pt .. ''; npt_s := npt .. ''; bw_s := bin_width .. ''; pw_s := paper_bag_width .. ''; ph_s := paper_bag_height .. ''; wall_px_xyz := xp_s .. ';0;' .. cz_s; wall_nx_xyz := xn_s .. ';0;' .. cz_s; wall_py_xyz := cx_s .. ';' .. hyn_s .. ';' .. cz_s; wall_ny_xyz := cx_s .. ';' .. nhy_s .. ';' .. cz_s; wall_x_dims := pt_s .. ';' .. bw_s .. ';' .. ph_s; wall_py_dims := pw_s .. ';' .. npt_s .. ';' .. ph_s; wall_ny_dims := pw_s .. ';' .. pt_s .. ';' .. ph_s; id_px := bag_id .. '_wall_px'; id_nx := bag_id .. '_wall_nx'; id_py := bag_id .. '_wall_py'; id_ny := bag_id .. '_wall_ny'"
       />
+      <!--The +Y wall, nearest the robot, is modelled much thicker than the paper (npt),
+          grown into the bag (its outer face stays against the bin's near wall). The wrist camera
+          grazes that wall on the way into the bag, so the planner gets a wider margin
+          there without shrinking the rest of the opening.-->
       <Action
         ID="CreatePoseStamped"
         name="PaperBagWallOffset_px"
@@ -84,7 +88,7 @@
         ID="AddCollisionBox"
         name="AddPaperBagWall_py"
         object_id="{id_py}"
-        dimensions="{wall_y_dims}"
+        dimensions="{wall_py_dims}"
         pose="{wall_pose}"
         overwrite="true"
       />
@@ -107,7 +111,7 @@
         ID="AddCollisionBox"
         name="AddPaperBagWall_ny"
         object_id="{id_ny}"
-        dimensions="{wall_y_dims}"
+        dimensions="{wall_ny_dims}"
         pose="{wall_pose}"
         overwrite="true"
       />

@@ -6,7 +6,7 @@
   <BehaviorTree
     ID="Collect Unshelve Episodes - Grasp Scout (NPU)"
     _description="Collect Unshelve Episodes - Grasp Scout for a Qualcomm Dragonwing board (iq9-1): the same collection (GraspScout trial server pointing, right paper bag, recording into Collect Unshelve Episodes v2), with the pick's SAM3 segmentations run on the Hexagon NPU from a Qualcomm AI Hub export at aihub/sam3/ in this workspace (exported on the board, never committed). Fails at the first segmentation on a PC without that export; run Collect Unshelve Episodes - Grasp Scout there. Needs the pinned GraspScout trial running on this PC. See design_docs/qualcomm_npu_segmentation.md."
-    _favorite="true"
+    _favorite="false"
   >
     <!--Collect Unshelve Episodes - Grasp Scout plus the SAM3 bundle: the UI does
         not pass Objective inputs, so the model is fixed here rather than on the

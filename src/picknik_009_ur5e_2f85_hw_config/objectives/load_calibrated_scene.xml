@@ -44,6 +44,9 @@
         <Action ID="RemoveCollisionObject" object_id="bottom_shelf_inflation_bottom" />
       </Decorator>
       <Decorator ID="ForceSuccess" _collapsed="false">
+        <Action ID="RemoveCollisionObject" object_id="bottom_rack_keepout" />
+      </Decorator>
+      <Decorator ID="ForceSuccess" _collapsed="false">
         <Action ID="RemoveURDFFromScene" urdf_name="calibrated_bin" />
       </Decorator>
       <Decorator ID="ForceSuccess" _collapsed="false">
@@ -279,6 +282,63 @@
         object_id="bottom_shelf_inflation_bottom"
         dimensions="1.2192;0.4572;0.01"
         pose="{shelf_inflation_pose}"
+        overwrite="true"
+      />
+      <!--=== KEEP OUT OF THE BOTTOM RACK ===-->
+      <!--Nothing is picked from the bottom rack on this cell. One box fills the opening
+          under the middle rack, in the bottom rack's frame: the full rack length, from the
+          wall (y -0.4254) to the front face of the lip's 1 cm inflation (y +0.0354), and
+          from the bottom board's top surface up to the bottom of the middle rack's front
+          inflation (lip 31.8 mm + 1 cm below its top surface). The height is the two
+          racks' calibrated spacing, so it follows a re-measured middle or bottom rack. A
+          grasp worked out on the bottom board, including a middle-rack product that Plan
+          Shelf Pick sorted onto the bottom rack from a low cloud centroid, then fails to
+          plan and the next candidate is tried.-->
+      <Action
+        ID="CalculatePoseOffset"
+        name="MiddleRackInBottomRack"
+        source_pose="{bottom_shelf_pose}"
+        destination_pose="{middle_shelf_pose}"
+        source_to_destination_pose="{middle_in_bottom_rack}"
+      />
+      <Action
+        ID="UnpackPoseStampedMessage"
+        pose_stamped="{middle_in_bottom_rack}"
+        pose="{middle_in_bottom_rack_pose}"
+        header="{middle_in_bottom_rack_header}"
+      />
+      <Action
+        ID="UnpackPoseMessage"
+        pose="{middle_in_bottom_rack_pose}"
+        position="{middle_in_bottom_rack_position}"
+        orientation="{middle_in_bottom_rack_orientation}"
+      />
+      <Action
+        ID="UnpackPointMessage"
+        point="{middle_in_bottom_rack_position}"
+        x="{middle_in_bottom_rack_x}"
+        y="{middle_in_bottom_rack_y}"
+        z="{rack_spacing}"
+      />
+      <Action
+        ID="Script"
+        name="BottomRackKeepoutSize"
+        code="keepout_h := rack_spacing - 0.0418; keepout_cz := keepout_h / 2.0; keepout_h_s := keepout_h .. ''; keepout_cz_s := keepout_cz .. ''; bottom_rack_keepout_dims := '1.2192;0.4608;' .. keepout_h_s; bottom_rack_keepout_xyz := '0;-0.195;' .. keepout_cz_s"
+      />
+      <Action
+        ID="TransformPose"
+        name="BottomRackKeepoutPose"
+        input_pose="{bottom_shelf_pose}"
+        translation_xyz="{bottom_rack_keepout_xyz}"
+        quaternion_xyzw="0;0;0;1"
+        output_pose="{bottom_rack_keepout_pose}"
+      />
+      <Action
+        ID="AddCollisionBox"
+        name="AddBottomRackKeepout"
+        object_id="bottom_rack_keepout"
+        dimensions="{bottom_rack_keepout_dims}"
+        pose="{bottom_rack_keepout_pose}"
         overwrite="true"
       />
       <!--=== PLACE SHELF BACK BOX ===-->
