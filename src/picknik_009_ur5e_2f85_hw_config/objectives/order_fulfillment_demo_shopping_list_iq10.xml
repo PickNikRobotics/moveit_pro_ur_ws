@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root
+  BTCPP_format="4"
+  main_tree_to_execute="Order Fulfillment Demo - Shopping List (IQ10)"
+>
+  <BehaviorTree
+    ID="Order Fulfillment Demo - Shopping List (IQ10)"
+    _description="Order Fulfillment Demo (IQ10) driven by the Shopping List pane: runs until cancelled, waiting for an order to be placed in the pane and then unshelving only what it asks for into the right bag, with the same settings as Order Fulfillment Demo (IQ10) (SAM3 on the NPU sidecar, no recording, faster moves, no breakpoints but the full bag). Each placed order is worked on once: when it is done the pane shows the order complete, when the robot cannot find or reach the rest the pane shows it stopped, and either way it waits for the next order. Restock the shelf while it waits. Needs the sam3_npu sidecar and the hardware drivers' shopping_list_server. See src/shelf_stocking/design_docs/shopping_list.md."
+    _favorite="true"
+  >
+    <!--The order is read from shelf_stocking_objectives' config/shopping_list.yaml,
+        which shopping_list_server.py rewrites on every save and pick. order_id goes
+        up on every save, so handled_order_n tells a newly placed order from the
+        one already worked on, including a resaved identical order. ReadYamlValue
+        writes a string, hence the * 1.0 before comparing.-->
+    <Control ID="Sequence" name="OrderFulfillmentWithShoppingList">
+      <Action
+        ID="Script"
+        name="NoOrderHandledYet"
+        code="handled_order_n := 0 - 1"
+      />
+      <Decorator
+        ID="RepeatUnlessFailureEachTick"
+        name="EveryOrder"
+        num_cycles="-1"
+      >
+        <Control ID="Sequence" name="OneOrder">
+          <Action
+            ID="LogMessage"
+            log_level="warn"
+            message="Order Fulfillment Demo: waiting for an order in the Shopping List pane."
+          />
+          <!--Inverter / RepeatUnlessFailureEachTick / Inverter polls until a new,
+              non-empty order is in the file.-->
+          <Decorator ID="Inverter" name="UntilOrderPlaced">
+            <Decorator ID="RepeatUnlessFailureEachTick" num_cycles="-1">
+              <Decorator ID="Inverter">
+                <Control ID="Fallback" name="NewOrderOrWait">
+                  <Control ID="Sequence" name="NewOrderPlaced">
+                    <Action
+                      ID="ReadYamlValue"
+                      name="ReadOrderId"
+                      package_name="shelf_stocking_objectives"
+                      relative_file_path="config/shopping_list.yaml"
+                      key1="order_id"
+                      key2=""
+                      key3=""
+                      key4=""
+                      key5=""
+                      value="{list_order_id}"
+                    />
+                    <Action
+                      ID="ReadYamlValue"
+                      name="ReadRemainingTotal"
+                      package_name="shelf_stocking_objectives"
+                      relative_file_path="config/shopping_list.yaml"
+                      key1="remaining_total"
+                      key2=""
+                      key3=""
+                      key4=""
+                      key5=""
+                      value="{list_remaining_total}"
+                    />
+                    <Action
+                      ID="Script"
+                      code="list_order_id_n := list_order_id * 1.0; list_remaining_total_n := list_remaining_total * 1.0"
+                    />
+                    <Decorator
+                      ID="Precondition"
+                      name="IsNewNonEmptyOrder"
+                      if="list_remaining_total_n &gt; 0 &amp;&amp; list_order_id_n != handled_order_n"
+                      else="FAILURE"
+                    >
+                      <Action ID="AlwaysSuccess" />
+                    </Decorator>
+                  </Control>
+                  <Control ID="Sequence" name="WaitAndLookAgain">
+                    <Action ID="WaitForDuration" delay_duration="1.0" />
+                    <Action ID="AlwaysFailure" />
+                  </Control>
+                </Control>
+              </Decorator>
+            </Decorator>
+          </Decorator>
+          <Action
+            ID="Script"
+            code="handled_order_n := list_order_id_n; order_message := 'Order Fulfillment Demo: filling order ' .. list_order_id .. '.'"
+          />
+          <Action ID="LogMessage" log_level="info" message="{order_message}" />
+          <!--The settings of Order Fulfillment Demo (IQ10) (order_fulfillment_demo_iq10.xml),
+              keep the two in step, with the list on. Called directly rather than
+              through Collect Unshelve Episodes, which turns the list off. A failed
+              order does not end the demo: it waits for the next one.-->
+          <Decorator ID="ForceSuccess" name="AnOrderFailingDoesNotEndTheDemo">
+            <SubTree
+              ID="Unshelve Shopping List"
+              name="FillShoppingListIntoRightBagOnIq10Npu"
+              _collapsed="true"
+              use_shopping_list="true"
+              collection_products_only="true"
+              dataset_name="Collect Unshelve Episodes v2"
+              compare_pick_proposals="false"
+              detector="gemini"
+              bag_side="right"
+              record_episodes="false"
+              pause_before_close="false"
+              align_at_pre_grasp="false"
+              check_grasp_by_weight="false"
+              approach_max_solutions="4"
+              abort_if_not_aligned="false"
+              bag_view_pause="0.0"
+              pause_on_plan_failure="false"
+              pause_if_gentle_bag_fails="false"
+              bag_descent_timing="[{mode: time_optimal, velocity_scale_factor: 0.1, acceleration_scale_factor: 0.1, trajectory_sampling_rate: 100}]"
+              bag_retreat_timing="[{mode: time_optimal, velocity_scale_factor: 0.33, acceleration_scale_factor: 0.33, trajectory_sampling_rate: 100}]"
+              velocity_scale="1.0"
+              acceleration_scale="0.4"
+              sam_model_package="shelf_stocking_objectives"
+              sam_model_bundle_manifest="models/sam3_bundle.yaml"
+              sam_npu_service="/sam3_npu/segment_text"
+              lean_forward="false"
+              turn_cylinders="false"
+              carry_max_solutions="5"
+              mtc_introspection="false"
+            />
+          </Decorator>
+          <!--With products left, tell the pane the robot gave up on this order.
+              Sent a few times, like every shopping list event.-->
+          <Decorator ID="ForceSuccess" name="ReportStoppedBestEffort">
+            <Control ID="Sequence">
+              <Action ID="WaitForDuration" delay_duration="1.0" />
+              <Action
+                ID="ReadYamlValue"
+                name="ReadRemainingAfterOrder"
+                package_name="shelf_stocking_objectives"
+                relative_file_path="config/shopping_list.yaml"
+                key1="remaining_total"
+                key2=""
+                key3=""
+                key4=""
+                key5=""
+                value="{list_remaining_total}"
+              />
+              <Action
+                ID="Script"
+                code="list_remaining_total_n := list_remaining_total * 1.0; stopped_event := list_order_id .. ''"
+              />
+              <Decorator
+                ID="Precondition"
+                name="IfOrderUnfinished"
+                if="list_remaining_total_n &gt; 0"
+                else="SUCCESS"
+              >
+                <Control ID="Sequence">
+                  <Action
+                    ID="LogMessage"
+                    log_level="warn"
+                    message="Order Fulfillment Demo: could not find or reach the rest of the order. Restock the shelf and place a new order."
+                  />
+                  <Decorator ID="RepeatUnlessFailureEachTick" num_cycles="3">
+                    <Control ID="Sequence">
+                      <Action
+                        ID="PublishString"
+                        topic="/shopping_list/stopped"
+                        message="{stopped_event}"
+                        queue_size="10"
+                        use_best_effort="false"
+                      />
+                      <Action ID="WaitForDuration" delay_duration="0.1" />
+                    </Control>
+                  </Decorator>
+                </Control>
+              </Decorator>
+            </Control>
+          </Decorator>
+        </Control>
+      </Decorator>
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Order Fulfillment Demo - Shopping List (IQ10)">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="xExperimental - Kristen" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

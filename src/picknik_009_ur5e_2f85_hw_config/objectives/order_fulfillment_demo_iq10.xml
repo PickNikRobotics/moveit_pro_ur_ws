@@ -6,7 +6,8 @@
     _favorite="false"
   >
     <!--A copy of Order Fulfillment Demo (order_fulfillment_demo.xml) and its GPU twin; keep
-        the three in step. Only the SAM3 path differs: on the IQ10 only root reaches the NPU,
+        the three in step, and Order Fulfillment Demo - Shopping List (IQ10), which runs
+        these settings with the Shopping List pane. Only the SAM3 path differs: on the IQ10 only root reaches the NPU,
         so neither the iq9-1 AI Hub export nor the Runtime's QNN provider can be used, and
         the segmentations go to a root sidecar over a ROS service instead. The bundle ports
         are left on the vendored bundle; they are not read while sam_npu_service is set.
