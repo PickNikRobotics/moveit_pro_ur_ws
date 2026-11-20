@@ -1,4 +1,10 @@
-based_on_package: "picknik_009_ur5e_config_sim"
+# Gripper-neutral UR5e 009 hardware base: the UR driver, cameras, calibration and robot
+# IP shared by every end effector. Not meant to be run on its own: run a gripper config
+# based on it, picknik_009_ur5e_vacuum_config (EPick suction) or
+# picknik_009_ur5e_2f85_hw_config (Robotiq 2F-85). It is based on the mock config, not
+# the sim, so the suction sim's Objectives and the suction-only adapters/epick library
+# stay out of the 2-finger config. See design_docs/end_effector_variants.md.
+based_on_package: "picknik_009_ur5e_config"
 
 # [Required]
 hardware:
@@ -54,37 +60,10 @@ hardware:
 
 objectives:
   objective_library_paths:
-    # The x<N>_ prefix is load-bearing: Pro 10 picks the winning file by the ALPHABETICAL order of these ids (see design_docs/objective_library_precedence.md). Keep x1 base < x2 sim < x3 hw.
+    # The x<N>_ prefix is load-bearing: Pro 10 picks the winning file by the ALPHABETICAL order of these ids (see design_docs/objective_library_precedence.md). Keep x1 base < x3 hw < x4 gripper config.
     x3_hw_objectives:
       package_name: "picknik_009_ur5e_hw_config"
       relative_path: "objectives"
 
-# Configuration for launching ros2_control processes.
-# [Required, if using ros2_control]
-ros2_control:
-  config:
-    package: "picknik_009_ur5e_hw_config"
-    path: "config/control/ros2_controllers.yaml"
-  # MoveIt Pro will load and activate these controllers at start up to ensure they are available.
-  # If not specified, it is up to the user to ensure the appropriate controllers are active and available
-  # for running the application.
-  # [Optional, default=[]]
-  controllers_active_at_startup:
-    - "force_torque_sensor_broadcaster"
-    - "epick_controller"
-    - "epick_status_publisher_controller"
-    - "joint_state_broadcaster"
-    - "policy_state_broadcaster"
-    - "io_and_status_controller"
-  # Load but do not start these controllers so they can be activated later if needed.
-  # [Optional, default=[]]
-  controllers_inactive_at_startup:
-    - "joint_trajectory_admittance_controller"
-    - "velocity_force_controller"
-    - "joint_velocity_controller"
-  # Any controllers here will not be spawned by MoveIt Pro.
-  # [Optional, default=[]]
-  controllers_not_managed: []
-  # Optionally configure remapping rules to let multiple controllers receive commands on the same topic.
-  # [Optional, default=[]]
-  controller_shared_topics: []
+# No ros2_control section: the controllers belong to the gripper, so each gripper config
+# sets its own (picknik_009_ur5e_vacuum_config, picknik_009_ur5e_2f85_hw_config).

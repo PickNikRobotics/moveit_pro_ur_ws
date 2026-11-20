@@ -1,0 +1,54 @@
+moveit_pro_ur_ws
+Copyright (c) PickNik Inc.
+
+This workspace redistributes the third-party files listed below, copied from
+their upstream sources. Each entry names the source and version, the license
+(whose text sits beside the files), and whether the files were modified.
+Files that the workspace only references through package:// (for example
+the UR5e collision meshes in ur_description) are not copies and are not
+listed; they ship with their own packages.
+
+--------------------------------------------------------------------------------
+src/picknik_009_ur5e_config_sim/mjcf/assets/ur5e_visual/*.obj
+
+  Source:   MuJoCo Menagerie, universal_robots_ur5e/assets
+            https://github.com/google-deepmind/mujoco_menagerie
+            Byte-identical to commit 370c43965323c0944b433b202aac5058b5f907a9
+  License:  BSD-3-Clause, Copyright 2018 ROS Industrial Consortium
+            (src/picknik_009_ur5e_config_sim/mjcf/assets/ur5e_visual/LICENSE)
+  Modified: no
+
+--------------------------------------------------------------------------------
+src/picknik_009_ur5e_config/description/wrist_camera_adapter/picknik_ur_camera_adapter.urdf.xacro
+src/picknik_009_ur5e_config/meshes/wrist_camera_adapter/picknik_ur5_realsense_camera_adapter_rev2.dae
+src/picknik_009_ur5e_config/meshes/wrist_camera_adapter/picknik_ur5_realsense_camera_adapter_rev2_collision.stl
+
+  Source:   picknik_accessories, descriptions/brackets/ur_realsense_camera_adapter
+            https://github.com/PickNikRobotics/picknik_accessories
+            commit 668d150a3d747524864c2f483810ec80266a5c46
+  License:  BSD-3-Clause, Copyright (c) 2024 PickNik Inc.
+            (LICENSE.picknik_accessories beside the files)
+  Modified: the xacro's mesh URIs repointed to this package (notice in the
+            file). The meshes are unmodified.
+
+--------------------------------------------------------------------------------
+src/picknik_009_ur5e_config/description/wrist_camera_adapter/realsense_d415.urdf.xacro
+
+  Source:   picknik_accessories, descriptions/sensors/realsense_d415.urdf.xacro
+            (commit as above), itself carrying Intel's realsense-ros header:
+            "License: Apache 2.0 ... Copyright(c) 2017 Intel Corporation"
+            https://github.com/IntelRealSense/realsense-ros
+  License:  Apache-2.0 (LICENSE.realsense-ros beside the file, from
+            realsense-ros commit 960306819f45006ca3f903aa046bed32c509679a)
+  Modified: the visual mesh URI points at this package's meshes/d415.stl
+            (notice in the file).
+
+--------------------------------------------------------------------------------
+src/picknik_009_ur5e_config/meshes/d415.stl
+
+  Source:   realsense-ros, realsense2_description/meshes/d415.stl
+            https://github.com/IntelRealSense/realsense-ros
+  License:  Apache-2.0, Intel Corporation
+            (src/picknik_009_ur5e_config/meshes/LICENSE.realsense-ros)
+  Modified: yes, quadric-decimated by PickNik Inc. to fit the MoveIt Pro UI's
+            per-mesh size limit. See design_docs/vendored_camera_adapter_description.md.

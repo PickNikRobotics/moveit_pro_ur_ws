@@ -6,6 +6,9 @@ Copyright(c) 2017 Intel Corporation. All Rights Reserved
 This is the URDF model for the Intel RealSense 415 camera, in its
 aluminum peripheral evaluation case.
 -->
+<!-- Copied from picknik_accessories (descriptions/sensors); the Apache-2.0 license it refers to is
+     LICENSE.realsense-ros in this directory. Modified by PickNik Inc., 2026: the visual mesh URI
+     points at this package's decimated meshes/d415.stl. See NOTICE at the workspace root. -->
 
 <robot name="realsense_d415" xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- Includes -->

@@ -9,9 +9,10 @@
     _favorite="false"
   >
     <!--The UI does not pass Objective inputs, so the detector, bag side and
-        recording are fixed here. Only the detector differs from Collect Unshelve
-        Episodes - Left Bag: everything after the points (masks, grasps, planning,
-        execution, the drop and the episode) is the same shared pipeline.-->
+        recording are fixed here. Only the detector and the pause before the close
+        differ from Collect Unshelve Episodes: everything after the points (masks,
+        grasps, planning, execution, the drop and the episode) is the same shared
+        pipeline.-->
     <SubTree
       ID="Collect Unshelve Episodes"
       name="CollectWithGraspScout"

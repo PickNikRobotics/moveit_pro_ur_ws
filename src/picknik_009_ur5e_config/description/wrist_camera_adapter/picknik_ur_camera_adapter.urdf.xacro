@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Copied from picknik_accessories (descriptions/brackets/ur_realsense_camera_adapter, BSD-3-Clause,
+     LICENSE.picknik_accessories). Modified by PickNik Inc., 2026: mesh URIs repointed to this
+     package. See NOTICE at the workspace root. -->
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:macro name="ur_realsense_camera_adapter" params="prefix parent child_camera child_tool rotation:=^|${0.0} camera_mount_pitch_offset:=^|${6.0 * pi / 180}">
 

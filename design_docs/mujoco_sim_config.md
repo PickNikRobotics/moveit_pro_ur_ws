@@ -62,7 +62,7 @@ Both the joint `range` **and** the actuator `ctrlrange` need to be set: MuJoCo c
 
 ## The calibrated bodies are generated, the products are not
 
-The tote (`calibrated_bin`), the shelving (`calibrated_top_shelf`, `calibrated_bottom_shelf`, `shelf_back`, `shelf_base` and the four flanking rows) and the two fixed cameras (`calibrated_camera`, `calibrated_shelf_cam`) come from `assets/calibrated_scene.xml`, which the package build generates from `cell_calibration.yaml` and `board_offsets.yaml`. They follow every calibration after one rebuild; never edit their poses by hand. See [`board_based_calibration.md`](board_based_calibration.md).
+The tote (`calibrated_bin`), the shelving (`calibrated_top_shelf`, `calibrated_bottom_shelf`, `shelf_back`, `shelf_base` and the four flanking rows) and the fixed scene camera (`calibrated_camera`) come from `assets/calibrated_scene.xml`, which the package build generates from `cell_calibration.yaml` and `board_offsets.yaml`. They follow every calibration after one rebuild; never edit their poses by hand. See [`board_based_calibration.md`](board_based_calibration.md).
 
 The free products are not generated. Their default poses in `assets/extra_objects.xml` and every keyframe in `keyframes.xml` are world positions laid out for the tote of an earlier calibration, so a calibration that moves the tote moves the walls around them.
 - After a calibration that moves the tote, run `scripts/check_sim_products_in_bin.py` on the installed `mjcf/scene.xml`. It settles the default state and every keyframe and lists any product that ends outside the walls.

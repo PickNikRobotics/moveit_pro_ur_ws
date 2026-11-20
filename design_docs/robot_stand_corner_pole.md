@@ -7,7 +7,7 @@ The 2F-85 hardware planning scene models the added 80/20 stand pole, which carri
 ## Why this shape
 
 - **Planning-scene primitives are enough.** The pole and its flat camera plate are fixed rectangular extrusions, so world-frame collision boxes are simpler than adding URDF geometry and do not alter the common robot model.
-- **Keep the hardware-specific change in the 2F-85 leaf.** The pole belongs to this physical setup, not to the inherited EPick or MuJoCo configuration.
+- **Keep the hardware-specific change in the 2F-85 leaf.** The pole belongs to this physical setup, not to the base config's EPick scene, which the sim and the vacuum config load.
 
 ## Notes and gotchas
 

@@ -2,7 +2,7 @@
 
 ## What it does, at a glance
 
-The EPick workcell's cross-shaped 80/20 camera rig (a vertical post with a crossbar bolted to its far side, off-center along Y) stands on the table on the world −X side of the bin (the operator's right). It is modeled as world-frame collision boxes, one per bar and clamp, added by [`Load Calibrated Scene`](../src/picknik_009_ur5e_config/objectives/load_calibrated_scene.xml) next to the table and camera mount plate. The 2F-85 has no shelf camera; its scene override omits these objects and removes their IDs during cleanup if an older scene left them behind.
+The EPick workcell's cross-shaped 80/20 camera rig (a vertical post with a crossbar bolted to its far side, off-center along Y) stands on the table on the world −X side of the bin (the operator's right). It is modeled as world-frame collision boxes, one per bar and clamp, added by the base config's [`Load Calibrated Scene`](../src/picknik_009_ur5e_config/objectives/load_calibrated_scene.xml) next to the table and camera mount plate, which the sim and the EPick vacuum config use. The 2F-85 has no shelf camera; its scene override omits these objects and removes their IDs during cleanup if an older scene left them behind.
 
 ## Why this shape
 
@@ -17,4 +17,4 @@ The EPick workcell's cross-shaped 80/20 camera rig (a vertical post with a cross
 - **One touch-off anchors everything.** The whole rig comes from a single reading: the cup touching the post's bin-side face at the cross. The crossbar and clamp are placed relative to the post using the measured bar dimensions, not separate readings. To re-measure, repeat that one touch-off and re-derive the rest using the arithmetic in the XML comment.
 - **Eyeballed gaps are not reliable.** An earlier "about 2 inches away" estimate, read off a teleop pose, put the crossbar about 1.7 cm further out than the direct contact did. Use contact, not estimated stand-off.
 - **The camera clamp is a rough bounding box.** It is one box, flush with the crossbar's shelf-side end. That is deliberate: it's conservative keep-out, not geometry to plan close against. In X/Z it is aligned to the crossbar's top, robot-side (+X) corner, so it hangs below the bar and extends away from the robot instead of overhanging toward it.
-- **Planning scene only.** The MuJoCo sim scene (`picknik_009_ur5e_config_sim/mjcf/assets/additions.xml`) does not include the rig. Sim physics won't collide with it, but sim planning will still avoid it, because `Load Calibrated Scene` is shared by both configs.
+- **Planning scene only.** The MuJoCo sim scene (`picknik_009_ur5e_config_sim/mjcf/assets/additions.xml`) does not include the rig. Sim physics won't collide with it, but sim planning will still avoid it, because the sim and the vacuum config load the same `Load Calibrated Scene`.

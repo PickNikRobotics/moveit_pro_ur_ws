@@ -46,22 +46,6 @@ scene_camera_link:
       y: 0.046716388873078579
       z: 0.80573378549459862
       w: 0.58801996185934946
-shelf_cam_camera_link:
-  header:
-    stamp:
-      sec: 1792095410
-      nanosec: 562526335
-    frame_id: world
-  pose:
-    position:
-      x: -0.5420114102838873
-      y: -0.13747300908724722
-      z: 0.6181015982565019
-    orientation:
-      x: -0.10297576876864079
-      y: 0.15613467684969964
-      z: 0.5800973368898187
-      w: 0.7927830935791248
 wrist_camera_solve_wall_board:
   header:
     stamp:

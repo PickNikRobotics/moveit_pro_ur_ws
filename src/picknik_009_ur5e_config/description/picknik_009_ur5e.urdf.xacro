@@ -172,7 +172,7 @@
     rotation="0"
   />
   <xacro:if value="${wrist_camera == 'd415'}">
-  <!-- Camera mount origin from cell_calibration.yaml; Apply Wrist Camera Calibration writes it. -->
+  <!-- D415 wrist camera mount origin from cell_calibration.yaml (wrist_camera_mount). Its calibration Objectives were removed with the EPick cell; the 2F-85 Orbbec mount is wrist_orbbec_mount. -->
   <xacro:property
     name="wrist_mount"
     value="${xacro.load_yaml('$(find picknik_009_ur5e_config)/objectives/calibration/cell_calibration.yaml')['wrist_camera_mount']['pose']}"

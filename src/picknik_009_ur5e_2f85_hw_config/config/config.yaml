@@ -46,8 +46,9 @@ objectives:
       package_name: "picknik_009_ur5e_2f85_hw_config"
       relative_path: "objectives"
     # The shelf-stocking application's 2F-85 adapter: its gripper switching subtrees and
-    # favourite wrappers. y sorts after x4, so these replace the shared EPick files of the
-    # same name. They live in the src/shelf_stocking submodule, not in this workspace.
+    # favourite wrappers (the EPick's are in adapters/epick, which this config does not
+    # load). y sorts after x4, so an adapter file would win over a same-named file in this
+    # config. They live in the src/shelf_stocking submodule, not in this workspace.
     y_shelf_stocking_robotiq_2f85:
       package_name: "shelf_stocking_objectives"
       relative_path: "adapters/robotiq_2f85"

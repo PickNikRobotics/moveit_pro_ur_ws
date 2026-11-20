@@ -16,7 +16,7 @@ populate the worldbody, materials, and visual block:
 | `assets/robot_description.xml` | UR5e + EPick + camera-adapter chain, ground plane, skybox, headlight, key/fill lights |
 | `assets/ur_stand.xml` | UR pedestal mesh and its painted-metal material |
 | `assets/additions.xml` | Table, workcell, camera mount plate, overview camera, and the materials/textures of everything below |
-| `assets/calibrated_scene.xml` | Generated at build time from `templates/calibrated_scene.xml.in`: tote, shelving and its four flanking rows, scene camera and ZED at the calibrated poses (see `mujoco_sim_config.md`) |
+| `assets/calibrated_scene.xml` | Generated at build time from `templates/calibrated_scene.xml.in`: tote, shelving and its four flanking rows, scene camera at the calibrated pose (see `mujoco_sim_config.md`) |
 | `assets/shelved_products.xml` | The decorative products on the flanking shelves, placed inside a body that follows the calibrated back wall |
 | `assets/extra_objects.xml` | Free YCB products with per-object texture maps |
 
@@ -37,7 +37,19 @@ Texture and visual-mesh files referenced by these fragments:
 The textures and OBJ meshes are vendored locally into this package (the OBJ
 meshes from the mujoco_menagerie UR5e model), copied in so that the install
 share tree is self-contained (no `<compiler texturedir>` indirection or path
-substitution).
+substitution). The OBJs are byte-identical upstream files: their BSD-3-Clause
+license sits beside them in `ur5e_visual/LICENSE`, and the source commit is
+recorded in the workspace `NOTICE`. They are copied because no package in the
+workspace ships them, and `picknik_accessories` is being retired as a source of
+robot assets.
+
+Meshes that a package in the workspace already ships are **not** copied. The UR5e
+collision STLs, the EPick body, the UR-to-Robotiq adapter and the wrist camera
+adapter's collision mesh are loaded with `package://` URIs (`ur_description`,
+`epick_description`, `robotiq_description`, `picknik_009_ur5e_config`), which
+MoveIt Pro's MuJoCo resolves through ament since 10.0. Each of those packages is
+an `exec_depend` of the sim package. A copy here would carry a second license
+obligation and silently drift from the description the planner uses.
 
 ## UR5e visual mesh strategy
 
@@ -47,8 +59,10 @@ Each UR5e link has two kinds of geom in `robot_description.xml`:
    of mujoco_menagerie OBJ meshes, one per painted region (UR-blue, joint-gray,
    link-gray, black). Materials carry small `specular`/`shininess` so the arm
    reads as polished plastic instead of flat paint.
-2. **Collision** — the original convex-hull STL exported from the URDF.
-   Single mesh, no material, `group="3"`. Untouched.
+2. **Collision** — the URDF's own collision STL, loaded from `ur_description`
+   by `package://`. Single mesh, no material, `group="3"`. MuJoCo collides
+   against its convex hull, so a link whose mesh is far from convex collides
+   more coarsely than the planner checks it.
 
 The visual OBJs are positioned with the **same `pos`/`quat` as the original
 visual STL** the link used to render. This works because both meshes derive

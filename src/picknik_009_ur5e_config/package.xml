@@ -10,6 +10,9 @@
   <maintainer email="support@picknik.ai">Henning Kayser</maintainer>
 
   <license>Proprietary</license>
+  <!-- wrist_camera_adapter (picknik_accessories), and the realsense-ros D415 macro and mesh; see NOTICE. -->
+  <license>BSD-3-Clause</license>
+  <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 

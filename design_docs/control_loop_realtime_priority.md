@@ -161,8 +161,12 @@ Worth recording so nobody re-walks it. None of these were the cause:
 ## `thread_priority`: necessary, not sufficient
 
 `controller_manager` 4.45.2 reads a `thread_priority` parameter and calls
-`realtime_tools::configure_sched_fifo()`. Set in
-`src/picknik_009_ur5e_hw_config/config/control/ros2_controllers.yaml`:
+`realtime_tools::configure_sched_fifo()`. The controllers belong to the gripper, so it is set
+in each hardware gripper leaf's controllers file:
+`src/picknik_009_ur5e_2f85_hw_config/config/control/ros2_controllers.yaml` (2F-85) and
+`src/picknik_009_ur5e_vacuum_config/config/control/ros2_controllers.yaml` (EPick). The
+gripper-neutral `picknik_009_ur5e_hw_config` has no controllers file, so a new gripper leaf
+must set it too:
 
 ```yaml
 controller_manager:

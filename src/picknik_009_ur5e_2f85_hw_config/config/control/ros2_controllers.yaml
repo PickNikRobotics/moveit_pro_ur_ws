@@ -1,4 +1,4 @@
-# Copy of picknik_009_ur5e_hw_config/config/control/ros2_controllers.yaml with the EPick
+# Copy of picknik_009_ur5e_vacuum_config/config/control/ros2_controllers.yaml with the EPick
 # controllers swapped for the Robotiq 2F-85. Keep the arm sections in step with that file.
 controller_manager:
   ros__parameters:
@@ -32,7 +32,7 @@ controller_manager:
       type: position_controllers/GripperActionController
 
 # The 2F-85 gripper, as in moveit_pro_ur_ws's ur_mock. The EPick controllers and the EPick-only
-# policy state broadcaster of picknik_009_ur5e_hw_config are left out.
+# policy state broadcaster of picknik_009_ur5e_vacuum_config are left out.
 # See design_docs/end_effector_variants.md.
 robotiq_gripper_controller:
   ros__parameters:

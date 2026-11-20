@@ -58,7 +58,7 @@
 #
 # Must live in the *leaf* launched config package: the loader reads
 # get_config_package()/share/config/frontend_settings.yaml and does NOT follow
-# based_on_package inheritance. Copy of picknik_009_ur5e_hw_config's; keep the two in sync.
+# based_on_package inheritance. Copy of picknik_009_ur5e_vacuum_config's; keep the two in sync.
 # picknik_009_ur5e_2f85_policy_config carries a copy of this file; keep that in sync too.
 iframeViewports:
   - name: Shelf Stocking App

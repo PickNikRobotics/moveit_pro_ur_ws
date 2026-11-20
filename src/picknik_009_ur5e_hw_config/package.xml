@@ -4,8 +4,10 @@
   <version>0.0.0</version>
 
   <description>
-    Hardware config inheriting Core resources from picknik_009_ur5e_config, and
-    adding hardware-specific resources such as drivers.
+    Gripper-neutral UR5e 009 hardware base, inheriting Core resources from
+    picknik_009_ur5e_config and adding the UR driver, cameras and calibration. Not run
+    on its own: picknik_009_ur5e_vacuum_config (EPick) and
+    picknik_009_ur5e_2f85_hw_config (Robotiq 2F-85) are based on it.
   </description>
 
   <maintainer email="support@picknik.ai">Henning Kayser</maintainer>
@@ -14,7 +16,7 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <!-- Required because agent_bridge.launch.xml `<include>`s
+  <!-- based_on_package parent. Also required because agent_bridge.launch.xml `<include>`s
        $(find-pkg-share picknik_009_ur5e_config)/launch/serve_custom_view_panes.launch.xml.
        Without this, an installed-only build of hw_config can ship without the
        sibling package's share dir and `ros2 launch` will fail at include time. -->
@@ -27,7 +29,6 @@
   <exec_depend>rclpy</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>std_srvs</exec_depend>
-  <exec_depend>epick_msgs</exec_depend>
   <exec_depend>python3-numpy</exec_depend>
   <exec_depend>ur_robot_driver</exec_depend>
   <!-- Required because agent_bridge.launch.xml `<include>`s

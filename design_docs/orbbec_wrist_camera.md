@@ -67,12 +67,12 @@ the color image before relying on pixel-to-3D projection.
   up, the frame is off-centre on the body, not the calibration wrong. The 2F SRDF's
   disabled self-collision pairs moved from `wrist_mounted_camera_link` to the box
   link. They were generated for the D415's wider, shorter body, so re-check them if
-  the box grows. Removing the D415 frames also leaves the hw-config objectives that
-  name them (`Test Wrist Camera Calibration`, the D415 mount conversion) unusable
-  under the 2F config. They were already unusable there, because they read D415 topics.
+  the box grows. No Objective the 2F config loads names the D415 frames: the wrist
+  D415 subtrees are in the EPick vacuum config, not the shared hw config.
 - **The Orbbec mount remains separate from the D415 mount.** `wrist_orbbec_mount`
   is consumed by the 2F driver launch; `wrist_camera_mount` remains owned by the
-  D415 xacro and EPick calibration Objectives. Applying a reviewed Orbbec candidate
+  D415 xacro (its calibration Objectives were removed with the EPick cell; see
+  [`board_based_calibration.md`](board_based_calibration.md)). Applying a reviewed Orbbec candidate
   writes a plain pose section, after which launch accepts the missing temporary
   marker as calibrated and still checks that the parent is `d415_mount_link`.
 - **The scene D415 is unpinned.** The 2F wrapper inherits the empty scene serial

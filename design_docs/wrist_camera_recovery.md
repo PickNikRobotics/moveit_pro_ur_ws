@@ -2,7 +2,7 @@
 
 ## What it does, at a glance
 
-Two host scripts for when the `wrist_mounted_camera` D415 stops publishing on hardware:
+Two host scripts for when the `wrist_mounted_camera` D415 stops publishing on hardware. That camera is the EPick cell's (`picknik_009_ur5e_vacuum_config`); the 2F-85's wrist camera is the Orbbec, whose recovery is in [`orbbec_wrist_camera.md`](orbbec_wrist_camera.md) and [`scene_camera_recovery.md`](scene_camera_recovery.md).
 
 - [`scripts/relaunch_wrist_camera.sh`](../scripts/relaunch_wrist_camera.sh) works out why the camera is down and, when a relaunch can help, restarts only the wrist `realsense2_camera_node` inside the running drivers container, without a stack restart. It reads the node's launch args from the wrist include in [`cameras.launch.xml`](../src/picknik_009_ur5e_hw_config/launch/cameras.launch.xml). `--check` only diagnoses, and its exit code says which case it found (listed in the script header). `--force` relaunches a camera that is still publishing.
 - [`scripts/monitor_wrist_camera.sh`](../scripts/monitor_wrist_camera.sh) is the long-running counterpart. It runs the shelf_stocking [`camera_watchdog.py`](../src/shelf_stocking/scripts/camera_watchdog.py) on the wrist colour topic, prints its state changes, diagnoses a stall with `--check` once the stall has lasted a short while, and relaunches the node itself when only the node is at fault. It keeps going across stack restarts.

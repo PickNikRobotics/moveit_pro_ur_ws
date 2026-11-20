@@ -2,7 +2,7 @@
 <root BTCPP_format="4" main_tree_to_execute="Load Calibrated Scene">
   <BehaviorTree
     ID="Load Calibrated Scene"
-    _description="Builds the calibrated scene from objectives/calibration/cell_calibration.yaml and board_offsets.yaml: works out the shelving and the tote from the two board poses and the offsets, places them and the fixed workcell parts in the planning scene, and publishes the scene camera and shelf_cam transforms. An offset edit counts at the next run. See design_docs/board_based_calibration.md."
+    _description="Builds the calibrated scene from objectives/calibration/cell_calibration.yaml and board_offsets.yaml: works out the shelving and the tote from the two board poses and the offsets, places them and the fixed workcell parts in the planning scene, and publishes the scene camera transform. An offset edit counts at the next run. See design_docs/board_based_calibration.md."
     _favorite="false"
   >
     <Control ID="Sequence" name="TopLevelSequence" _collapsed="false">
@@ -21,9 +21,6 @@
       </Decorator>
       <Decorator ID="ForceSuccess" _collapsed="false">
         <Action ID="RemoveURDFFromScene" urdf_name="calibrated_workcell" />
-      </Decorator>
-      <Decorator ID="ForceSuccess" _collapsed="false">
-        <Action ID="RemoveURDFFromScene" urdf_name="calibrated_shelf_cam" />
       </Decorator>
       <!--=== WORK OUT THE SHELVING FROM THE WALL BOARD AND THE OFFSETS ===-->
       <Action
@@ -249,7 +246,7 @@
         package_name="picknik_009_ur5e_config"
         urdf_file_path="description/bin_tote.urdf"
       />
-      <!--=== LOAD CALIBRATED SCENE CAMERA (from Calibrate Scene Camera From Tote Board) ===-->
+      <!--=== LOAD CALIBRATED SCENE CAMERA (saved by the removed EPick tote-board calibration) ===-->
       <Action
         ID="LoadPoseStampedFromYamlNamespace"
         file_path="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
@@ -268,31 +265,6 @@
         pose="{scene_camera_link_pose}"
         child_frame_id="scene_camera_link"
       />
-      <!--=== LOAD CALIBRATED SHELF CAM (ZED 2i, from Calibrate Shelf Cam From Wall Board) ===-->
-      <!--Optional: skipped while the shelf_cam pose file is missing, before stage c has run.-->
-      <Decorator ID="ForceSuccess" _collapsed="false">
-        <Control ID="Sequence">
-          <Action
-            ID="LoadPoseStampedFromYamlNamespace"
-            file_path="~/user_ws/src/picknik_009_ur5e_config/objectives/calibration/cell_calibration.yaml"
-            namespace="shelf_cam_camera_link"
-            output="{shelf_cam_link_pose}"
-          />
-          <Action
-            ID="PublishStaticTransform"
-            pose="{shelf_cam_link_pose}"
-            child_frame_id="shelf_cam_camera_link"
-          />
-          <!--Collision body at the same pose, like the scene camera; skipped with the transform.-->
-          <Action
-            ID="AddURDF"
-            urdf_name="calibrated_shelf_cam"
-            urdf_pose="{shelf_cam_link_pose}"
-            package_name="picknik_009_ur5e_config"
-            urdf_file_path="description/shelf_cam.urdf"
-          />
-        </Control>
-      </Decorator>
     </Control>
   </BehaviorTree>
   <TreeNodesModel>

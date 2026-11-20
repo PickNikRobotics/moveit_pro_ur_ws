@@ -86,9 +86,8 @@ def main():
     board_p, board_q = section_pose(calibration, "tote_board")
     corner = add(board_p, rotate(board_q, offset(offsets, "tote_outer_corner_in_tote_board")))
     poses["bin"] = (add(corner, offset(offsets, "tote_origin_from_outer_corner")), IDENTITY_XYZW)
-    # Fixed cameras: the stored root-link poses as they are.
-    for name in ("scene_camera_link", "shelf_cam_camera_link"):
-        poses[name] = section_pose(calibration, name)
+    # The fixed scene camera: the stored root-link pose as it is.
+    poses["scene_camera_link"] = section_pose(calibration, "scene_camera_link")
 
     values = {}
     for name, (p, q) in poses.items():

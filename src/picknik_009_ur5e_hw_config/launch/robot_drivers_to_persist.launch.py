@@ -117,14 +117,8 @@ def generate_launch_description():
         }.items(),
     )
 
-    # The Trainer Training Config records this relay's topic: the policy joint states with
-    # the EPick seal appended. Lives in the src/shelf_stocking submodule; see its
-    # design_docs/policy_suction_channel.md.
-    policy_state_seal_relay = Node(
-        package="shelf_stocking_objectives",
-        executable="policy_state_seal_relay.py",
-        name="policy_state_seal_relay",
-    )
+    # Gripper-specific drivers (the EPick seal relay, the 2F-85 Orbbec mount) are added by
+    # the gripper configs' own drivers launch files, which include this one.
 
     # Keeps the Shopping List pane's order in shelf_stocking_objectives'
     # config/shopping_list.yaml for the unshelve collections. See the submodule's
@@ -154,7 +148,6 @@ def generate_launch_description():
             ),
             base_robot_drivers_to_persist_launch,
             cameras_launch,
-            policy_state_seal_relay,
             shopping_list_server,
         ]
         + calibrated_camera_transforms()

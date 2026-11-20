@@ -583,46 +583,4 @@
         quat="0.5 0.5 -0.5 -0.5"
       />
     </body>
-
-    <!-- Shelf camera (ZED 2i): body at the shelf_cam_camera_link section of cell_calibration.yaml.
-         Camera and optical site sit at the left lens as in zed_wrapper's zed2i URDF; the box
-         matches description/shelf_cam.urdf. -->
-    <body
-      name="calibrated_shelf_cam"
-      pos="${shelf_cam_camera_link_pos}"
-      quat="${shelf_cam_camera_link_quat}"
-      gravcomp="1"
-    >
-      <geom
-        name="calibrated_shelf_cam_visual"
-        type="box"
-        size="0.01905 0.0889 0.0127"
-        pos="-0.01 0 0.015"
-        rgba="0.3 0.3 0.3 1"
-        contype="0"
-        conaffinity="0"
-        group="2"
-      />
-      <geom
-        name="calibrated_shelf_cam_collision"
-        type="box"
-        size="0.01905 0.0889 0.0127"
-        pos="-0.01 0 0.015"
-        group="3"
-      />
-      <site
-        name="shelf_cam_left_camera_optical_frame"
-        pos="-0.01 0.06 0.015"
-        quat="0.5 -0.5 0.5 -0.5"
-      />
-      <!-- Same focal length as the real camera's grab mode; the frame size is the sim's shared buffer. -->
-      <camera
-        name="shelf_cam_left_camera"
-        pos="-0.01 0.06 0.015"
-        fovy="83.94"
-        mode="fixed"
-        resolution="1280 960"
-        quat="0.5 0.5 -0.5 -0.5"
-      />
-    </body>
 </calibrated_scene>

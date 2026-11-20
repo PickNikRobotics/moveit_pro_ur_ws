@@ -1,0 +1,42 @@
+# UR5e 009 with the Robotiq EPick suction gripper on real hardware.
+# Everything gripper-neutral (UR driver, cameras, calibration, robot IP) comes from
+# picknik_009_ur5e_hw_config; this config adds only what is suction-specific.
+# See design_docs/end_effector_variants.md.
+based_on_package: "picknik_009_ur5e_hw_config"
+
+hardware:
+  # The gripper-neutral drivers launch plus the EPick seal relay.
+  additional_driver_launch_file:
+    package: "picknik_009_ur5e_vacuum_config"
+    path: "launch/robot_drivers_to_persist.launch.py"
+
+objectives:
+  objective_library_paths:
+    # Suction-only Objectives shared with the suction sim. The id sorts before the
+    # robot libraries (x...), so this config's own same-named files (for example
+    # Check Epick Grasp Status) win. See design_docs/objective_library_precedence.md.
+    w_shelf_stocking_epick:
+      package_name: "shelf_stocking_objectives"
+      relative_path: "adapters/epick"
+    # Must sort after x3_hw_objectives.
+    x4_vacuum_objectives:
+      package_name: "picknik_009_ur5e_vacuum_config"
+      relative_path: "objectives"
+
+ros2_control:
+  config:
+    package: "picknik_009_ur5e_vacuum_config"
+    path: "config/control/ros2_controllers.yaml"
+  controllers_active_at_startup:
+    - "force_torque_sensor_broadcaster"
+    - "epick_controller"
+    - "epick_status_publisher_controller"
+    - "joint_state_broadcaster"
+    - "policy_state_broadcaster"
+    - "io_and_status_controller"
+  controllers_inactive_at_startup:
+    - "joint_trajectory_admittance_controller"
+    - "velocity_force_controller"
+    - "joint_velocity_controller"
+  controllers_not_managed: []
+  controller_shared_topics: []

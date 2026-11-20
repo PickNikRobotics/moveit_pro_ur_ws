@@ -11,20 +11,21 @@
   </option>
 
   <asset>
-    <!-- Convex-hull collision STLs (also used as visuals on non-UR5e parts). -->
-    <mesh name="base" file="base.stl" />
-    <mesh name="shoulder" file="shoulder.stl" />
-    <mesh name="upperarm" file="upperarm.stl" />
-    <mesh name="forearm" file="forearm.stl" />
-    <mesh name="wrist1" file="wrist1.stl" />
-    <mesh name="wrist2" file="wrist2.stl" />
-    <mesh name="wrist3" file="wrist3.stl" />
+    <!-- Collision STLs (also used as visuals on non-UR5e parts), loaded with package:// from the
+         description packages that ship them rather than copied here. -->
+    <mesh name="base" file="package://ur_description/meshes/ur5e/collision/base.stl" />
+    <mesh name="shoulder" file="package://ur_description/meshes/ur5e/collision/shoulder.stl" />
+    <mesh name="upperarm" file="package://ur_description/meshes/ur5e/collision/upperarm.stl" />
+    <mesh name="forearm" file="package://ur_description/meshes/ur5e/collision/forearm.stl" />
+    <mesh name="wrist1" file="package://ur_description/meshes/ur5e/collision/wrist1.stl" />
+    <mesh name="wrist2" file="package://ur_description/meshes/ur5e/collision/wrist2.stl" />
+    <mesh name="wrist3" file="package://ur_description/meshes/ur5e/collision/wrist3.stl" />
     <mesh
       name="picknik_ur5_realsense_camera_adapter_rev2_collision"
-      file="picknik_ur5_realsense_camera_adapter_rev2_collision.stl"
+      file="package://picknik_009_ur5e_config/meshes/wrist_camera_adapter/picknik_ur5_realsense_camera_adapter_rev2_collision.stl"
     />
-    <mesh name="ur_to_robotiq_adapter" file="ur_to_robotiq_adapter.stl" />
-    <mesh name="epick_body" file="epick_body.stl" scale="0.001 0.001 0.001" />
+    <mesh name="ur_to_robotiq_adapter" file="package://robotiq_description/meshes/collision/2f_85/ur_to_robotiq_adapter.stl" />
+    <mesh name="epick_body" file="package://epick_description/meshes/visual/epick_body.stl" scale="0.001 0.001 0.001" />
 
     <!--
       mujoco_menagerie split-by-color visual meshes for the UR5e (vendored

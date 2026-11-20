@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<package format="3">
+  <name>picknik_009_ur5e_vacuum_config</name>
+  <version>0.0.0</version>
+
+  <description>
+    UR5e 009 hardware config with the Robotiq EPick suction gripper. Based on the
+    gripper-neutral picknik_009_ur5e_hw_config; adds the EPick controllers, the EPick
+    seal relay and the suction-only Objectives (the shelf_stocking adapters/epick
+    library). See design_docs/end_effector_variants.md.
+  </description>
+
+  <maintainer email="support@picknik.ai">Henning Kayser</maintainer>
+
+  <license>Proprietary</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- based_on_package parent; its drivers launch is included by this one. -->
+  <exec_depend>picknik_009_ur5e_hw_config</exec_depend>
+  <!-- adapters/epick Objective library and the policy_state_seal_relay node. -->
+  <exec_depend>shelf_stocking_objectives</exec_depend>
+  <exec_depend>epick_msgs</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_cmake_lint_cmake</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

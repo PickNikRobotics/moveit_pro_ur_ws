@@ -20,7 +20,13 @@ hardware:
 
 objectives:
   objective_library_paths:
-    # The x<N>_ prefix is load-bearing: Pro 10 picks the winning file by the ALPHABETICAL order of these ids (see design_docs/objective_library_precedence.md). Keep x1 base < x2 sim < x3 hw.
+    # The sim is a suction (EPick) sim, so it loads the suction-only Objectives, as
+    # picknik_009_ur5e_vacuum_config does. The id sorts before x2, so the sim's own
+    # same-named files (Check Epick Grasp Status) win.
+    w_shelf_stocking_epick:
+      package_name: "shelf_stocking_objectives"
+      relative_path: "adapters/epick"
+    # The x<N>_ prefix is load-bearing: Pro 10 picks the winning file by the ALPHABETICAL order of these ids (see design_docs/objective_library_precedence.md). Keep x1 base < x2 sim.
     x2_sim_objectives:
       package_name: "picknik_009_ur5e_config_sim"
       relative_path: "objectives"

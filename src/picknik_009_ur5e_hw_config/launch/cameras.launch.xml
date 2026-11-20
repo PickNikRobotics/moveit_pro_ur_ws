@@ -46,15 +46,16 @@
   <arg
     name="calibration_mode"
     default="false"
-    description="Run the cameras at the calibration-only resolutions. Set by the
-                 picknik_009_ur5e_hw_calibration_config package, never by normal
-                 runs. See design_docs/board_based_calibration.md."
+    description="Run the cameras at the calibration-only resolutions. This default is
+                 never used: the drivers launch passes its own calibration_mode, which
+                 is turned on by hand for a calibration session only. See
+                 design_docs/board_based_calibration.md."
   />
 
   <!-- Calibration mode raises the D415 color resolution. -->
   <!-- Color runs at 30 Hz so the Trainer's 10 fps divides it evenly (a D415 has
        no 10 Hz mode). Depth stays at 6 Hz: nothing records it, and it carries the
-       point cloud. See design_docs/cracker_box_pick_drop_collection.md. -->
+       point cloud. See src/shelf_stocking/design_docs/vla_training_pipeline.md. -->
   <let
     name="d415_color_profile"
     value="640x480x30"
