@@ -206,7 +206,7 @@
         file="$(find-pkg-share orbbec_camera)/launch/gemini305.launch.py"
       >
         <arg name="camera_name" value="wrist_orbbec" />
-        <arg name="serial_number" value="CV2F861000X6" />
+        <arg name="serial_number" value="CV2A96100136" />
         <!-- Load-bearing. Include args and declared defaults leak into later
              siblings, and the upstream launch reads every arg it declares from the
              launch context, so it inherits the D415 blocks' device_type=D415. With

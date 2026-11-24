@@ -20,10 +20,9 @@ hardware:
       - end_effector: "robotiq_2f85"
       # Real robotiq_driver. Set "true" to run the fingers on mock hardware with the real arm.
       - gripper_use_fake_hardware: "false"
-      # The Robotiq USB-RS485 bridge on the Agent PC, as for the EPick. Not the UR tool port.
-      # By serial number, so it survives the bridge renumbering to ttyUSB1; needs the
-      # /dev/serial mount in the workspace docker-compose.yaml. Change it if the bridge is swapped.
-      - robotiq_2f85_com_port: "/dev/serial/by-id/usb-FTDI_USB_TO_RS-485_DA61OIR8-if00-port0"
+      # The UR wrist tool port: the pseudo-terminal that ur_tool_comms.launch.xml bridges
+      # to the robot. Must match tool_device_name in picknik_009_ur5e.urdf.xacro.
+      - robotiq_2f85_com_port: "/tmp/ttyUR"
       # Grip force, as a fraction of the 2F-85's 235 N maximum (the driver's default is 0.5).
       # Raised for unshelving: a mustard bottle slipped out at 0.5. 0.8 held everything but
       # squeezed harder than wanted, so it is 20% lower; still above the 0.5 that let the
