@@ -34,3 +34,5 @@ computer_setup/
 design_docs/rtpc_time_sync.md
 CLAUDE.md
 **/CLAUDE.md
+# Orbbec SDK logs written to CWD when the wrist camera driver starts.
+/Log/
