@@ -3,22 +3,9 @@
 # fails on a list or a map. See design_docs/board_based_calibration.md.
 
 wall_corner_in_wall_board:
-  # MEASURE ON THE CELL, board on the back wall. The wall's front-face top-left corner
-  # (seen from the robot) in the board frame: x = -a, y = -b, z = +t.
-  # a, b: wall left / top edge to the pattern's black edge. t: wall face to pattern face,
-  # the print thickness (board mounted directly on the wall).
-  # 2026-10-16: NOT the measured value. The operator's measurement ("-0.544;-0.600;0.0006")
-  # put the wall, both racks and the shelf base 45 mm low and 16 mm nearer the robot than
-  # the AprilTag poses placing had used for months, and places hit the rack. This value is
-  # fitted so all four land back on those AprilTag poses (top_shelf_pose.yaml etc., removed
-  # in ff08116) to within 0.1 mm. Re-measure a, b and t before trusting a fresh value; the
-  # 16 mm in z (off the wall face) is not physical and says the measurement, the board
-  # solve or the old poses are off, not which. See design_docs/board_based_calibration.md.
-  # 2026-10-16, later: then touched off on the cell, from the cup lip (epick_tip, 5 mm past
-  # grasp_link). With the lip pressed against the top rack's front face, centred on it top to
-  # bottom and at its right end (seen from the robot), the model's front face, face centre
-  # and right end were moved onto it, all four poses together. A fit, not a tape measurement.
-  xyz: "-0.5605;-0.6693;0.0429"
+  # MEASURE ON THE CELL: the wall's front-face top-left corner (seen from the robot) in the
+  # board frame, x = -a, y = -b, z = +t. NRF 2027 cell: see docs/AGENT_COMMENTS.md.
+  xyz: "-0.443;-0.543;0.0429"
 
 tote_outer_corner_in_tote_board:
   # MEASURE ON THE CELL, tote board in the tote. The tote's outer corner (world +x and robot
@@ -40,45 +27,19 @@ wall_center_from_wall_corner:
   xyz: "0.635;0.04;-0.9144"
 
 top_rack_from_wall_corner:
-  # Geometry, measurable. Top rack reference point (chunky_shelf_only.urdf origin:
-  # centre in x, top surface, behind the front lip) from the wall's front-face
-  # top-left corner, world-aligned wall frame. Default: current calibration.
-  # 2026-10-20: z lowered 22.0 mm (was -0.436). Touch-off: 4 cm cup laid flat on the top
-  # surface near the right end, surface = epick_tip z minus the cup radius. The front-face
-  # fit had left the top surface high, because the mesh's front lip is taller than the
-  # real one. See design_docs/board_based_calibration.md.
-  # 2026-10-20: x moved +25.4 mm (was 0.6313) with the mesh cut from 50" to the real 48",
-  # keeping the right end where the front-face touch-off put it. Left end not touched off.
-  xyz: "0.6567;-0.4135;-0.458"
+  # Geometry: top rack chunky_shelf_only.urdf origin from the wall corner, world-aligned
+  # wall frame. NRF 2027 cell: moved with the middle rack, not measured.
+  xyz: "0.6276;-0.4052;-0.4161"
 
 bottom_rack_from_wall_corner:
-  # Geometry, measurable. Bottom rack reference point (chunky_shelf_only.urdf
-  # origin) from the wall's front-face top-left corner, world-aligned wall frame.
-  # Default: current calibration.
-  # 2026-10-20: z lowered 11.0 mm in all (was -1.2678). Set to a cup-lip (epick_tip)
-  # touch on the top surface at the RIGHT front corner (seen from the robot), bellows
-  # compressed. The real rack slopes along x: the left front corner touched 19 mm lower.
-  # The level model sits on the high end on purpose, so the place descent stops on force
-  # at the low end. Set to the low end (-1.2980), places on the right half pressed into
-  # the shelf and the push into the shelf aborted on goal tolerance.
-  # 2026-10-20: x moved +39.9 mm (was 0.6387) with the mesh cut to the real 48" rack: centred
-  # between the cup-centre touches at the left (-0.6456) and right (0.5440) front corners.
-  xyz: "0.6786;-0.3865;-1.2788"
+  # Geometry: bottom rack chunky_shelf_only.urdf origin from the wall corner, world-aligned
+  # wall frame. NRF 2027 cell: moved with the middle rack, not measured.
+  xyz: "0.6495;-0.3782;-1.2369"
 
 middle_rack_from_wall_corner:
-  # Geometry, measurable. Middle rack reference point (chunky_shelf_only.urdf origin), the
-  # rack added between the top and bottom ones, from the wall's front-face top-left corner,
-  # world-aligned wall frame.
-  # 2026-11-16: 2F-85 fingertip touch on the front face of the lip (front-most fingertip
-  # collision-mesh point y 0.5325, contact z 0.176..0.196 in world). y: front face at the
-  # touch, the mesh's front face being 25.4 mm in front of its origin. z: top surface set
-  # with the fingertip centred on the 31.8 mm lip (+-6 mm). x: not measured by a front-face
-  # touch; the mean of the top and bottom racks. A touch on the top surface would pin z.
-  # 2026-11-17: z lowered 10.0 mm (was -0.8719). The arm grazed the rack when the model said
-  # it cleared, a pudding's planned face (stood on this board) sat about 1.5 cm above the real
-  # box in the wrist image, and the wrist Orbbec cloud put the top surface 1 to 1.7 cm below
-  # the model (noisy: a glossy board seen at a grazing angle). Not a touch-off; pin it with one.
-  xyz: "0.6677;-0.3959;-0.8819"
+  # Geometry: middle rack chunky_shelf_only.urdf origin from the wall corner, world-aligned
+  # wall frame (+x right, +y into the wall, +z up). NRF 2027 cell: tape-measured.
+  xyz: "0.6386;-0.3876;-0.84"
 
 shelf_base_from_wall_corner:
   # Geometry, measurable. Shelf base box centre from the wall's front-face top-left
